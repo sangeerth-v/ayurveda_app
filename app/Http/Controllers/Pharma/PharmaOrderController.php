@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Http\Controllers\Pharma;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class PharmaOrderController extends Controller
+{
+    //
+}
