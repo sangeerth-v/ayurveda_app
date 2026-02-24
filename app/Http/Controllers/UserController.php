@@ -32,13 +32,29 @@ class UserController extends Controller
         $credentials = $request->only('email', 'password');
         $guards = ['admin', 'doctor', 'pharma', 'web'];
 
+        \Log::info("USER_LOGIN: Attempt for email: " . $request->email);
+
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->attempt($credentials)) {
-                $request->session()->regenerate();
-                return redirect()->intended($this->redirectPath($guard));
+            \Log::info("USER_LOGIN: Trying guard '$guard'");
+            
+            if ($guard === 'admin') {
+                $admin = \App\Models\Admin::where('email', $request->email)->first();
+                if ($admin && $admin->password === $request->password) {
+                    Auth::guard('admin')->login($admin);
+                    \Log::info("USER_LOGIN: Success for guard: admin (Plain text match)");
+                    $request->session()->regenerate();
+                    return redirect()->intended($this->redirectPath('admin'));
+                }
+            } else {
+                if (Auth::guard($guard)->attempt($credentials)) {
+                    \Log::info("USER_LOGIN: Success for guard: $guard");
+                    $request->session()->regenerate();
+                    return redirect()->intended($this->redirectPath($guard));
+                }
             }
         }
 
+        \Log::warning("USER_LOGIN: All guards failed for: " . $request->email);
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
 
