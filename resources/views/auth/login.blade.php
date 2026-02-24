@@ -147,12 +147,12 @@
             
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="user@example.com">
+                <input type="email" name="email" value="{{ old('email') }}" required >
             </div>
 
             <div class="form-group" style="position: relative;">
                 <label>Password</label>
-                <input type="password" name="password" id="password" required placeholder="••••••••">
+                <input type="password" name="password" id="password" required >
                 <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 38px; cursor: pointer;">
                     👁️
                 </span>

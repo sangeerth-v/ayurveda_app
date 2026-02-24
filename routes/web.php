@@ -46,14 +46,24 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- Admin Routes (AdminController + DoctorController + PharmaController) ---
-Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
-    // Doctor Management by Admin
-    Route::resource('doctors', DoctorController::class);
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Guest Admin Routes
+    Route::middleware('guest:admin')->group(function () {
+        Route::get('/login', [AdminController::class, 'showLogin'])->name('login');
+        Route::post('/login', [AdminController::class, 'login']);
+    });
 
-    // Pharma Management by Admin
-    Route::resource('pharmas', PharmaController::class);
+    // Protected Admin Routes
+    Route::middleware('auth:admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
+        
+        // Doctor Management by Admin
+        Route::resource('doctors', DoctorController::class);
+
+        // Pharma Management by Admin
+        Route::resource('pharmas', PharmaController::class);
+    });
 });
 
 // --- Doctor Role Routes (DoctorController) ---

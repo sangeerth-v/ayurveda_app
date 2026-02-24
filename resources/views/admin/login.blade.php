@@ -122,11 +122,11 @@
             @csrf
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" required placeholder="admin@example.com">
+                <input type="email" name="email" required>
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" required placeholder="••••••••">
+                <input type="password" name="password" required>
             </div>
             <button type="submit">Sign In</button>
         </form>
