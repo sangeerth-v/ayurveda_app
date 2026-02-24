@@ -17,5 +17,6 @@ class PharmaCompany extends Authenticatable
         'password',
         'phone',
         'address',
+        'logo',
     ];
 }

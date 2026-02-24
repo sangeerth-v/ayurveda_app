@@ -54,37 +54,91 @@
                             <label class="form-label fw-semibold">Appointment Date</label>
                             <input type="date"
                                    name="booking_date"
+                                   id="booking_date"
                                    class="form-control @error('booking_date') is-invalid @enderror"
                                    min="{{ date('Y-m-d') }}"
-                                   value="{{ old('booking_date') }}"
+                                   value="{{ old('booking_date', date('Y-m-d')) }}"
                                    required>
                             @error('booking_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Appointment Time</label>
-                            <select name="booking_time" class="form-select @error('booking_time') is-invalid @enderror" required>
-                                <option value="">-- Select Time Slot --</option>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Select Appointment Time</label>
+                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-2" id="time-slots-container">
                                 @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'] as $slot)
-                                    <option value="{{ $slot }}" {{ old('booking_time') == $slot ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::createFromFormat('H:i', $slot)->format('h:i A') }}
-                                    </option>
+                                    <div class="col">
+                                        <input type="radio" name="booking_time" value="{{ $slot }}" id="slot-{{ str_replace(':', '-', $slot) }}" class="btn-check" required>
+                                        <label class="btn btn-outline-success w-100 py-2 rounded-3 shadow-sm time-slot-label" for="slot-{{ str_replace(':', '-', $slot) }}" data-slot="{{ $slot }}">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i', $slot)->format('h:i A') }}
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
+                            </div>
                             @error('booking_time')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-success px-4 fw-semibold">
+                        <button type="submit" class="btn btn-success px-4 fw-semibold shadow-sm">
                             <i class="fas fa-check-circle me-2"></i>Confirm Booking
                         </button>
                         <a href="{{ route('home') }}" class="btn btn-outline-secondary px-4">Cancel</a>
                     </div>
                 </form>
+
+                <style>
+                    .time-slot-label.booked {
+                        background-color: #f8f9fa !important;
+                        border-color: #dee2e6 !important;
+                        color: #adb5bd !important;
+                        opacity: 0.5 !important;
+                        cursor: not-allowed !important;
+                        pointer-events: none !important;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+                    }
+                </style>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const bookedData = {!! $bookedSlots->toJson() !!};
+                        const dateInput = document.getElementById('booking_date');
+                        const timeSlotsContainer = document.getElementById('time-slots-container');
+                        const slotLabels = timeSlotsContainer.querySelectorAll('.time-slot-label');
+
+                        function updateSlots() {
+                            const selectedDate = dateInput.value;
+                            if(!selectedDate) return;
+
+                            slotLabels.forEach(label => {
+                                const slotTime = label.getAttribute('data-slot'); // e.g. "09:00"
+                                const radioInput = document.getElementById(label.getAttribute('for'));
+                                
+                                // Check if this slot for the selected date is in bookedData
+                                // Normalize both times to HH:MM format (first 5 chars)
+                                const isBooked = bookedData.some(b => {
+                                    const bookedTimeNormalized = b.booking_time.substring(0, 5);
+                                    const slotTimeNormalized = slotTime.substring(0, 5);
+                                    return b.booking_date === selectedDate && bookedTimeNormalized === slotTimeNormalized;
+                                });
+                                
+                                if(isBooked) {
+                                    radioInput.disabled = true;
+                                    radioInput.checked = false;
+                                    label.classList.add('booked');
+                                } else {
+                                    radioInput.disabled = false;
+                                    label.classList.remove('booked');
+                                }
+                            });
+                        }
+
+                        dateInput.addEventListener('change', updateSlots);
+                        updateSlots(); // Initialize on load
+                    });
+                </script>
             </div>
         </div>
     </div>

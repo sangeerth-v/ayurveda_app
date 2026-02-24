@@ -13,7 +13,7 @@
                 <li class="nav-item"><a href="{{ route('doctors.index') }}" class="nav-link">Doctors</a></li>
                 
                 @if(Auth::guard('web')->check())
-                    <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">My Dashboard</a></li>
+                    <!-- <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">My Dashboard</a></li> -->
                     <li class="nav-item"><a href="{{ route('cart.index') }}" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li class="nav-item"><a href="{{ route('orders.index') }}" class="nav-link">My Orders</a></li>
                     <li class="nav-item"><a href="{{ route('bookings.my') }}" class="nav-link"><i class="fas fa-calendar-check"></i> My Appointments</a></li>

@@ -36,7 +36,7 @@
 
                             <div class="col-md-6">
                                 <label for="price" class="form-label fw-bold text-dark">{{ __('Price (₹)') }}</label>
-                                <input id="price" type="number" step="0.01" class="form-control form-control-lg border-success-subtle" name="price" placeholder="0.00" required>
+                                <input id="price" type="number" step="0.01" min="0" class="form-control form-control-lg border-success-subtle" name="price" placeholder="0.00" required>
                             </div>
 
                             <!-- Description -->
@@ -48,7 +48,7 @@
                             <!-- Stock, Expiry, Image -->
                             <div class="col-md-4">
                                 <label for="stock" class="form-label fw-bold text-dark">{{ __('Stock Quantity') }}</label>
-                                <input id="stock" type="number" class="form-control form-control-lg border-success-subtle" name="stock" required>
+                                <input id="stock" type="number" min="0" step="1" class="form-control form-control-lg border-success-subtle" name="stock" required>
                             </div>
 
                             <div class="col-md-4">

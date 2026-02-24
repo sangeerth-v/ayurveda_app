@@ -23,6 +23,7 @@ class Doctor extends Authenticatable
         'experience',
         'consultation_fee',
         'available_time',
+        'photo',
         'status', // Assuming added later or handled differently, but good to have in fillable if needed. Wait, migration didn't have status. I'll stick to known fields.
     ];
 
@@ -34,5 +35,10 @@ class Doctor extends Authenticatable
     public function district()
     {
         return $this->belongsTo(District::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(DoctorToken::class);
     }
 }

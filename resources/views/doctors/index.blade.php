@@ -22,27 +22,42 @@
 
     @if(isset($doctors) && $doctors->count() > 0)
 
-        {{-- ── Search Bar ── --}}
-        <div class="mb-4">
-            <div class="input-group shadow-sm" style="max-width:480px;">
-                <span class="input-group-text bg-white border-end-0" style="border-color:#c8dfc8;">
-                    <i class="fas fa-search text-success"></i>
-                </span>
-                <input type="text"
-                       id="doctorSearch"
-                       class="form-control border-start-0 ps-0"
-                       placeholder="Search by doctor name or category…"
-                       style="border-color:#c8dfc8;">
-                <button class="btn btn-outline-secondary" id="clearSearch" type="button" style="display:none;" title="Clear">
-                    <i class="fas fa-times"></i>
-                </button>
+        {{-- ── Search & Filter Row ── --}}
+        <div class="row mb-4 g-3">
+            <div class="col-md-6">
+                <div class="input-group shadow-sm h-100">
+                    <span class="input-group-text bg-white border-end-0" style="border-color:#c8dfc8;">
+                        <i class="fas fa-search text-success"></i>
+                    </span>
+                    <input type="text"
+                           id="doctorSearch"
+                           class="form-control border-start-0 ps-0"
+                           placeholder="Search by doctor name or category…"
+                           style="border-color:#c8dfc8;">
+                    <button class="btn btn-outline-secondary" id="clearSearch" type="button" style="display:none;" title="Clear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group shadow-sm h-100">
+                    <span class="input-group-text bg-white border-end-0" style="border-color:#c8dfc8;">
+                        <i class="fas fa-map-marker-alt text-success"></i>
+                    </span>
+                    <select id="districtFilter" class="form-select border-start-0 ps-0" style="border-color:#c8dfc8;">
+                        <option value="all">All Districts (Kerala)</option>
+                        @foreach($districts as $dist)
+                            <option value="{{ $dist->id }}">{{ $dist->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
 
         {{-- ── Category Filter Pills ── --}}
         <div class="mb-4 d-flex flex-wrap gap-2" id="categoryFilters">
             <button class="btn btn-success btn-sm rounded-pill px-3 fw-semibold category-btn active" data-cat="all">
-                All
+                All Specialties
             </button>
             @foreach($doctors->pluck('department.name')->filter()->unique() as $deptName)
                 <button class="btn btn-outline-success btn-sm rounded-pill px-3 category-btn" data-cat="{{ strtolower($deptName) }}">
@@ -56,7 +71,8 @@
             @foreach($doctors as $doctor)
                 <div class="col doctor-card"
                      data-name="{{ strtolower($doctor->name) }}"
-                     data-category="{{ strtolower($doctor->department->name ?? '') }}">
+                     data-category="{{ strtolower($doctor->department->name ?? '') }}"
+                     data-district="{{ $doctor->district_id }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.2s, box-shadow 0.2s;">
                         {{-- Header band --}}
                         <div class="py-4 text-center" style="background: linear-gradient(135deg, #1a4d2e, #4f772d);">
@@ -110,8 +126,8 @@
         {{-- No results message --}}
         <div id="noResults" class="text-center py-5" style="display:none;">
             <i class="fas fa-user-slash fa-3x text-muted opacity-50 mb-3"></i>
-            <h5 class="text-muted">No doctors found matching "<span id="searchTerm"></span>"</h5>
-            <p class="text-muted small">Try searching by a different name or category.</p>
+            <h5 class="text-muted">No doctors found matching your criteria.</h5>
+            <p class="text-muted small">Try searching by a different name, category, or district.</p>
         </div>
 
     @else
@@ -122,31 +138,34 @@
 {{-- ── Live Search & Filter JS ── --}}
 <script>
 (function () {
-    const searchInput  = document.getElementById('doctorSearch');
-    const clearBtn     = document.getElementById('clearSearch');
-    const catBtns      = document.querySelectorAll('.category-btn');
-    const cards        = document.querySelectorAll('.doctor-card');
-    const noResults    = document.getElementById('noResults');
-    const searchTermEl = document.getElementById('searchTerm');
+    const searchInput   = document.getElementById('doctorSearch');
+    const clearBtn      = document.getElementById('clearSearch');
+    const districtFilter = document.getElementById('districtFilter');
+    const catBtns       = document.querySelectorAll('.category-btn');
+    const cards         = document.querySelectorAll('.doctor-card');
+    const noResults     = document.getElementById('noResults');
 
     let activeCategory = 'all';
 
     function filterCards() {
         if (!searchInput) return;
         const query = searchInput.value.trim().toLowerCase();
+        const selectedDistrict = districtFilter ? districtFilter.value : 'all';
+        
         if (clearBtn) clearBtn.style.display = query.length ? 'block' : 'none';
-        if (searchTermEl) searchTermEl.textContent = query;
 
         let visible = 0;
 
         cards.forEach(function (card) {
-            const name     = card.dataset.name     || '';
-            const category = card.dataset.category || '';
+            const name           = card.dataset.name     || '';
+            const category       = card.dataset.category || '';
+            const cardDistrictId = card.dataset.district || '';
 
             const matchesSearch   = !query || name.includes(query) || category.includes(query);
             const matchesCategory = activeCategory === 'all' || category === activeCategory;
+            const matchesDistrict = selectedDistrict === 'all' || cardDistrictId === selectedDistrict;
 
-            if (matchesSearch && matchesCategory) {
+            if (matchesSearch && matchesCategory && matchesDistrict) {
                 card.style.display = '';
                 visible++;
             } else {
@@ -159,6 +178,10 @@
 
     if (searchInput) {
         searchInput.addEventListener('input', filterCards);
+    }
+
+    if (districtFilter) {
+        districtFilter.addEventListener('change', filterCards);
     }
 
     if (clearBtn) {

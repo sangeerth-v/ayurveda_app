@@ -45,7 +45,7 @@
                 </div>
             @else
                 <div class="alert alert-info text-center">
-                    You haven't placed any orders yet. <a href="{{ url('/') }}">Start shopping!</a>
+                    You haven't placed any orders yet. <a href="{{ url('products') }}">Start shopping!</a>
                 </div>
             @endif
         </div>

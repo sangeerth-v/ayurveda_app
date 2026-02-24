@@ -20,7 +20,7 @@
             <div class="text-center py-5">
                 <i class="fas fa-calendar-times fa-4x text-muted opacity-50 mb-3"></i>
                 <h5 class="text-muted">No appointments booked yet.</h5>
-                <a href="{{ route('home') }}" class="btn btn-success mt-2">Book a Doctor</a>
+                <a href="{{ route('doctors.index') }}" class="btn btn-success mt-2">Book a Doctor</a>
             </div>
         @else
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">

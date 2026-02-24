@@ -4,15 +4,15 @@
     @include('partials.nav-admin')
 @endsection
 
-@section('title', 'Add Pharma Company | Ayurveda Admin')
+@section('title', 'Edit Pharma Company | Ayurveda Admin')
 
 @section('content')
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
-                <h2 class="mb-1">Register Pharma Partner</h2>
-                <p class="text-muted mb-0">Onboard a new pharmaceutical company to the network.</p>
+                <h2 class="mb-1">Edit Pharma Partner</h2>
+                <p class="text-muted mb-0">Update information for {{ $pharma->company_name }}</p>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <a href="{{ route('admin.pharmas.index') }}" class="btn btn-outline-secondary">
@@ -23,15 +23,20 @@
 
         <div class="card border-0 shadow-sm overflow-hidden">
             <div class="card-body p-0">
-                <form action="{{ route('admin.pharmas.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.pharmas.update', $pharma->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @method('PUT')
                     <div class="row g-0">
                         <!-- Sidebar Info -->
                         <div class="col-lg-4 bg-light border-end p-4 p-xl-5 text-center">
                             <div class="mb-4">
                                 <div class="position-relative d-inline-block">
                                     <div id="logo-preview" class="rounded-3 d-flex align-items-center justify-content-center border border-4 border-white shadow-sm" style="width: 160px; height: 160px; background-color: #fff8e1; color: var(--accent-gold); overflow: hidden;">
-                                        <i class="fas fa-building fa-5x"></i>
+                                        @if($pharma->logo)
+                                            <img src="{{ asset('storage/' . $pharma->logo) }}" style="width: 100%; height: 100%; object-fit: contain; background: white;">
+                                        @else
+                                            <i class="fas fa-building fa-5x"></i>
+                                        @endif
                                     </div>
                                     <label for="logo-input" class="btn btn-sm btn-warning rounded-circle position-absolute bottom-0 end-0 p-2 shadow" style="width: 38px; height: 38px;">
                                         <i class="fas fa-edit"></i>
@@ -39,14 +44,14 @@
                                     <input type="file" name="logo" id="logo-input" class="d-none" accept="image/*" onchange="previewImage(this, 'logo-preview')">
                                 </div>
                                 <h5 class="mt-3 fw-bold">Company Logo</h5>
-                                <p class="small text-muted">Upload high-res brand logo. PNG preferred.</p>
+                                <p class="small text-muted">Upload high-res brand logo to replace current one.</p>
                             </div>
                             
                             <hr class="my-4 opacity-10">
                             
                             <div class="text-start">
-                                <label class="form-label fw-bold small text-uppercase text-muted">Partnership Terms</label>
-                                <p class="small text-muted mb-0">By registering this company, you grant them access to manage their product catalog and receive orders.</p>
+                                <label class="form-label fw-bold small text-uppercase text-muted">Business ID: #{{ $pharma->id }}</label>
+                                <p class="small text-muted mb-0">Partner since {{ $pharma->created_at->format('M Y') }}</p>
                             </div>
                         </div>
 
@@ -55,35 +60,35 @@
                             <div class="row g-4">
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Company Legal Name</label>
-                                    <input type="text" name="company_name" class="form-control form-control-lg @error('company_name') is-invalid @enderror" placeholder="ABC Pharmaceuticals Pvt Ltd" value="{{ old('company_name') }}" required>
+                                    <input type="text" name="company_name" class="form-control form-control-lg @error('company_name') is-invalid @enderror" placeholder="ABC Pharmaceuticals Pvt Ltd" value="{{ old('company_name', $pharma->company_name) }}" required>
                                     @error('company_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Admin Email</label>
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="admin@abcpharma.com" value="{{ old('email') }}" required>
+                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="admin@abcpharma.com" value="{{ old('email', $pharma->email) }}" required>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Access Password</label>
-                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
+                                    <label class="form-label fw-bold">Access Password (Leave blank to keep current)</label>
+                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Support Phone</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="10 Digit Number" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" required>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="10 Digit Number" value="{{ old('phone', $pharma->phone) }}" pattern="[0-9]{10}" maxlength="10" required>
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Registered Office Address</label>
-                                    <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="3" placeholder="Street, Building, City, Pin...">{{ old('address') }}</textarea>
+                                    <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="3" placeholder="Street, Building, City, Pin...">{{ old('address', $pharma->address) }}</textarea>
                                 </div>
                             </div>
 
                             <div class="mt-5">
                                 <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 w-100 shadow-sm" style="background-color: var(--accent-gold); border-color: var(--accent-gold); color: white;">
-                                    <i class="fas fa-handshake"></i> Complete Registration
+                                    <i class="fas fa-save"></i> Save Changes
                                 </button>
                             </div>
                         </div>

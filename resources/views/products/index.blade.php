@@ -10,32 +10,39 @@
         <div class="row">
             <!-- Sidebar Filters -->
             <div class="col-md-3 d-none d-md-block">
-                <div class="card border-0 shadow-sm p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0">Filter</h5>
-                        <a href="{{ route('products.index') }}" class="text-success text-decoration-none small">Clear All</a>
-                    </div>
+                <form id="filterForm" action="{{ route('products.index') }}" method="GET">
+                    @if(request('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    <div class="card border-0 shadow-sm p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Filter</h5>
+                            <a href="{{ route('products.index') }}" class="text-success text-decoration-none small">Clear All</a>
+                        </div>
 
-                    <div class="mb-4">
-                        <h6 class="fw-bold">Availability</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="availability" id="inStock" checked disabled>
-                            <label class="form-check-label opacity-100" for="inStock">In Stock Only</label>
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Availability</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="availability" id="inStock" checked disabled>
+                                <label class="form-check-label opacity-100" for="inStock">In Stock Only</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Categories</h6>
+                            <div class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
+                                @foreach($categories as $category)
+                                    <div class="form-check">
+                                        <input class="form-check-input category-checkbox" type="checkbox" name="categories[]" value="{{ $category }}" id="cat-{{ $category }}" 
+                                            {{ is_array(request('categories')) && in_array($category, request('categories')) ? 'checked' : '' }}
+                                            onchange="document.getElementById('filterForm').submit()">
+                                        <label class="form-check-label" for="cat-{{ $category }}">{{ $category }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mb-4">
-                        <h6 class="fw-bold">Categories</h6>
-                        <div class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
-                            @foreach(['Medicine', 'Wellness', 'Skincare', 'Haircare', 'Equipment', 'Supplements'] as $category)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="category[]" value="{{ $category }}" id="cat-{{ $category }}">
-                                    <label class="form-check-label" for="cat-{{ $category }}">{{ $category }}</label>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- Product Grid -->
@@ -44,12 +51,12 @@
                     <h4 class="fw-bold text-dark">Our Products <span class="text-muted fs-6">({{ $products->count() }})</span></h4>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Sort By: Price - Low to High
+                            Sort By: {{ str_replace('_', ' ', ucwords($sort ?? 'price_asc', '_')) }}
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item active" href="#">Price - Low to High</a></li>
-                            <li><a class="dropdown-item" href="#">Price - High to Low</a></li>
-                            <li><a class="dropdown-item" href="#">Newest First</a></li>
+                            <li><a class="dropdown-item {{ (request('sort') == 'price_asc' || !request('sort')) ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">Price - Low to High</a></li>
+                            <li><a class="dropdown-item {{ request('sort') == 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">Price - High to Low</a></li>
+                            <li><a class="dropdown-item {{ request('sort') == 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Newest First</a></li>
                         </ul>
                     </div>
                 </div>
@@ -59,10 +66,7 @@
                         @foreach($products as $product)
                             <div class="col">
                                 <div class="card h-100 border-0 shadow-sm position-relative product-card">
-                                    <!-- Wishlist Icon -->
-                                    <button class="btn btn-link position-absolute top-0 end-0 p-3 text-muted" style="z-index: 10;">
-                                        <i class="far fa-heart fa-lg"></i>
-                                    </button>
+
 
                                     <!-- Prescription Badge -->
                                     @if($product->category == 'Medicine')
