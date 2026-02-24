@@ -59,9 +59,9 @@
             <button class="btn btn-success btn-sm rounded-pill px-3 fw-semibold category-btn active" data-cat="all">
                 All Specialties
             </button>
-            @foreach($doctors->pluck('department.name')->filter()->unique() as $deptName)
-                <button class="btn btn-outline-success btn-sm rounded-pill px-3 category-btn" data-cat="{{ strtolower($deptName) }}">
-                    {{ $deptName }}
+            @foreach($doctors->pluck('specialization_category')->filter()->unique() as $catName)
+                <button class="btn btn-outline-success btn-sm rounded-pill px-3 category-btn" data-cat="{{ strtolower($catName) }}">
+                    {{ $catName }}
                 </button>
             @endforeach
         </div>
@@ -71,7 +71,7 @@
             @foreach($doctors as $doctor)
                 <div class="col doctor-card"
                      data-name="{{ strtolower($doctor->name) }}"
-                     data-category="{{ strtolower($doctor->department->name ?? '') }}"
+                     data-category="{{ strtolower($doctor->specialization_category ?? '') }}"
                      data-district="{{ $doctor->district_id }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.2s, box-shadow 0.2s;">
                         {{-- Header band --}}
@@ -81,7 +81,10 @@
                                 <i class="fas fa-user-md fa-2x text-white"></i>
                             </div>
                             <h5 class="text-white fw-bold mb-0">Dr. {{ $doctor->name }}</h5>
-                            <small class="text-white opacity-75">{{ $doctor->department->name ?? 'General Practice' }}</small>
+                            <small class="text-white opacity-75">{{ $doctor->specialization_category ?? 'General Practice' }}</small>
+                            @if($doctor->specialization_subcategory)
+                                <br><small class="text-white opacity-50 small" style="font-size: 0.7rem;">{{ $doctor->specialization_subcategory }}</small>
+                            @endif
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <div class="mb-3">

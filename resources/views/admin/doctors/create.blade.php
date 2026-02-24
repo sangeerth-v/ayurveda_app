@@ -55,13 +55,13 @@
                             <div class="row g-4">
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Full Name</label>
-                                    <input type="text" name="name" class="form-control form-control-lg @error('name') is-invalid @enderror" placeholder="Dr. Jane Smith" value="{{ old('name') }}" required>
+                                    <input type="text" name="name" class="form-control form-control-lg @error('name') is-invalid @enderror" placeholder="" value="{{ old('name') }}" required>
                                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Email Address</label>
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="doctor@ayurveda.com" value="{{ old('email') }}" required>
+                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="" value="{{ old('email') }}" required>
                                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
@@ -72,49 +72,72 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Department / Specialization</label>
-                                    <input type="text" name="department" class="form-control @error('department') is-invalid @enderror" placeholder="e.g. Panchakarma" value="{{ old('department') }}" required>
+                                    <label class="form-label fw-bold">Specialization Category</label>
+                                    <input type="text" name="specialization_category" class="form-control @error('specialization_category') is-invalid @enderror" placeholder="" value="{{ old('specialization_category') }}" required>
+                                    @error('specialization_category') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Working District</label>
-                                    <select name="district_id" class="form-select @error('district_id') is-invalid @enderror" required>
-                                        <option value="">Select District</option>
+                                    <label class="form-label fw-bold">Specialization Subcategory</label>
+                                    <input type="text" name="specialization_subcategory" class="form-control @error('specialization_subcategory') is-invalid @enderror" placeholder="" value="{{ old('specialization_subcategory') }}">
+                                    @error('specialization_subcategory') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+    <label class="form-label fw-bold">Working District</label>
+    <select name="district_id" class="form-select @error('district_id') is-invalid @enderror" required>
+        <option value="">Select District</option>
+
                                         @foreach($districts as $district)
                                             <option value="{{ $district->id }}" {{ old('district_id') == $district->id ? 'selected' : '' }}>
                                                 {{ $district->name }}
                                             </option>
                                         @endforeach
-                                    </select>
-                                    @error('district_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
+
+    </select>
+    @error('district_id') 
+        <div class="invalid-feedback">{{ $message }}</div> 
+    @enderror
+</div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="10 Digit Number" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" required>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" required>
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Consultation Fee (₹)</label>
-                                    <input type="number" min="0" step="1" name="consultation_fee" class="form-control @error('consultation_fee') is-invalid @enderror" placeholder="500" value="{{ old('consultation_fee') }}">
+                                    <input type="number" min="0" step="1" name="consultation_fee" class="form-control @error('consultation_fee') is-invalid @enderror" placeholder="" value="{{ old('consultation_fee') }}">
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Qualifications</label>
-                                    <input type="text" name="qualification" class="form-control" placeholder="e.g. BAMS, MD (Ayurveda)" value="{{ old('qualification') }}">
+                                    <input type="text" name="qualification" class="form-control" placeholder="" value="{{ old('qualification') }}">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Experience (Years)</label>
-                                    <input type="number" name="experience" class="form-control @error('experience') is-invalid @enderror" placeholder="5" value="{{ old('experience') }}">
+                                    <input type="number" name="experience" class="form-control @error('experience') is-invalid @enderror" placeholder="" value="{{ old('experience') }}">
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Available Timing</label>
-                                    <input type="text" name="available_time" class="form-control @error('available_time') is-invalid @enderror" placeholder="e.g. Mon-Sat (10AM - 4PM)" value="{{ old('available_time') }}">
+                                    <label class="form-label fw-bold">Available From</label>
+                                    <select name="available_from" class="form-select @error('available_from') is-invalid @enderror">
+                                        @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
+                                            <option value="{{ $time }}">{{ date('h:i A', strtotime($time)) }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Available To</label>
+                                    <select name="available_to" class="form-select @error('available_to') is-invalid @enderror">
+                                        @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
+                                            <option value="{{ $time }}" {{ $time == '17:00' ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                             <div class="mt-5">
                                 <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">

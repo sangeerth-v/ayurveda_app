@@ -69,6 +69,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // --- Doctor Role Routes (DoctorController) ---
 Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(function () {
     Route::get('/dashboard', [DoctorController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [DoctorController::class, 'profile'])->name('profile');
+    Route::put('/profile', [DoctorController::class, 'updateProfile'])->name('profile.update');
 });
 
 // --- Pharma Role Routes (PharmaController) ---

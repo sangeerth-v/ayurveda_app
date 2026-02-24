@@ -16,20 +16,22 @@ class Doctor extends Authenticatable
         'name',
         'email',
         'password',
+        'password_plain',
         'phone',
-        'department_id',
+        'specialization_category',
+        'specialization_subcategory',
         'district_id',
         'qualification',
         'experience',
         'consultation_fee',
         'available_time',
         'photo',
-        'status', // Assuming added later or handled differently, but good to have in fillable if needed. Wait, migration didn't have status. I'll stick to known fields.
     ];
 
-    public function department()
+    public function specialization_category()
     {
-        return $this->belongsTo(Department::class);
+        // Since we are now using string columns, we don't need a relationship here 
+        // unless the user later wants to link to a Specialty table.
     }
 
     public function district()

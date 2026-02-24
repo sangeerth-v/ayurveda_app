@@ -26,7 +26,9 @@
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%">Doctor Information</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted">Specialization</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Specialization Category</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Subcategory</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Login Password</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Location</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Contact</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 15%">Actions</th>
@@ -52,8 +54,16 @@
                         </td>
                         <td class="py-4">
                             <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 border border-success border-opacity-10 font-weight-normal">
-                                {{ $doctor->department->name ?? 'General Practice' }}
+                                {{ $doctor->specialization_category ?? 'General' }}
                             </span>
+                        </td>
+                        <td class="py-4">
+                            <span class="text-muted small">
+                                {{ $doctor->specialization_subcategory ?? 'N/A' }}
+                            </span>
+                        </td>
+                        <td class="py-4">
+                            <code class="text-primary">{{ $doctor->password_plain ?? 'N/A' }}</code>
                         </td>
                         <td class="py-4">
                             <div class="d-flex align-items-center text-muted">
