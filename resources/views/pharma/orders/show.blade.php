@@ -17,6 +17,8 @@
                             <p>
                                 <strong>Name:</strong> {{ $order->user->name ?? 'Guest' }}<br>
                                 <strong>Phone:</strong> {{ $order->delivery_phone }}<br>
+                                <strong>District:</strong> {{ $order->delivery_district }}<br>
+                                <strong>Pincode:</strong> {{ $order->delivery_pincode }}<br>
                                 <strong>Address:</strong> {{ $order->delivery_address }}
                             </p>
                         </div>

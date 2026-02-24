@@ -21,18 +21,18 @@
                                 <input id="name" type="text" class="form-control form-control-lg border-success-subtle" name="name" value="{{ old('name', $product->name) }}" required>
                             </div>
 
-                            <!-- Category & Price -->
+                            <!-- Category & Subcategory -->
                             <div class="col-md-6">
                                 <label for="category" class="form-label fw-bold text-dark">{{ __('Category') }}</label>
-                                <select id="category" class="form-select form-select-lg border-success-subtle" name="category" required>
-                                    <option value="" disabled>Select Category</option>
-                                    @foreach(['Medicine', 'Wellness', 'Skincare', 'Haircare', 'Equipment', 'Supplements'] as $cat)
-                                        <option value="{{ $cat }}" {{ old('category', $product->category) == $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                                    @endforeach
-                                </select>
+                                <input id="category" type="text" class="form-control form-control-lg border-success-subtle" name="category" value="{{ old('category', $product->category) }}" placeholder="E.g. Medicine, Wellness" required>
                             </div>
 
                             <div class="col-md-6">
+                                <label for="subcategory" class="form-label fw-bold text-dark">{{ __('Subcategory') }}</label>
+                                <input id="subcategory" type="text" class="form-control form-control-lg border-success-subtle" name="subcategory" value="{{ old('subcategory', $product->subcategory) }}" placeholder="E.g. Immunity, Digestion">
+                            </div>
+
+                            <div class="col-md-12">
                                 <label for="price" class="form-label fw-bold text-dark">{{ __('Price (₹)') }}</label>
                                 <input id="price" type="number" step="0.01" min="0" class="form-control form-control-lg border-success-subtle" name="price" value="{{ old('price', $product->price) }}" required>
                             </div>

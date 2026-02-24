@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\DoctorToken;
 use App\Models\User;
+use App\Models\District;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -30,7 +31,7 @@ class UserController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
-        $guards = ['admin', 'doctor', 'pharma', 'web'];
+        $guards = ['web', 'admin', 'doctor', 'pharma'];
 
         \Log::info("USER_LOGIN: Attempt for email: " . $request->email);
 
@@ -39,17 +40,34 @@ class UserController extends Controller
             
             if ($guard === 'admin') {
                 $admin = \App\Models\Admin::where('email', $request->email)->first();
-                if ($admin && $admin->password === $request->password) {
-                    Auth::guard('admin')->login($admin);
-                    \Log::info("USER_LOGIN: Success for guard: admin (Plain text match)");
-                    $request->session()->regenerate();
-                    return redirect()->intended($this->redirectPath('admin'));
+                if ($admin) {
+                    \Log::info("USER_LOGIN: Admin record found.");
+                    if ($admin->password === $request->password || Hash::check($request->password, $admin->password)) {
+                        Auth::guard('admin')->login($admin);
+                        \Log::info("USER_LOGIN: Success for admin. Check: " . (Auth::guard('admin')->check() ? 'YES' : 'NO'));
+                        $request->session()->regenerate();
+                        \Log::info("USER_LOGIN: After regenerate. Check: " . (Auth::guard('admin')->check() ? 'YES' : 'NO'));
+                        return redirect()->intended($this->redirectPath('admin'));
+                    } else {
+                        \Log::warning("USER_LOGIN: Admin password mismatch.");
+                    }
                 }
             } else {
-                if (Auth::guard($guard)->attempt($credentials)) {
-                    \Log::info("USER_LOGIN: Success for guard: $guard");
-                    $request->session()->regenerate();
-                    return redirect()->intended($this->redirectPath($guard));
+                $user = null;
+                if ($guard === 'web') $user = \App\Models\User::where('email', $request->email)->first();
+                elseif ($guard === 'doctor') $user = \App\Models\Doctor::where('email', $request->email)->first();
+                elseif ($guard === 'pharma') $user = \App\Models\PharmaCompany::where('email', $request->email)->first();
+
+                if ($user) {
+                    \Log::info("USER_LOGIN: User record found in $guard guard.");
+                    if (Auth::guard($guard)->attempt($credentials)) {
+                        \Log::info("USER_LOGIN: Success for $guard. Check: " . (Auth::guard($guard)->check() ? 'YES' : 'NO'));
+                        $request->session()->regenerate();
+                        \Log::info("USER_LOGIN: After regenerate. Check: " . (Auth::guard($guard)->check() ? 'YES' : 'NO'));
+                        return redirect()->intended($this->redirectPath($guard));
+                    } else {
+                        \Log::warning("USER_LOGIN: Password mismatch for $guard.");
+                    }
                 }
             }
         }
@@ -92,7 +110,7 @@ class UserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home');
+        return redirect()->intended($this->redirectPath('web'));
     }
 
     protected function redirectPath($role)
@@ -115,18 +133,31 @@ class UserController extends Controller
     public function products(Request $request)
     {
         $query = Product::where('stock', '>', 0);
+        
         if ($request->has('categories')) {
             $query->whereIn('category', $request->categories);
         }
+        
+        if ($request->has('subcategories')) {
+            $query->whereIn('subcategory', $request->subcategories);
+        }
+
         $sort = $request->get('sort', 'price_asc');
         switch ($sort) {
             case 'price_desc': $query->orderBy('price', 'desc'); break;
             case 'newest': $query->orderBy('created_at', 'desc'); break;
             default: $query->orderBy('price', 'asc'); break;
         }
+        
         $products = $query->get();
-        $categories = Product::select('category')->distinct()->pluck('category');
-        return view('products.index', compact('products', 'categories', 'sort'));
+        
+        // Group subcategories by category
+        $categoryData = Product::select('category', 'subcategory')
+            ->distinct()
+            ->get()
+            ->groupBy('category');
+            
+        return view('products.index', compact('products', 'categoryData', 'sort'));
     }
 
     public function doctors()
@@ -146,7 +177,8 @@ class UserController extends Controller
     public function cartIndex()
     {
         $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
-        return view('cart.index', compact('cart'));
+        $districts = District::all();
+        return view('cart.index', compact('cart', 'districts'));
     }
 
     public function addToCart(Request $request, $id)
@@ -201,18 +233,32 @@ class UserController extends Controller
 
     public function storeOrder(Request $request)
     {
-        $cart = Cart::with('items')->where('user_id', Auth::id())->first();
+        $request->validate([
+            'delivery_name' => 'required|string|max:255',
+            'delivery_phone' => 'required|string|max:20',
+            'delivery_district' => 'required|string',
+            'delivery_pincode' => 'required|string|digits:6',
+            'delivery_address' => 'required|string',
+            'payment_method' => 'required|in:COD',
+        ]);
+
+        $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
         if (!$cart || $cart->items->isEmpty()) return redirect()->route('cart.index')->with('error', 'Cart is empty!');
 
-        $totalAmount = 0;
-        foreach ($cart->items as $item) $totalAmount += $item->price * $item->quantity;
+        $totalPrice = 0;
+        foreach ($cart->items as $item) $totalPrice += $item->price * $item->quantity;
 
         $order = Order::create([
             'user_id' => Auth::id(),
-            'total_amount' => $totalAmount,
-            'status' => 'Pending',
+            'delivery_name' => $request->delivery_name,
+            'delivery_phone' => $request->delivery_phone,
+            'delivery_district' => $request->delivery_district,
+            'delivery_pincode' => $request->delivery_pincode,
+            'delivery_address' => $request->delivery_address,
+            'total_price' => $totalPrice,
+            'payment_method' => $request->payment_method,
             'payment_status' => 'Pending',
-            'order_date' => now(),
+            'order_status' => 'Placed',
         ]);
 
         foreach ($cart->items as $item) {

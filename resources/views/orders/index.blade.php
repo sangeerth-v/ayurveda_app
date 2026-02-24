@@ -28,14 +28,14 @@
                                     <tr>
                                         <td>#{{ $order->id }}</td>
                                         <td>{{ $order->created_at->format('d M Y') }}</td>
-                                        <td>₹{{ number_format($order->total_amount, 2) }}</td>
+                                        <td>₹{{ number_format($order->total_price, 2) }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $order->status == 'Completed' ? 'success' : ($order->status == 'Pending' ? 'warning' : 'secondary') }}">
-                                                {{ $order->status }}
+                                            <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : ($order->order_status == 'Placed' ? 'warning' : 'secondary') }}">
+                                                {{ $order->order_status }}
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Details</a>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -169,25 +169,33 @@
             
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" required placeholder="John Doe">
+                <input type="text" name="name" value="{{ old('name') }}" required>
             </div>
 
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}" required placeholder="user@example.com">
+                <input type="email" name="email" value="{{ old('email') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone" value="{{ old('phone') }}" 
+                       required maxlength="10" pattern="\d{10}" 
+                       title="Please enter exactly 10 digits"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" id="password" required placeholder="••••••••">
+                <input type="password" name="password" id="password" required>
                 <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
-
+            
             <div class="form-group">
                 <label>Confirm Password</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" required placeholder="••••••••">
+                <input type="password" name="password_confirmation" id="password_confirmation" required>
                 <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', this)">
                     <i class="fas fa-eye"></i>
                 </button>

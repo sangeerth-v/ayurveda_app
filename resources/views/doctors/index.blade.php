@@ -111,9 +111,9 @@
                                         <i class="fas fa-calendar-plus me-2"></i>Book Appointment
                                     </a>
                                 @else
-                                    <a href="{{ route('login') }}"
+                                    <a href="{{ route('bookings.create', $doctor->id) }}"
                                        class="btn btn-outline-success w-100 fw-semibold">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Login to Book
+                                        <i class="fas fa-calendar-plus me-2"></i>Login to Book
                                     </a>
                                 @endauth
                             </div>

@@ -80,4 +80,6 @@ Route::prefix('pharma')->name('pharma.')->middleware('auth:pharma')->group(funct
     Route::put('/products/{id}', [PharmaController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/{id}', [PharmaController::class, 'destroyProduct'])->name('products.destroy');
     Route::get('/orders/{id}', [PharmaController::class, 'showOrder'])->name('orders.show');
+    Route::get('/profile', [PharmaController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/profile', [PharmaController::class, 'updateProfile'])->name('profile.update');
 });

@@ -49,7 +49,10 @@
                             <td class="ps-4 fw-bold">#{{ $order->id }}</td>
                             <td>
                                 <div class="fw-bold">{{ $order->user->name ?? 'Guest User' }}</div>
-                                <div class="small text-muted">{{ $order->delivery_phone }}</div>
+                                <div class="small text-muted">
+                                    <i class="fas fa-phone-alt me-1 small"></i>{{ $order->delivery_phone }} | 
+                                    <i class="fas fa-map-pin me-1 small"></i>{{ $order->delivery_pincode }}
+                                </div>
                             </td>
                             <td>
                                 <div class="dropdown">
@@ -105,6 +108,9 @@
                 <!-- Category Badge -->
                 <span class="badge bg-dark rounded-0 rounded-start position-absolute bottom-0 end-0 px-3 py-2 bg-opacity-75">
                     {{ $product->category ?? 'General' }}
+                    @if($product->subcategory)
+                        <span class="ms-1 ps-1 border-start border-light border-opacity-25">{{ $product->subcategory }}</span>
+                    @endif
                 </span>
                 
                 <!-- Stock Status -->

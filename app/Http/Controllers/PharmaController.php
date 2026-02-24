@@ -132,6 +132,8 @@ class PharmaController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'subcategory' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
@@ -147,6 +149,7 @@ class PharmaController extends Controller
             'pharma_company_id' => \Illuminate\Support\Facades\Auth::guard('pharma')->id(),
             'name' => $request->name,
             'category' => $request->category,
+            'subcategory' => $request->subcategory,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -171,15 +174,21 @@ class PharmaController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'subcategory' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'category', 'description', 'price', 'stock', 'expiry_date']);
+        $data = $request->only(['name', 'category', 'subcategory', 'description', 'price', 'stock', 'expiry_date']);
 
         if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
@@ -213,5 +222,42 @@ class PharmaController extends Controller
         }
 
         return view('pharma.orders.show', compact('order'));
+    }
+
+    // --- Profile Management ---
+    public function editProfile()
+    {
+        $pharma = \Illuminate\Support\Facades\Auth::guard('pharma')->user();
+        return view('pharma.profile', compact('pharma'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $pharma = \Illuminate\Support\Facades\Auth::guard('pharma')->user();
+
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:pharma_companies,email,' . $pharma->id,
+            'phone' => 'required|string|max:20',
+            'password' => 'nullable|min:6',
+            'logo' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->only(['company_name', 'email', 'phone', 'address']);
+
+        if ($request->filled('password')) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+
+        if ($request->hasFile('logo')) {
+            if ($pharma->logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($pharma->logo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($pharma->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('pharmas', 'public');
+        }
+
+        $pharma->update($data);
+
+        return back()->with('success', 'Profile updated successfully!');
     }
 }

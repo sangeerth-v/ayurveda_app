@@ -13,6 +13,7 @@ class Product extends Model
         'pharma_company_id',
         'name',
         'category',
+        'subcategory',
         'description',
         'price',
         'stock',

@@ -46,6 +46,24 @@
         color: #6c757d;
         border-top: none;
     }
+    .custom-option {
+        border: 1px solid #dee2e6;
+        padding: 10px 15px;
+        border-radius: 12px;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        background: white;
+    }
+    .custom-option:hover {
+        border-color: #1a4d2e;
+        background: #f0f7f2;
+    }
+    .form-check-input:checked + .form-check-label {
+        font-weight: bold;
+        color: #1a4d2e;
+    }
 </style>
 
 <div class="container mb-5">
@@ -157,8 +175,58 @@
                                 </div>
                                 <form action="{{ route('orders.store') }}" method="POST">
                                     @csrf
+                                    <div class="card bg-light border-0 rounded-4 mb-4 text-start">
+                                        <div class="card-body p-4">
+                                            <h5 class="mb-4" style="color: #1a4d2e;"><i class="fas fa-truck me-2"></i>Shipping Details</h5>
+                                            
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Full Name</label>
+                                                    <input type="text" name="delivery_name" class="form-control rounded-pill" placeholder="Enter recipient name" required value="{{ auth()->user()->name }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Phone Number</label>
+                                                    <input type="tel" name="delivery_phone" class="form-control rounded-pill" placeholder="Enter phone number" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">District</label>
+                                                    <select name="delivery_district" class="form-select rounded-pill" required>
+                                                        <option value="">Select District</option>
+                                                        @foreach($districts as $district)
+                                                            <option value="{{ $district->name }}">{{ $district->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Pincode</label>
+                                                    <input type="text" name="delivery_pincode" class="form-control rounded-pill" placeholder="Enter 6-digit pincode" required pattern="\d{6}" maxlength="6" title="Please enter a valid 6-digit pincode">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Shipping Address</label>
+                                                    <textarea name="delivery_address" class="form-control rounded-4" rows="3" placeholder="Enter full delivery address" required></textarea>
+                                                </div>
+                                                
+                                                <div class="col-12 mt-4">
+                                                    <h5 class="mb-3" style="color: #1a4d2e;"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
+                                                    <div class="d-flex gap-3">
+                                                        <div class="form-check custom-option w-100">
+                                                            <input class="form-check-input" type="radio" name="payment_method" id="pay_cod" value="COD" checked required>
+                                                            <label class="form-check-label w-100" for="pay_cod">
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <span>Cash on Delivery</span>
+                                                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                                                </div>
+                                                                <div class="small text-muted mt-1">Pay when you receive your order</div>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
-                                        Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+                                        Place Order Now <i class="fas fa-check-circle ms-2"></i>
                                     </button>
                                 </form>
                             </div>

@@ -20,21 +20,18 @@
                                 <input id="name" type="text" class="form-control form-control-lg border-success-subtle focus-ring-success" name="name" placeholder="E.g. Ashwagandha Powder" required>
                             </div>
 
-                            <!-- Category & Price -->
+                            <!-- Category & Subcategory -->
                             <div class="col-md-6">
                                 <label for="category" class="form-label fw-bold text-dark">{{ __('Category') }}</label>
-                                <select id="category" class="form-select form-select-lg border-success-subtle" name="category" required>
-                                    <option value="" disabled selected>Select Category</option>
-                                    <option value="Medicine">Medicine</option>
-                                    <option value="Wellness">Wellness</option>
-                                    <option value="Skincare">Skincare</option>
-                                    <option value="Haircare">Haircare</option>
-                                    <option value="Equipment">Equipment</option>
-                                    <option value="Supplements">Supplements</option>
-                                </select>
+                                <input id="category" type="text" class="form-control form-control-lg border-success-subtle" name="category" placeholder="E.g. Medicine, Wellness" required>
                             </div>
 
                             <div class="col-md-6">
+                                <label for="subcategory" class="form-label fw-bold text-dark">{{ __('Subcategory') }}</label>
+                                <input id="subcategory" type="text" class="form-control form-control-lg border-success-subtle" name="subcategory" placeholder="E.g. Immunity, Digestion">
+                            </div>
+
+                            <div class="col-md-12">
                                 <label for="price" class="form-label fw-bold text-dark">{{ __('Price (₹)') }}</label>
                                 <input id="price" type="number" step="0.01" min="0" class="form-control form-control-lg border-success-subtle" name="price" placeholder="0.00" required>
                             </div>

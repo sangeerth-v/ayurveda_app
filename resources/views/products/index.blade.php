@@ -29,14 +29,31 @@
                         </div>
 
                         <div class="mb-4">
-                            <h6 class="fw-bold">Categories</h6>
-                            <div class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
-                                @foreach($categories as $category)
-                                    <div class="form-check">
-                                        <input class="form-check-input category-checkbox" type="checkbox" name="categories[]" value="{{ $category }}" id="cat-{{ $category }}" 
-                                            {{ is_array(request('categories')) && in_array($category, request('categories')) ? 'checked' : '' }}
-                                            onchange="document.getElementById('filterForm').submit()">
-                                        <label class="form-check-label" for="cat-{{ $category }}">{{ $category }}</label>
+                            <h6 class="fw-bold mb-3">Categories</h6>
+                            <div class="d-flex flex-column gap-3" style="max-height: 500px; overflow-y: auto;">
+                                @foreach($categoryData as $category => $subcategories)
+                                    <div class="category-group">
+                                        <div class="form-check fw-bold">
+                                            <input class="form-check-input category-checkbox" type="checkbox" name="categories[]" value="{{ $category }}" id="cat-{{ Str::slug($category) }}" 
+                                                {{ is_array(request('categories')) && in_array($category, request('categories')) ? 'checked' : '' }}
+                                                onchange="document.getElementById('filterForm').submit()">
+                                            <label class="form-check-label" for="cat-{{ Str::slug($category) }}">{{ $category }}</label>
+                                        </div>
+                                        
+                                        @if($subcategories->whereNotNull('subcategory')->count() > 0)
+                                            <div class="ms-3 mt-1 d-flex flex-column gap-1">
+                                                @foreach($subcategories as $sub)
+                                                    @if($sub->subcategory)
+                                                        <div class="form-check small text-muted">
+                                                            <input class="form-check-input subcategory-checkbox" type="checkbox" name="subcategories[]" value="{{ $sub->subcategory }}" id="sub-{{ Str::slug($sub->subcategory) }}" 
+                                                                {{ is_array(request('subcategories')) && in_array($sub->subcategory, request('subcategories')) ? 'checked' : '' }}
+                                                                onchange="document.getElementById('filterForm').submit()">
+                                                            <label class="form-check-label" for="sub-{{ Str::slug($sub->subcategory) }}">{{ $sub->subcategory }}</label>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
