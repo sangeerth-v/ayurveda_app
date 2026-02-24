@@ -41,7 +41,7 @@
                                         Dr. {{ $booking->doctor->name ?? 'N/A' }}
                                     </h5>
                                     <p class="mb-0 text-muted small">
-                                        {{ $booking->doctor->department->name ?? 'General' }}
+                                        {{ $booking->doctor->specialization_category ?? 'General' }}
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-end">

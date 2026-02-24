@@ -31,7 +31,8 @@
                     @endif
                 </div>
                 <h3 class="text-white mb-1">{{ $doctor->name }}</h3>
-                <p class="text-white opacity-75 mb-0">{{ $doctor->department->name ?? 'General Practice' }}</p>
+                <p class="text-white opacity-75 mb-1">{{ $doctor->specialization_category ?? 'General' }}</p>
+                <p class="text-white opacity-50 small mb-0">{{ $doctor->specialization_subcategory ?? '' }}</p>
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
@@ -60,6 +61,10 @@
                 <div class="mb-3">
                     <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Email Address</label>
                     <div class="text-dark">{{ $doctor->email }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">System Password</label>
+                    <div class="text-primary fw-bold">{{ $doctor->password_plain ?? 'N/A' }}</div>
                 </div>
                 <div class="mb-3">
                     <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Phone Number</label>

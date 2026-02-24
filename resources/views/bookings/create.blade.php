@@ -24,12 +24,20 @@
                     <div>
                         <h5 class="mb-1 fw-bold" style="color:#1a4d2e;">Dr. {{ $doctor->name }}</h5>
                         <p class="mb-0 text-muted small">
-                            {{ $doctor->department->name ?? 'General' }} &bull; {{ $doctor->district->name ?? '' }}
+                            {{ $doctor->specialization_category ?? 'General' }} &bull; {{ $doctor->district->name ?? '' }}
                         </p>
                         <p class="mb-0 text-muted small">
                             <i class="fas fa-rupee-sign me-1"></i>{{ number_format($doctor->consultation_fee, 2) }} consultation fee
                             @if($doctor->available_time)
-                             &bull; <i class="fas fa-clock me-1"></i>Available: {{ $doctor->available_time }}
+                                &bull; <i class="fas fa-clock me-1"></i>Available: 
+                                @php
+                                    $times = explode(' to ', $doctor->available_time);
+                                    if(count($times) == 2) {
+                                        echo \Carbon\Carbon::createFromFormat('H:i', trim($times[0]))->format('h:i A') . ' - ' . \Carbon\Carbon::createFromFormat('H:i', trim($times[1]))->format('h:i A');
+                                    } else {
+                                        echo $doctor->available_time;
+                                    }
+                                @endphp
                             @endif
                         </p>
                     </div>
@@ -57,6 +65,7 @@
                                    id="booking_date"
                                    class="form-control @error('booking_date') is-invalid @enderror"
                                    min="{{ date('Y-m-d') }}"
+                                   max="{{ date('Y-m-t', strtotime('+3 months')) }}"
                                    value="{{ old('booking_date', date('Y-m-d')) }}"
                                    required>
                             @error('booking_date')
@@ -66,7 +75,7 @@
                         <div class="col-12">
                             <label class="form-label fw-semibold">Select Appointment Time</label>
                             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-2" id="time-slots-container">
-                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'] as $slot)
+                                @foreach($slots as $slot)
                                     <div class="col">
                                         <input type="radio" name="booking_time" value="{{ $slot }}" id="slot-{{ str_replace(':', '-', $slot) }}" class="btn-check" required>
                                         <label class="btn btn-outline-success w-100 py-2 rounded-3 shadow-sm time-slot-label" for="slot-{{ str_replace(':', '-', $slot) }}" data-slot="{{ $slot }}">

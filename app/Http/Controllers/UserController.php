@@ -131,7 +131,7 @@ class UserController extends Controller
 
     public function doctors()
     {
-        $doctors = Doctor::with(['department', 'district'])->get();
+        $doctors = Doctor::with(['district'])->get();
         $districts = \App\Models\District::all();
         return view('doctors.index', compact('doctors', 'districts'));
     }
@@ -230,12 +230,34 @@ class UserController extends Controller
     // --- Booking Section ---
     public function createBooking($doctorId)
     {
-        $doctor = Doctor::with(['department', 'district'])->findOrFail($doctorId);
+        $doctor = Doctor::with(['district'])->findOrFail($doctorId);
         $bookedSlots = DoctorToken::where('doctor_id', $doctorId)
             ->where('status', 'Booked')
             ->where('booking_date', '>=', now()->toDateString())
             ->get(['booking_date', 'booking_time']);
-        return view('bookings.create', compact('doctor', 'bookedSlots'));
+
+        // Generate dynamic time slots based on doctor's available_time
+        $slots = [];
+        if ($doctor->available_time && str_contains($doctor->available_time, ' to ')) {
+            [$startStr, $endStr] = explode(' to ', $doctor->available_time);
+            try {
+                $start = \Carbon\Carbon::createFromFormat('H:i', $startStr);
+                $end = \Carbon\Carbon::createFromFormat('H:i', $endStr);
+
+                while ($start < $end) {
+                    $slots[] = $start->format('H:i');
+                    $start->addMinutes(30);
+                }
+            } catch (\Exception $e) {
+                // Fallback to default slots if parsing fails
+                $slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+            }
+        } else {
+            // Default slots
+            $slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+        }
+
+        return view('bookings.create', compact('doctor', 'bookedSlots', 'slots'));
     }
 
     public function storeBooking(Request $request)
@@ -267,7 +289,7 @@ class UserController extends Controller
 
     public function myBookings()
     {
-        $bookings = DoctorToken::where('user_id', Auth::id())->with('doctor.department')->orderBy('booking_date', 'desc')->get();
+        $bookings = DoctorToken::where('user_id', Auth::id())->with('doctor')->orderBy('booking_date', 'desc')->get();
         return view('bookings.my-bookings', compact('bookings'));
     }
 }
