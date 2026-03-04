@@ -10,6 +10,7 @@
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
                 <li class="nav-item"><a href="{{ route('admin.doctors.index') }}" class="nav-link">Doctors</a></li>
+                <li class="nav-item"><a href="{{ route('admin.categories.doctor') }}" class="nav-link">Doctor Categories</a></li>
                 <li class="nav-item"><a href="{{ route('admin.pharmas.index') }}" class="nav-link">Pharmacies</a></li>
                 <li class="nav-item">
                     <form action="{{ route('logout') }}" method="POST" class="d-inline">

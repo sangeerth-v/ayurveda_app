@@ -30,7 +30,7 @@
                                         <td>{{ $order->created_at->format('d M Y') }}</td>
                                         <td>₹{{ number_format($order->total_price, 2) }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : ($order->order_status == 'Placed' ? 'warning' : 'secondary') }}">
+                                            <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }}">
                                                 {{ $order->order_status }}
                                             </span>
                                         </td>

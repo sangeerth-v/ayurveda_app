@@ -10,6 +10,7 @@
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item"><a href="{{ route('pharma.dashboard') }}" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="{{ route('pharma.products.create') }}" class="nav-link">Add Product</a></li>
+                <li class="nav-item"><a href="{{ route('pharma.categories.product') }}" class="nav-link">Manage Categories</a></li>
                 <li class="nav-item"><a href="{{ route('pharma.profile.edit') }}" class="nav-link">Profile</a></li>
                 <!-- <li class="nav-item"><a href="{{ route('home') }}" class="nav-link"> -->
                     <!-- <i class="fas fa-external-link-alt me-1"></i> Visit Website</a></li> -->

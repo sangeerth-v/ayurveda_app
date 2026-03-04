@@ -26,10 +26,21 @@
                             <h5>Order Summary</h5>
                             <p>
                                 <strong>Date:</strong> {{ $order->created_at->format('d M Y, h:i A') }}<br>
-                                <strong>Status:</strong> 
-                                <span class="badge bg-{{ $order->order_status == 'Placed' ? 'primary' : ($order->order_status == 'Delivered' ? 'success' : 'warning') }}">
-                                    {{ $order->order_status }}
-                                </span>
+                            <div class="order-status-control mt-2">
+                                <label class="small text-muted mb-1 d-block font-weight-bold">Update Order Status:</label>
+                                <form action="{{ route('pharma.orders.status.update', $order->id) }}" method="POST" class="d-inline-block">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="btn-group shadow-sm" role="group">
+                                        <button type="submit" name="order_status" value="Placed" class="btn btn-sm {{ $order->order_status == 'Placed' ? 'btn-primary shadow-none' : 'btn-outline-primary' }}">
+                                            <i class="fas fa-box me-1"></i> Placed
+                                        </button>
+                                        <button type="submit" name="order_status" value="Delivered" class="btn btn-sm {{ $order->order_status == 'Delivered' ? 'btn-success shadow-none' : 'btn-outline-success' }}">
+                                            <i class="fas fa-check-circle me-1"></i> Delivered
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                             </p>
                         </div>
                     </div>

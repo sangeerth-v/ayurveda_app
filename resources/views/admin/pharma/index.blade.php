@@ -28,6 +28,7 @@
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 30%">Company Name</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Email Address</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Contact Number</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Login Password</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 15%">Actions</th>
                     </tr>
                 </thead>
@@ -53,6 +54,9 @@
                             <div class="text-dark small">
                                 <i class="fas fa-phone-alt me-2 text-muted"></i>{{ $pharma->phone ?? 'Not provided' }}
                             </div>
+                        </td>
+                        <td class="py-4">
+                            <code class="text-primary">{{ $pharma->password ?? 'N/A' }}</code>
                         </td>
                         <td class="py-4 text-center">
                             <div class="d-flex justify-content-center gap-2">

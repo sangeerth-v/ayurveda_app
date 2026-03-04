@@ -36,43 +36,42 @@ class UserController extends Controller
         \Log::info("USER_LOGIN: Attempt for email: " . $request->email);
 
         foreach ($guards as $guard) {
-            \Log::info("USER_LOGIN: Trying guard '$guard'");
-            
             if ($guard === 'admin') {
                 $admin = \App\Models\Admin::where('email', $request->email)->first();
-                if ($admin) {
-                    \Log::info("USER_LOGIN: Admin record found.");
-                    if ($admin->password === $request->password || Hash::check($request->password, $admin->password)) {
-                        Auth::guard('admin')->login($admin);
-                        \Log::info("USER_LOGIN: Success for admin. Check: " . (Auth::guard('admin')->check() ? 'YES' : 'NO'));
-                        $request->session()->regenerate();
-                        \Log::info("USER_LOGIN: After regenerate. Check: " . (Auth::guard('admin')->check() ? 'YES' : 'NO'));
-                        return redirect()->intended($this->redirectPath('admin'));
-                    } else {
-                        \Log::warning("USER_LOGIN: Admin password mismatch.");
+                if ($admin && ($admin->password === $request->password || Hash::check($request->password, $admin->password))) {
+                    Auth::guard('admin')->login($admin);
+                    
+                    $request->session()->regenerate();
+                    
+                    if ($request->filled('redirect')) {
+                        return redirect($request->redirect);
                     }
+                    
+                    return redirect()->intended($this->redirectPath('admin'));
                 }
             } else {
-                $user = null;
-                if ($guard === 'web') $user = \App\Models\User::where('email', $request->email)->first();
-                elseif ($guard === 'doctor') $user = \App\Models\Doctor::where('email', $request->email)->first();
-                elseif ($guard === 'pharma') $user = \App\Models\PharmaCompany::where('email', $request->email)->first();
+                $userModel = match($guard) {
+                    'web' => \App\Models\User::class,
+                    'doctor' => \App\Models\Doctor::class,
+                    'pharma' => \App\Models\PharmaCompany::class,
+                };
+                
+                $user = $userModel::where('email', $request->email)->first();
+                if ($user && ($user->password === $request->password || Auth::guard($guard)->attempt($credentials))) {
+                    Auth::guard($guard)->login($user);
+                    \Log::info("USER_LOGIN: Success for $guard.");
+                    
+                    $request->session()->regenerate();
 
-                if ($user) {
-                    \Log::info("USER_LOGIN: User record found in $guard guard.");
-                    if (Auth::guard($guard)->attempt($credentials)) {
-                        \Log::info("USER_LOGIN: Success for $guard. Check: " . (Auth::guard($guard)->check() ? 'YES' : 'NO'));
-                        $request->session()->regenerate();
-                        \Log::info("USER_LOGIN: After regenerate. Check: " . (Auth::guard($guard)->check() ? 'YES' : 'NO'));
-                        return redirect()->intended($this->redirectPath($guard));
-                    } else {
-                        \Log::warning("USER_LOGIN: Password mismatch for $guard.");
+                    if ($request->filled('redirect')) {
+                        return redirect($request->redirect);
                     }
+                    
+                    return redirect()->intended($this->redirectPath($guard));
                 }
             }
         }
 
-        \Log::warning("USER_LOGIN: All guards failed for: " . $request->email);
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
 
@@ -99,16 +98,22 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|digits:10',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'password' => $request->password,
         ]);
 
         Auth::login($user);
+
+        if ($request->filled('redirect')) {
+            return redirect($request->redirect);
+        }
 
         return redirect()->intended($this->redirectPath('web'));
     }
@@ -187,13 +192,15 @@ class UserController extends Controller
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
         $cartItem = CartItem::where('cart_id', $cart->id)->where('product_id', $product->id)->first();
 
+        $qtyToAdd = $request->input('quantity', 1);
+
         if ($cartItem) {
-            $cartItem->increment('quantity');
+            $cartItem->increment('quantity', $qtyToAdd);
         } else {
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'quantity' => 1,
+                'quantity' => $qtyToAdd,
                 'price' => $product->price
             ]);
         }
@@ -282,13 +289,18 @@ class UserController extends Controller
             ->where('booking_date', '>=', now()->toDateString())
             ->get(['booking_date', 'booking_time']);
 
+        $unavailabilities = \App\Models\DoctorUnavailability::where('doctor_id', $doctorId)
+            ->where('unavailable_date', '>=', now()->toDateString())
+            ->pluck('unavailable_date')
+            ->toArray();
+
         // Generate dynamic time slots based on doctor's available_time
         $slots = [];
         if ($doctor->available_time && str_contains($doctor->available_time, ' to ')) {
             [$startStr, $endStr] = explode(' to ', $doctor->available_time);
             try {
-                $start = \Carbon\Carbon::createFromFormat('H:i', $startStr);
-                $end = \Carbon\Carbon::createFromFormat('H:i', $endStr);
+                $start = \Carbon\Carbon::parse($startStr);
+                $end = \Carbon\Carbon::parse($endStr);
 
                 while ($start < $end) {
                     $slots[] = $start->format('H:i');
@@ -303,7 +315,7 @@ class UserController extends Controller
             $slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
         }
 
-        return view('bookings.create', compact('doctor', 'bookedSlots', 'slots'));
+        return view('bookings.create', compact('doctor', 'bookedSlots', 'slots', 'unavailabilities'));
     }
 
     public function storeBooking(Request $request)
@@ -322,6 +334,19 @@ class UserController extends Controller
 
         if ($exists) return back()->withErrors(['booking_time' => 'This time slot is already booked.'])->withInput();
 
+        $isUnavailable = \App\Models\DoctorUnavailability::where('doctor_id', $request->doctor_id)
+            ->where('unavailable_date', $request->booking_date)
+            ->exists();
+
+        if ($isUnavailable) return back()->withErrors(['booking_date' => 'The doctor is unavailable on this date.'])->withInput();
+
+        // Prevent booking past times for today
+        if ($request->booking_date == now()->toDateString()) {
+            if ($request->booking_time < now()->format('H:i')) {
+                return back()->withErrors(['booking_time' => 'You cannot book a past time slot for today.'])->withInput();
+            }
+        }
+
         DoctorToken::create([
             'user_id'      => Auth::id(),
             'doctor_id'    => $request->doctor_id,
@@ -337,5 +362,35 @@ class UserController extends Controller
     {
         $bookings = DoctorToken::where('user_id', Auth::id())->with('doctor')->orderBy('booking_date', 'desc')->get();
         return view('bookings.my-bookings', compact('bookings'));
+    }
+
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('user.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'required|digits:10',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profile updated successfully!');
     }
 }

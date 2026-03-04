@@ -38,24 +38,48 @@
         </div>
 
         <!-- Date Strip (Only relevant for Today/Upcoming) -->
-        <div class="date-scroll-wrapper mb-4">
-            <div class="d-flex gap-2 overflow-auto hide-scrollbar py-2" id="dateStrip">
-                @php
-                    $today = \Carbon\Carbon::today();
-                    $selectedDate = request('date', $today->format('Y-m-d'));
-                @endphp
-                @for($i = -2; $i < 14; $i++)
-                    @php 
-                        $date = \Carbon\Carbon::today()->addDays($i);
-                        $isActive = ($selectedDate == $date->format('Y-m-d'));
-                    @endphp
-                    <div class="date-pill {{ $isActive ? 'active' : '' }} flex-shrink-0 d-flex flex-column align-items-center justify-content-center" 
-                         onclick="window.location.href='{{ route('doctor.dashboard', ['filter' => 'upcoming', 'date' => $date->format('Y-m-d')]) }}'"
-                         style="cursor: pointer;">
-                        <span class="day">{{ $date->format('D') }}</span>
-                        <span class="num">{{ $date->format('d') }}</span>
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-9">
+                <div class="date-scroll-wrapper">
+                    <div class="d-flex gap-2 overflow-auto hide-scrollbar py-2" id="dateStrip">
+                        @php
+                            $today = \Carbon\Carbon::today();
+                            $selectedDate = request('date', $today->format('Y-m-d'));
+                        @endphp
+                        @for($i = -2; $i < 14; $i++)
+                            @php 
+                                $date = \Carbon\Carbon::today()->addDays($i);
+                                $dateStr = $date->format('Y-m-d');
+                                $isActive = ($selectedDate == $dateStr);
+                                $isUnavailable = in_array($dateStr, $unavailabilities);
+                            @endphp
+                            <div class="date-pill {{ $isActive ? 'active' : '' }} {{ $isUnavailable ? 'unavailable' : '' }} flex-shrink-0 d-flex flex-column align-items-center justify-content-center" 
+                                 onclick="window.location.href='{{ route('doctor.dashboard', ['filter' => 'upcoming', 'date' => $dateStr]) }}'"
+                                 style="cursor: pointer; position: relative;">
+                                <span class="day">{{ $date->format('D') }}</span>
+                                <span class="num">{{ $date->format('d') }}</span>
+                                @if($isUnavailable)
+                                    <span class="unavailable-marker px-1 rounded-pill bg-danger text-white position-absolute top-0 end-0" style="font-size: 8px; transform: translate(30%, -30%);">Leave</span>
+                                @endif
+                            </div>
+                        @endfor
                     </div>
-                @endfor
+                </div>
+            </div>
+            <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                @if($filter == 'upcoming')
+                    <form action="{{ route('doctor.unavailability.toggle') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="date" value="{{ $selectedDate }}">
+                        <button type="submit" class="btn {{ in_array($selectedDate, $unavailabilities) ? 'btn-success' : 'btn-danger' }} rounded-pill px-4 shadow-sm w-100">
+                            @if(in_array($selectedDate, $unavailabilities))
+                                <i class="fas fa-check-circle me-1"></i> Mark Available
+                            @else
+                                <i class="fas fa-times-circle me-1"></i> Mark Leave Today
+                            @endif
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
@@ -82,7 +106,7 @@
                         @forelse($bookings as $booking)
                             <tr>
                                 <td class="ps-4">
-                                    <div class="fw-bold text-dark fs-6">{{ \Carbon\Carbon::createFromFormat('H:i:s', $booking->booking_time)->format('h:i A') }}</div>
+                                    <div class="fw-bold text-dark fs-6">{{ \Carbon\Carbon::parse($booking->booking_time)->format('h:i A') }}</div>
                                     <div class="small text-muted">{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M') }}</div>
                                 </td>
                                 <td>
@@ -240,8 +264,26 @@
         box-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
     }
     
-    .calendar-day.other-month { opacity: 0.1; pointer-events: none; }
+    .calendar-day.on-leave { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
     
+    .calendar-day.on-leave::after {
+        content: '';
+        background: #ef4444 !important;
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.5) !important;
+    }
+
+    .date-pill.unavailable {
+        background: #f1f3f5 !important;
+        border-color: #dee2e6 !important;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .date-pill.unavailable .day, .date-pill.unavailable .num {
+        color: #adb5bd !important;
+        text-decoration: line-through;
+    }
+
     .pagination { margin-bottom: 0; }
     .page-link { color: #1a4d2e; border-radius: 8px !important; margin: 0 2px; border: none; background: #f8f9fa; }
     .page-item.active .page-link { background-color: #1a4d2e; border-color: #1a4d2e; }
@@ -250,6 +292,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const appointmentDates = {!! json_encode($allBookingDates) !!};
+    const leaveDates = {!! json_encode($unavailabilities) !!};
     let currentViewDate = new Date();
 
     function renderCalendar() {
@@ -283,6 +326,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (appointmentDates.includes(dateStr)) {
                 div.classList.add('has-appointment');
+            }
+
+            if (leaveDates.includes(dateStr)) {
+                div.classList.add('on-leave');
+                div.title = 'Marked as Leave';
             }
             
             if (year === now.getFullYear() && month === now.getMonth() && i === now.getDate()) {

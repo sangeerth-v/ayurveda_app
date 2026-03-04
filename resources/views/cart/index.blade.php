@@ -81,12 +81,7 @@
                 @endif
             </div>
 
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+
 
             @if($cart && $cart->items->count() > 0)
                 <div class="card border-0 shadow-md rounded-4 overflow-hidden">
@@ -124,22 +119,16 @@
                                             <td class="align-middle fw-semibold">₹{{ number_format($item->price, 2) }}</td>
                                             <td class="align-middle">
                                                 <div class="quantity-selector">
-                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="m-0">
+                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="m-0 d-flex align-items-center">
                                                         @csrf
                                                         @method('PUT')
-                                                        <input type="hidden" name="quantity" value="{{ $item->quantity - 1 }}">
-                                                        <button type="submit" class="btn qty-btn" {{ $item->quantity <= 1 ? 'disabled' : '' }} title="Decrease">
+                                                        <button type="button" class="btn qty-btn" onclick="const input = this.nextElementSibling; if(input.value > 1) { input.stepDown(); this.form.submit(); }" title="Decrease">
                                                             <i class="fas fa-minus small"></i>
                                                         </button>
-                                                    </form>
-                                                    
-                                                    <span class="qty-value px-2">{{ $item->quantity }}</span>
-                                                    
-                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="m-0">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
-                                                        <button type="submit" class="btn qty-btn" title="Increase">
+                                                        
+                                                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="20" class="form-control border-0 bg-transparent text-center fw-bold text-success" style="width: 50px;" onchange="this.form.submit()">
+                                                        
+                                                        <button type="button" class="btn qty-btn" onclick="const input = this.previousElementSibling; input.stepUp(); this.form.submit();" title="Increase">
                                                             <i class="fas fa-plus small"></i>
                                                         </button>
                                                     </form>
@@ -168,67 +157,77 @@
                                     <i class="fas fa-info-circle me-1"></i> Shipping and taxes calculated at checkout
                                 </div>
                             </div>
-                            <div class="col-md-6 text-md-end">
-                                <div class="mb-3">
-                                    <span class="text-muted me-2">Order Total:</span>
+                            <div class="col-md-6 text-md-end" id="cart-summary-section">
+                                <div class="mb-4">
+                                    <span class="text-muted me-2">Subtotal:</span>
                                     <span class="fs-3 fw-bold text-success">₹{{ number_format($grandTotal, 2) }}</span>
                                 </div>
-                                <form action="{{ route('orders.store') }}" method="POST">
-                                    @csrf
-                                    <div class="card bg-light border-0 rounded-4 mb-4 text-start">
-                                        <div class="card-body p-4">
-                                            <h5 class="mb-4" style="color: #1a4d2e;"><i class="fas fa-truck me-2"></i>Shipping Details</h5>
-                                            
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">Full Name</label>
-                                                    <input type="text" name="delivery_name" class="form-control rounded-pill" placeholder="Enter recipient name" required value="{{ auth()->user()->name }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">Phone Number</label>
-                                                    <input type="tel" name="delivery_phone" class="form-control rounded-pill" placeholder="Enter phone number" required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">District</label>
-                                                    <select name="delivery_district" class="form-select rounded-pill" required>
-                                                        <option value="">Select District</option>
-                                                        @foreach($districts as $district)
-                                                            <option value="{{ $district->name }}">{{ $district->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">Pincode</label>
-                                                    <input type="text" name="delivery_pincode" class="form-control rounded-pill" placeholder="Enter 6-digit pincode" required pattern="\d{6}" maxlength="6" title="Please enter a valid 6-digit pincode">
-                                                </div>
-                                                <div class="col-12">
-                                                    <label class="form-label small fw-bold">Shipping Address</label>
-                                                    <textarea name="delivery_address" class="form-control rounded-4" rows="3" placeholder="Enter full delivery address" required></textarea>
-                                                </div>
-                                                
-                                                <div class="col-12 mt-4">
-                                                    <h5 class="mb-3" style="color: #1a4d2e;"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
-                                                    <div class="d-flex gap-3">
-                                                        <div class="form-check custom-option w-100">
-                                                            <input class="form-check-input" type="radio" name="payment_method" id="pay_cod" value="COD" checked required>
-                                                            <label class="form-check-label w-100" for="pay_cod">
-                                                                <div class="d-flex justify-content-between align-items-center">
-                                                                    <span>Cash on Delivery</span>
-                                                                    <i class="fas fa-money-bill-wave text-success"></i>
-                                                                </div>
-                                                                <div class="small text-muted mt-1">Pay when you receive your order</div>
-                                                            </label>
+                                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" onclick="showCheckout()">
+                                    Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+
+                            <div class="col-12 d-none" id="checkout-form-section">
+                                <hr class="my-5">
+                                <div class="row justify-content-end">
+                                    <div class="col-lg-8">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <h4 style="color: #1a4d2e;"><i class="fas fa-truck me-2"></i>Shipping & Payment</h4>
+                                            <span class="fs-4 fw-bold text-success">Total: ₹{{ number_format($grandTotal, 2) }}</span>
+                                        </div>
+
+                                        <form action="{{ route('orders.store') }}" method="POST">
+                                            @csrf
+                                            <div class="card bg-light border-0 rounded-4 mb-4 text-start">
+                                                <div class="card-body p-4">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label small fw-bold">Full Name</label>
+                                                            <input type="text" name="delivery_name" class="form-control rounded-pill" placeholder="Enter recipient name" required value="{{ auth()->user()->name }}">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label small fw-bold">Phone Number</label>
+                                                            <input type="tel" name="delivery_phone" class="form-control rounded-pill @error('delivery_phone') is-invalid @enderror" placeholder="Enter 10-digit phone number" required pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="{{ auth()->user()->phone ?? '' }}">
+                                                            @error('delivery_phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label small fw-bold">Pincode</label>
+                                                            <input type="text" name="delivery_pincode" id="delivery_pincode" class="form-control rounded-pill" placeholder="Enter 6-digit pincode" required pattern="\d{6}" maxlength="6" title="Please enter a valid 6-digit pincode">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label small fw-bold">District</label>
+                                                            <input type="text" name="delivery_district" id="delivery_district" class="form-control rounded-pill" placeholder="Enter district" required>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label small fw-bold">Shipping Address</label>
+                                                            <textarea name="delivery_address" class="form-control rounded-4" rows="3" placeholder="Enter full delivery address" required></textarea>
+                                                        </div>
+                                                        
+                                                        <div class="col-12 mt-4">
+                                                            <h5 class="mb-3" style="color: #1a4d2e;"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
+                                                            <div class="form-check custom-option w-100">
+                                                                <input class="form-check-input" type="radio" name="payment_method" id="pay_cod" value="COD" checked required>
+                                                                <label class="form-check-label w-100" for="pay_cod">
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <span>Cash on Delivery</span>
+                                                                        <i class="fas fa-money-bill-wave text-success"></i>
+                                                                    </div>
+                                                                    <div class="small text-muted mt-1">Pay when you receive your order</div>
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                            <div class="d-flex gap-3 justify-content-end">
+                                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" onclick="hideCheckout()">Back to Cart</button>
+                                                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
+                                                    Complete Order <i class="fas fa-check-circle ms-2"></i>
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
-
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
-                                        Place Order Now <i class="fas fa-check-circle ms-2"></i>
-                                    </button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -241,4 +240,38 @@
         </div>
     </div>
 </div>
+
+<script>
+function showCheckout() {
+    document.getElementById('cart-summary-section').classList.add('d-none');
+    document.getElementById('checkout-form-section').classList.remove('d-none');
+    window.scrollTo({ top: document.getElementById('checkout-form-section').offsetTop - 100, behavior: 'smooth' });
+}
+
+function hideCheckout() {
+    document.getElementById('checkout-form-section').classList.add('d-none');
+    document.getElementById('cart-summary-section').classList.remove('d-none');
+}
+
+document.getElementById('delivery_pincode')?.addEventListener('input', function(e) {
+    const pincode = e.target.value;
+    const districtInput = document.getElementById('delivery_district');
+
+    if (pincode.length === 6) {
+        fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data[0].Status === "Success") {
+                    const district = data[0].PostOffice[0].District;
+                    
+                    // Directly fill the district value
+                    districtInput.value = district;
+                    districtInput.classList.add('is-valid');
+                    setTimeout(() => districtInput.classList.remove('is-valid'), 2000);
+                }
+            })
+            .catch(err => console.error('Pincode fetch error:', err));
+    }
+});
+</script>
 @endsection

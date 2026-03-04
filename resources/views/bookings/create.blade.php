@@ -33,7 +33,7 @@
                                 @php
                                     $times = explode(' to ', $doctor->available_time);
                                     if(count($times) == 2) {
-                                        echo \Carbon\Carbon::createFromFormat('H:i', trim($times[0]))->format('h:i A') . ' - ' . \Carbon\Carbon::createFromFormat('H:i', trim($times[1]))->format('h:i A');
+                                        echo \Carbon\Carbon::parse(trim($times[0]))->format('h:i A') . ' - ' . \Carbon\Carbon::parse(trim($times[1]))->format('h:i A');
                                     } else {
                                         echo $doctor->available_time;
                                     }
@@ -79,7 +79,7 @@
                                     <div class="col">
                                         <input type="radio" name="booking_time" value="{{ $slot }}" id="slot-{{ str_replace(':', '-', $slot) }}" class="btn-check" required>
                                         <label class="btn btn-outline-success w-100 py-2 rounded-3 shadow-sm time-slot-label" for="slot-{{ str_replace(':', '-', $slot) }}" data-slot="{{ $slot }}">
-                                            {{ \Carbon\Carbon::createFromFormat('H:i', $slot)->format('h:i A') }}
+                                            {{ \Carbon\Carbon::parse($slot)->format('h:i A') }}
                                         </label>
                                     </div>
                                 @endforeach
@@ -113,27 +113,61 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const bookedData = {!! $bookedSlots->toJson() !!};
+                        const leaveDates = {!! json_encode($unavailabilities) !!};
                         const dateInput = document.getElementById('booking_date');
                         const timeSlotsContainer = document.getElementById('time-slots-container');
                         const slotLabels = timeSlotsContainer.querySelectorAll('.time-slot-label');
+                        const submitBtn = document.querySelector('button[type="submit"]');
 
                         function updateSlots() {
                             const selectedDate = dateInput.value;
                             if(!selectedDate) return;
+
+                            const isUnavailable = leaveDates.includes(selectedDate);
+                            
+                            // Handle Leave Dates
+                            if (isUnavailable) {
+                                timeSlotsContainer.innerHTML = `
+                                    <div class="col-12 w-100 mt-2">
+                                        <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center py-4">
+                                            <i class="fas fa-calendar-times fa-3x me-4 opacity-50"></i>
+                                            <div>
+                                                <h5 class="fw-bold mb-1">Doctor is Unavailable</h5>
+                                                <p class="mb-0 small opcaity-75">The doctor has marked this date as a leave. Please select another date for your appointment.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                submitBtn.disabled = true;
+                                submitBtn.classList.add('opacity-50');
+                                return;
+                            } else {
+                                // Restore slots HTML if it was replaced
+                                if (timeSlotsContainer.querySelector('.alert-danger')) {
+                                    location.reload(); // Simplest way to restore slots and logic
+                                    return;
+                                }
+                            }
+
+                            const now = new Date();
+                            const todayStr = now.toLocaleDateString('en-CA'); // Gets YYYY-MM-DD in local time
+                            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
                             slotLabels.forEach(label => {
                                 const slotTime = label.getAttribute('data-slot'); // e.g. "09:00"
                                 const radioInput = document.getElementById(label.getAttribute('for'));
                                 
                                 // Check if this slot for the selected date is in bookedData
-                                // Normalize both times to HH:MM format (first 5 chars)
                                 const isBooked = bookedData.some(b => {
                                     const bookedTimeNormalized = b.booking_time.substring(0, 5);
                                     const slotTimeNormalized = slotTime.substring(0, 5);
                                     return b.booking_date === selectedDate && bookedTimeNormalized === slotTimeNormalized;
                                 });
+
+                                // Check if slot is in the past for today
+                                const isPast = (selectedDate === todayStr && slotTime < currentTimeStr);
                                 
-                                if(isBooked) {
+                                if(isBooked || isPast) {
                                     radioInput.disabled = true;
                                     radioInput.checked = false;
                                     label.classList.add('booked');
@@ -142,6 +176,9 @@
                                     label.classList.remove('booked');
                                 }
                             });
+                            
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-50');
                         }
 
                         dateInput.addEventListener('change', updateSlots);

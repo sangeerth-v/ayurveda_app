@@ -43,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/doctors/{id}/book', [UserController::class, 'createBooking'])->name('bookings.create');
     Route::post('/bookings', [UserController::class, 'storeBooking'])->name('bookings.store');
     Route::get('/my-appointments', [UserController::class, 'myBookings'])->name('bookings.my');
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
 // --- Admin Routes (AdminController + DoctorController + PharmaController) ---
@@ -63,12 +67,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);
+
+        // Category & Subcategory Management
+        Route::get('/doctor-categories', [\App\Http\Controllers\Admin\CategoryController::class, 'doctorIndex'])->name('categories.doctor');
+        Route::post('/doctor-categories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeDoctorCategory'])->name('categories.doctor.store');
+        Route::post('/doctor-subcategories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeDoctorSubcategory'])->name('categories.doctor_subcategory.store');
+        Route::delete('/doctor-categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyDoctorCategory'])->name('categories.doctor.destroy');
+        Route::delete('/doctor-subcategories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyDoctorSubcategory'])->name('categories.doctor_subcategory.destroy');
+
+        Route::get('/product-categories', [\App\Http\Controllers\Admin\CategoryController::class, 'productIndex'])->name('categories.product');
+        Route::post('/product-categories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeProductCategory'])->name('categories.product.store');
+        Route::post('/product-subcategories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
+        Route::delete('/product-categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductCategory'])->name('categories.product.destroy');
+        Route::delete('/product-subcategories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
     });
 });
+
+// AJAX Routes (No prefix to keep URL clean, or inside admin if appropriate)
+Route::get('/api/doctor-subcategories/{categoryId}', [\App\Http\Controllers\Admin\CategoryController::class, 'getDoctorSubcategories']);
+Route::get('/api/product-subcategories/{categoryId}', [\App\Http\Controllers\Admin\CategoryController::class, 'getProductSubcategories']);
 
 // --- Doctor Role Routes (DoctorController) ---
 Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(function () {
     Route::get('/dashboard', [DoctorController::class, 'dashboard'])->name('dashboard');
+    Route::post('/unavailability', [DoctorController::class, 'toggleAvailability'])->name('unavailability.toggle');
     Route::get('/profile', [DoctorController::class, 'profile'])->name('profile');
     Route::put('/profile', [DoctorController::class, 'updateProfile'])->name('profile.update');
 });
@@ -82,6 +104,14 @@ Route::prefix('pharma')->name('pharma.')->middleware('auth:pharma')->group(funct
     Route::put('/products/{id}', [PharmaController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/{id}', [PharmaController::class, 'destroyProduct'])->name('products.destroy');
     Route::get('/orders/{id}', [PharmaController::class, 'showOrder'])->name('orders.show');
+    Route::put('/orders/{id}/status', [PharmaController::class, 'updateOrderStatus'])->name('orders.status.update');
     Route::get('/profile', [PharmaController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [PharmaController::class, 'updateProfile'])->name('profile.update');
+
+    // Category Management for Pharma (reusing same logic)
+    Route::get('/product-categories', [PharmaController::class, 'productCategories'])->name('categories.product');
+    Route::post('/product-categories', [PharmaController::class, 'storeProductCategory'])->name('categories.product.store');
+    Route::post('/product-subcategories', [PharmaController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
+    Route::delete('/product-categories/{id}', [PharmaController::class, 'destroyProductCategory'])->name('categories.product.destroy');
+    Route::delete('/product-subcategories/{id}', [PharmaController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
 });

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Ayurveda App</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-green: #2d6a4f;
@@ -126,6 +127,26 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            background: none;
+            border: none;
+            color: var(--secondary-green);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            width: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -144,35 +165,42 @@
 
         <form action="{{ route('login') }}" method="POST">
             @csrf
+            <input type="hidden" name="redirect" value="{{ request()->query('redirect') }}">
             
             <div class="form-group">
                 <label>Email Address</label>
                 <input type="email" name="email" value="{{ old('email') }}" required >
             </div>
 
-            <div class="form-group" style="position: relative;">
+            <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" id="password" required >
-                <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 38px; cursor: pointer;">
-                    👁️
-                </span>
+                <input type="password" name="password" id="password" required>
+                <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
+                    <i class="fas fa-eye"></i>
+                </button>
             </div>
 
             <button type="submit">Log In</button>
         </form>
 
         <div class="text-center">
-            Don't have an account? <a href="{{ route('register') }}">Sign Up</a>
+            Don't have an account? <a href="{{ route('register') }}{{ request()->has('redirect') ? '?redirect=' . urlencode(request()->query('redirect')) : '' }}">Sign Up</a>
         </div>
     </div>
 
     <script>
-        function togglePassword() {
-            var passwordInput = document.getElementById("password");
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
-                passwordInput.type = "password";
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
     </script>

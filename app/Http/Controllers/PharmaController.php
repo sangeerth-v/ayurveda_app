@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PharmaCompany;
+use App\Models\ProductCategory;
+use App\Models\ProductSubcategory;
 
 class PharmaController extends Controller
 {
@@ -37,7 +39,7 @@ class PharmaController extends Controller
         PharmaCompany::create([
             'company_name' => $request->company_name,
             'email' => $request->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => $request->password,
             'phone' => $request->phone,
             'address' => $request->address,
             'logo' => $logoPath,
@@ -79,7 +81,7 @@ class PharmaController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+            $data['password'] = $request->password;
         }
 
         if ($request->hasFile('logo')) {
@@ -125,20 +127,25 @@ class PharmaController extends Controller
 
     public function createProduct()
     {
-        return view('pharma.products.create');
+        $categories = ProductCategory::all();
+        return view('pharma.products.create', compact('categories'));
     }
 
     public function storeProduct(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'subcategory' => 'nullable|string|max:255',
+            'category' => 'required',
+            'subcategory' => 'nullable',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
             'image' => 'nullable|image|max:2048',
         ]);
+
+        // Resolve Category Names
+        $cat = ProductCategory::find($request->category);
+        $sub = ProductSubcategory::find($request->subcategory);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -148,8 +155,8 @@ class PharmaController extends Controller
         \App\Models\Product::create([
             'pharma_company_id' => \Illuminate\Support\Facades\Auth::guard('pharma')->id(),
             'name' => $request->name,
-            'category' => $request->category,
-            'subcategory' => $request->subcategory,
+            'category' => $cat ? $cat->name : $request->category,
+            'subcategory' => $sub ? $sub->name : $request->subcategory,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -164,7 +171,8 @@ class PharmaController extends Controller
     {
         $product = \App\Models\Product::where('pharma_company_id', \Illuminate\Support\Facades\Auth::guard('pharma')->id())
             ->findOrFail($id);
-        return view('pharma.products.edit', compact('product'));
+        $categories = ProductCategory::all();
+        return view('pharma.products.edit', compact('product', 'categories'));
     }
 
     public function updateProduct(Request $request, $id)
@@ -174,15 +182,21 @@ class PharmaController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'subcategory' => 'nullable|string|max:255',
+            'category' => 'required',
+            'subcategory' => 'nullable',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'category', 'subcategory', 'description', 'price', 'stock', 'expiry_date']);
+        // Resolve Category Names
+        $cat = ProductCategory::find($request->category);
+        $sub = ProductSubcategory::find($request->subcategory);
+
+        $data = $request->only(['name', 'description', 'price', 'stock', 'expiry_date']);
+        $data['category'] = $cat ? $cat->name : $request->category;
+        $data['subcategory'] = $sub ? $sub->name : $request->subcategory;
 
         if ($request->hasFile('image')) {
             // Delete old image
@@ -246,7 +260,7 @@ class PharmaController extends Controller
         $data = $request->only(['company_name', 'email', 'phone', 'address']);
 
         if ($request->filled('password')) {
-            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+            $data['password'] = $request->password;
         }
 
         if ($request->hasFile('logo')) {
@@ -259,5 +273,53 @@ class PharmaController extends Controller
         $pharma->update($data);
 
         return back()->with('success', 'Profile updated successfully!');
+    }
+
+    // --- Product Category Management for Pharma ---
+    public function productCategories()
+    {
+        $categories = ProductCategory::with('subcategories')->get();
+        return view('pharma.categories.index', compact('categories'));
+    }
+
+    public function storeProductCategory(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        ProductCategory::create(['name' => $request->name]);
+        return back()->with('success', 'Product Category added successfully');
+    }
+
+    public function storeProductSubcategory(Request $request)
+    {
+        $request->validate([
+            'product_category_id' => 'required|exists:product_categories,id',
+            'name' => 'required|string|max:255'
+        ]);
+        ProductSubcategory::create($request->all());
+        return back()->with('success', 'Product Subcategory added successfully');
+    }
+
+    public function destroyProductCategory($id)
+    {
+        ProductCategory::findOrFail($id)->delete();
+        return back()->with('success', 'Product Category deleted successfully');
+    }
+
+    public function destroyProductSubcategory($id)
+    {
+        ProductSubcategory::findOrFail($id)->delete();
+        return back()->with('success', 'Product Subcategory deleted successfully');
+    }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|in:Placed,Delivered'
+        ]);
+
+        $order = \App\Models\Order::findOrFail($id);
+        $order->update(['order_status' => $request->order_status]);
+
+        return back()->with('success', 'Order status updated to ' . $request->order_status);
     }
 }

@@ -62,7 +62,7 @@
 
                             <div class="col-md-6">
                                 <label for="phone" class="form-label fw-bold">Phone Number</label>
-                                <input type="text" class="form-control form-control-lg @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $pharma->phone) }}" required>
+                                <input type="text" class="form-control form-control-lg @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $pharma->phone) }}" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -70,7 +70,12 @@
 
                             <div class="col-md-6">
                                 <label for="password" class="form-label fw-bold">New Password (Leave blank to keep current)</label>
-                                <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" id="password" name="password">
+                                <div class="input-group">
+                                    <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" id="password" name="password">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

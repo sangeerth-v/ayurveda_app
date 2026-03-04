@@ -139,7 +139,10 @@
                                                 <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                                     {{ substr($appointment->user->name ?? 'U', 0, 1) }}
                                                 </div>
-                                                <div class="fw-bold">{{ $appointment->user->name ?? 'Guest User' }}</div>
+                                                <div>
+                                                    <div class="fw-bold">{{ $appointment->user->name ?? 'Guest User' }}</div>
+                                                    <div class="small text-muted"><i class="fas fa-phone-alt me-1 opacity-50"></i> {{ $appointment->user->phone ?? 'No Phone' }}</div>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') }}</td>

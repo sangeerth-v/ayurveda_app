@@ -166,6 +166,7 @@
 
         <form action="{{ route('register') }}" method="POST">
             @csrf
+            <input type="hidden" name="redirect" value="{{ request()->query('redirect') }}">
             
             <div class="form-group">
                 <label>Full Name</label>
@@ -205,7 +206,7 @@
         </form>
 
         <div class="text-center">
-            Already have an account? <a href="{{ route('login') }}">Log In</a>
+            Already have an account? <a href="{{ route('login') }}{{ request()->has('redirect') ? '?redirect=' . urlencode(request()->query('redirect')) : '' }}">Log In</a>
         </div>
     </div>
 

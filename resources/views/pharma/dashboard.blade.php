@@ -70,7 +70,7 @@
                             </td>
                             <td class="fw-bold text-success">₹{{ number_format($order->total_price, 2) }}</td>
                             <td>
-                                <span class="badge rounded-pill bg-{{ $order->order_status == 'Placed' ? 'primary' : ($order->order_status == 'Delivered' ? 'success' : 'warning') }} bg-opacity-10 text-{{ $order->order_status == 'Placed' ? 'primary' : ($order->order_status == 'Delivered' ? 'success' : 'warning') }} border border-{{ $order->order_status == 'Placed' ? 'primary' : ($order->order_status == 'Delivered' ? 'success' : 'warning') }} border-opacity-10 px-3">
+                                <span class="badge rounded-pill bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} bg-opacity-10 text-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border border-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border-opacity-10 px-3">
                                     {{ $order->order_status }}
                                 </span>
                             </td>

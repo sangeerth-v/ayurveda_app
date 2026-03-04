@@ -17,7 +17,7 @@
                         <div class="col-md-6 border-end">
                             <h6 class="text-muted text-uppercase small fw-bold mb-3">Order Information</h6>
                             <p class="mb-1"><strong>Order Date:</strong> {{ $order->created_at->format('d M Y, h:i A') }}</p>
-                            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-success">{{ $order->order_status }}</span></p>
+                            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }}">{{ $order->order_status }}</span></p>
                             <p class="mb-1"><strong>Payment Method:</strong> {{ $order->payment_method }}</p>
                             <p class="mb-1"><strong>Payment Status:</strong> <span class="badge bg-info">{{ $order->payment_status }}</span></p>
                         </div>
@@ -52,8 +52,19 @@
                                 @foreach($order->items as $item)
                                     <tr>
                                         <td>
-                                            <div class="fw-bold">{{ $item->product ? $item->product->name : 'Product Removed' }}</div>
-                                            <small class="text-muted">{{ $item->product ? $item->product->category : '' }}</small>
+                                            <div class="d-flex align-items-center">
+                                                @if($item->product && $item->product->image)
+                                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="rounded shadow-sm border me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                @else
+                                                    <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; border: 1px solid #dee2e6;">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                @endif
+                                                <div>
+                                                    <div class="fw-bold">{{ $item->product ? $item->product->name : 'Product Removed' }}</div>
+                                                    <small class="text-muted">{{ $item->product ? $item->product->category : '' }}</small>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-center">₹{{ number_format($item->price, 2) }}</td>
                                         <td class="text-center">{{ $item->quantity }}</td>

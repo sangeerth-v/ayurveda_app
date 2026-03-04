@@ -1,0 +1,20 @@
+Array
+(
+    [id] => 2
+    [name] => ram
+    [email] => ram@gmail.com
+    [photo] => 
+    [password] => $2y$10$KOnmAxzF5kNdVYLyCrUfXuLu0rJeyUEHF8pPiCRgC6Qq.DzbQNoCi
+    [password_plain] => 
+    [phone] => 152266633737
+    [specialization_category] => 
+    [specialization_subcategory] => 
+    [district_id] => 1
+    [qualification] => bams
+    [experience] => 2
+    [consultation_fee] => 300.00
+    [available_time] => 9:00am to 5:00pm
+    [created_at] => 2026-02-12T18:35:49.000000Z
+    [updated_at] => 2026-02-12T18:35:49.000000Z
+    [deleted_at] => 
+)

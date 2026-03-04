@@ -7,6 +7,8 @@ use App\Models\Doctor;
 
 use App\Models\Department;
 use App\Models\District;
+use App\Models\DoctorCategory;
+use App\Models\DoctorSubcategory;
 
 class DoctorController extends Controller
 {
@@ -19,7 +21,8 @@ class DoctorController extends Controller
     public function create()
     {
         $districts = District::all();
-        return view('admin.doctors.create', compact('districts'));
+        $categories = DoctorCategory::all();
+        return view('admin.doctors.create', compact('districts', 'categories'));
     }
 
     public function store(Request $request)
@@ -45,15 +48,19 @@ class DoctorController extends Controller
             $photoPath = $request->file('photo')->store('doctors', 'public');
         }
 
+        // Resolve Category Names
+        $category = DoctorCategory::find($request->specialization_category);
+        $subcategory = DoctorSubcategory::find($request->specialization_subcategory);
+
         // Create Doctor
         Doctor::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password), 
+            'password' => $request->password, 
             'password_plain' => $request->password,
             'phone' => $request->phone,
-            'specialization_category' => $request->specialization_category,
-            'specialization_subcategory' => $request->specialization_subcategory,
+            'specialization_category' => $category ? $category->name : $request->specialization_category,
+            'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
@@ -80,7 +87,8 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::with(['district'])->findOrFail($id);
         $districts = District::all();
-        return view('admin.doctors.edit', compact('doctor', 'districts'));
+        $categories = DoctorCategory::all();
+        return view('admin.doctors.edit', compact('doctor', 'districts', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -92,8 +100,8 @@ class DoctorController extends Controller
             'email' => 'required|email|unique:doctors,email,' . $id,
             'password' => 'nullable|string|min:6',
             'phone' => 'required|digits:10',
-            'specialization_category' => 'required|string|max:255',
-            'specialization_subcategory' => 'nullable|string|max:255',
+            'specialization_category' => 'required',
+            'specialization_subcategory' => 'nullable',
             'district_id' => 'required|exists:districts,id',
             'qualification' => 'nullable|string',
             'experience' => 'nullable|integer',
@@ -103,12 +111,16 @@ class DoctorController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Resolve Category Names
+        $category = DoctorCategory::find($request->specialization_category);
+        $subcategory = DoctorSubcategory::find($request->specialization_subcategory);
+
         $data = [
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'specialization_category' => $request->specialization_category,
-            'specialization_subcategory' => $request->specialization_subcategory,
+            'specialization_category' => $category ? $category->name : $request->specialization_category,
+            'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
@@ -117,7 +129,7 @@ class DoctorController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
+            $data['password'] = $request->password;
             $data['password_plain'] = $request->password;
         }
 
@@ -168,7 +180,32 @@ class DoctorController extends Controller
                             ->pluck('booking_date')
                             ->toArray();
 
-        return view('doctor.dashboard', compact('bookings', 'allBookingDates', 'filter'));
+        $unavailabilities = \App\Models\DoctorUnavailability::where('doctor_id', $doctorId)
+                            ->pluck('unavailable_date')
+                            ->toArray();
+
+        return view('doctor.dashboard', compact('bookings', 'allBookingDates', 'unavailabilities', 'filter'));
+    }
+
+    public function toggleAvailability(Request $request)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+        $date = $request->date;
+
+        $unavailability = \App\Models\DoctorUnavailability::where('doctor_id', $doctorId)
+                            ->where('unavailable_date', $date)
+                            ->first();
+
+        if ($unavailability) {
+            $unavailability->delete();
+            return back()->with('success', 'Marked as available for ' . $date);
+        } else {
+            \App\Models\DoctorUnavailability::create([
+                'doctor_id' => $doctorId,
+                'unavailable_date' => $date,
+            ]);
+            return back()->with('success', 'Marked as unavailable for ' . $date);
+        }
     }
 
     public function profile()
@@ -210,7 +247,7 @@ class DoctorController extends Controller
         }
 
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
+            $data['password'] = $request->password;
             $data['password_plain'] = $request->password;
         }
 

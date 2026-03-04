@@ -17,18 +17,24 @@
                             <!-- Name -->
                             <div class="col-md-12">
                                 <label for="name" class="form-label fw-bold text-dark">{{ __('Product Name') }}</label>
-                                <input id="name" type="text" class="form-control form-control-lg border-success-subtle focus-ring-success" name="name" placeholder="E.g. Ashwagandha Powder" required>
+                                <input id="name" type="text" class="form-control form-control-lg border-success-subtle focus-ring-success" name="name" placeholder="Product Name" required>
                             </div>
 
-                            <!-- Category & Subcategory -->
                             <div class="col-md-6">
                                 <label for="category" class="form-label fw-bold text-dark">{{ __('Category') }}</label>
-                                <input id="category" type="text" class="form-control form-control-lg border-success-subtle" name="category" placeholder="E.g. Medicine, Wellness" required>
+                                <select id="category" name="category" class="form-select form-select-lg border-success-subtle" required>
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="col-md-6">
                                 <label for="subcategory" class="form-label fw-bold text-dark">{{ __('Subcategory') }}</label>
-                                <input id="subcategory" type="text" class="form-control form-control-lg border-success-subtle" name="subcategory" placeholder="E.g. Immunity, Digestion">
+                                <select id="subcategory" name="subcategory" class="form-select form-select-lg border-success-subtle">
+                                    <option value="">Select Subcategory</option>
+                                </select>
                             </div>
 
                             <div class="col-md-12">
@@ -73,4 +79,23 @@
         </div>
     </div>
 </div>
+@section('scripts')
+<script>
+document.getElementById('category').addEventListener('change', function() {
+    const categoryId = this.value;
+    const subSelect = document.getElementById('subcategory');
+    subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+    
+    if (categoryId) {
+        fetch(`/api/product-subcategories/${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sub => {
+                    subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                });
+            });
+    }
+});
+</script>
+@endsection
 @endsection

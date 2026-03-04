@@ -72,19 +72,33 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Password (Leave blank to keep current)</label>
-                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                     @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Specialization Category</label>
-                                    <input type="text" name="specialization_category" class="form-control @error('specialization_category') is-invalid @enderror" placeholder="" value="{{ old('specialization_category', $doctor->specialization_category) }}" required>
+                                    <select name="specialization_category" id="specialization_category" class="form-select @error('specialization_category') is-invalid @enderror" required>
+                                        <option value="">Select Category</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ (old('specialization_category', $doctor->specialization_category) == $category->id || old('specialization_category', $doctor->specialization_category) == $category->name) ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                     @error('specialization_category') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Specialization Subcategory</label>
-                                    <input type="text" name="specialization_subcategory" class="form-control @error('specialization_subcategory') is-invalid @enderror" placeholder="" value="{{ old('specialization_subcategory', $doctor->specialization_subcategory) }}">
+                                    <select name="specialization_subcategory" id="specialization_subcategory" class="form-select @error('specialization_subcategory') is-invalid @enderror">
+                                        <option value="">Select Subcategory</option>
+                                    </select>
                                     @error('specialization_subcategory') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
@@ -103,7 +117,7 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="" value="{{ old('phone', $doctor->phone) }}" pattern="[0-9]{10}" maxlength="10" required>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="" value="{{ old('phone', $doctor->phone) }}" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
@@ -159,6 +173,7 @@
     </div>
 </div>
 
+@section('scripts')
 <script>
 function previewImage(input, previewId) {
     const preview = document.getElementById(previewId);
@@ -170,7 +185,34 @@ function previewImage(input, previewId) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+const specializationCategory = document.getElementById('specialization_category');
+const specializationSubcategory = document.getElementById('specialization_subcategory');
+
+function loadSubcategories(categoryId, selectedSub = null) {
+    specializationSubcategory.innerHTML = '<option value="">Select Subcategory</option>';
+    if (categoryId) {
+        fetch(`/api/doctor-subcategories/${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sub => {
+                    const isSelected = selectedSub == sub.id || selectedSub == sub.name ? 'selected' : '';
+                    specializationSubcategory.innerHTML += `<option value="${sub.id}" ${isSelected}>${sub.name}</option>`;
+                });
+            });
+    }
+}
+
+specializationCategory.addEventListener('change', function() {
+    loadSubcategories(this.value);
+});
+
+// Initial load
+if (specializationCategory.value) {
+    loadSubcategories(specializationCategory.value, "{{ $doctor->specialization_subcategory }}");
+}
 </script>
+@endsection
 
 <style>
     .form-label { font-size: 0.9rem; color: #495057; }

@@ -1,0 +1,20 @@
+Array
+(
+    [0] => id
+    [1] => name
+    [2] => email
+    [3] => photo
+    [4] => password
+    [5] => password_plain
+    [6] => phone
+    [7] => specialization_category
+    [8] => specialization_subcategory
+    [9] => district_id
+    [10] => qualification
+    [11] => experience
+    [12] => consultation_fee
+    [13] => available_time
+    [14] => created_at
+    [15] => updated_at
+    [16] => deleted_at
+)

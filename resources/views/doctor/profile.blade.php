@@ -88,13 +88,18 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $doctor->phone) }}" pattern="[0-9]{10}" maxlength="10">
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $doctor->phone) }}" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 
                                 <div class="col-12">
                                     <label class="form-label fw-bold">New Password (Leave blank to keep current)</label>
-                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                     @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>

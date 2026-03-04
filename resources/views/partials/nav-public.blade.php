@@ -18,6 +18,11 @@
                     <li class="nav-item"><a href="{{ route('orders.index') }}" class="nav-link">My Orders</a></li>
                     <li class="nav-item"><a href="{{ route('bookings.my') }}" class="nav-link"><i class="fas fa-calendar-check"></i> My Appointments</a></li>
                     <li class="nav-item">
+                        <a href="{{ route('profile') }}" class="nav-link">
+                            <i class="fas fa-user-circle me-1"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>

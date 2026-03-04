@@ -28,11 +28,6 @@ class Doctor extends Authenticatable
         'photo',
     ];
 
-    public function specialization_category()
-    {
-        // Since we are now using string columns, we don't need a relationship here 
-        // unless the user later wants to link to a Specialty table.
-    }
 
     public function district()
     {

@@ -112,11 +112,20 @@
                                             <h5 class="fw-bold mb-3">₹{{ number_format($product->price, 2) }}</h5>
                                             
                                             @if($product->stock > 0)
-                                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="d-grid">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-success fw-bold py-2" style="background-color: #008000; border: none;">
-                                                        Add to Cart
-                                                    </button>
+                                                    <div class="d-flex align-items-center mb-2 justify-content-center">
+                                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="const input = this.parentNode.querySelector('input'); if(input.value > 1) input.stepDown();">-</button>
+                                                            <input type="number" name="quantity" class="form-control text-center p-0" value="1" min="1" max="10">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-grid">
+                                                        <button type="submit" class="btn btn-success fw-bold py-2" style="background-color: #008000; border: none;">
+                                                            Add to Cart
+                                                        </button>
+                                                    </div>
                                                 </form>
                                             @else
                                                 <div class="d-grid">

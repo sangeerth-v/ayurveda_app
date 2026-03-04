@@ -108,17 +108,21 @@
                                     </span>
                                     <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill small">Consultation Fee</span>
                                 </div>
-                                @auth
+                                @if(Auth::guard('web')->check())
                                     <a href="{{ route('bookings.create', $doctor->id) }}"
                                        class="btn btn-success w-100 fw-semibold">
                                         <i class="fas fa-calendar-plus me-2"></i>Book Appointment
                                     </a>
+                                @elseif(Auth::guard('admin')->check() || Auth::guard('doctor')->check() || Auth::guard('pharma')->check())
+                                    <button class="btn btn-secondary w-100 fw-semibold" disabled title="Currently logged in as a Professional. Please logout and login as a Patient to book.">
+                                        <i class="fas fa-exclamation-circle me-2"></i>Patient Account Needed
+                                    </button>
                                 @else
-                                    <a href="{{ route('bookings.create', $doctor->id) }}"
+                                    <a href="{{ route('login') }}?redirect={{ urlencode(route('bookings.create', $doctor->id)) }}"
                                        class="btn btn-outline-success w-100 fw-semibold">
                                         <i class="fas fa-calendar-plus me-2"></i>Login to Book
                                     </a>
-                                @endauth
+                                @endif
                             </div>
                         </div>
                     </div>

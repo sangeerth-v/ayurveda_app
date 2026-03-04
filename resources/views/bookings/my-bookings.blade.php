@@ -30,7 +30,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-2 text-center border-end">
                                     <h5 class="mb-0 fw-bold text-dark">
-                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $booking->booking_time)->format('h:i A') }}
+                                        {{ \Carbon\Carbon::parse($booking->booking_time)->format('h:i A') }}
                                     </h5>
                                     <small class="text-muted">
                                         {{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}
