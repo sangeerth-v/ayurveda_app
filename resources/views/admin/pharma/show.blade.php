@@ -18,6 +18,27 @@
     </div>
 </div>
 
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 h-100">
+            <div class="card-body p-4 text-center">
+                <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                <h2 class="fw-bold text-primary mb-1">{{ $orderCount }}</h2>
+                <span class="text-uppercase small fw-bold text-muted">Total Orders</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm bg-success bg-opacity-10 h-100">
+            <div class="card-body p-4 text-center">
+                <i class="fas fa-rupee-sign fa-2x text-success mb-2"></i>
+                <h2 class="fw-bold text-success mb-1">₹{{ number_format($revenue, 2) }}</h2>
+                <span class="text-uppercase small fw-bold text-muted">Total Revenue</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-4">
         <!-- Profile Card -->
@@ -40,87 +61,50 @@
                         <span class="fw-bold">#PHR-{{ str_pad($pharma->id, 4, '0', STR_PAD_LEFT) }}</span>
                     </li>
                     <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
-                        <span class="text-muted small text-uppercase fw-bold">Products Listed</span>
-                        <span class="badge bg-primary rounded-pill">0</span>
-                    </li>
-                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted small text-uppercase fw-bold">Partner Since</span>
                         <span class="fw-bold text-muted small">{{ $pharma->created_at->format('M Y') }}</span>
                     </li>
                 </ul>
             </div>
         </div>
-
-        <!-- Contact & Address -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-warning"></i> Business Details</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Admin Email</label>
-                    <div class="text-dark">{{ $pharma->email }}</div>
-                </div>
-                <div class="mb-3">
-                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Contact Support</label>
-                    <div class="text-dark">{{ $pharma->phone ?? 'Not provided' }}</div>
-                </div>
-                <div>
-                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Registered Address</label>
-                    <div class="text-dark small">{{ $pharma->address ?? 'Address details not available' }}</div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="col-lg-8">
-        <!-- Stats Overview -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
-                    <div class="card-body p-4 text-center">
-                        <h2 class="display-6 fw-bold text-primary mb-1">0</h2>
-                        <span class="text-uppercase small fw-bold text-primary opacity-75">Active Orders</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm bg-success bg-opacity-10">
-                    <div class="card-body p-4 text-center">
-                        <h2 class="display-6 fw-bold text-success mb-1">₹0</h2>
-                        <span class="text-uppercase small fw-bold text-success opacity-75">Total Revenue</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Management Placeholder -->
+        <!-- Business Details -->
         <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-box-open me-2 text-warning"></i> Catalog Inventory</h5>
-                <button class="btn btn-sm btn-outline-warning text-dark disabled">View Catalog</button>
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-warning"></i> Business Information</h5>
             </div>
-            <div class="card-body text-center py-5">
-                <div class="opacity-25 mb-3">
-                    <i class="fas fa-boxes fa-4x text-muted"></i>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Admin Email</label>
+                        <div class="text-dark fs-5">{{ $pharma->email }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Contact Support</label>
+                        <div class="text-dark fs-5">{{ $pharma->phone ?? 'Not provided' }}</div>
+                    </div>
                 </div>
-                <h6 class="text-muted">No products have been uploaded by this company yet.</h6>
-            </div>
-        </div>
+                <div class="mb-4">
+                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Registered Address</label>
+                    <div class="text-dark">{{ $pharma->address ?? 'Address details not available' }}</div>
+                </div>
+                
+                <hr class="my-4 opacity-10">
 
-        <!-- Actions -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4 d-flex gap-3">
-                <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Delete this pharma company and all associated data?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash-alt me-2"></i> Terminate Partnership
-                    </button>
-                </form>
-                <a href="{{ route('admin.pharmas.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i> Return to List
-                </a>
+                <div class="d-flex gap-3">
+                    <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Delete this pharma company and all associated data?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i> Terminate Partnership
+                        </button>
+                    </form>
+                    <a href="{{ route('admin.pharmas.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Return to List
+                    </a>
+                </div>
             </div>
         </div>
     </div>

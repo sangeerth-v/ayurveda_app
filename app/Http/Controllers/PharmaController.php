@@ -50,8 +50,17 @@ class PharmaController extends Controller
 
     public function show($id)
     {
-        $pharma = PharmaCompany::findOrFail($id);
-        return view('admin.pharma.show', compact('pharma'));
+        $pharma = PharmaCompany::withCount('products')->findOrFail($id);
+        
+        $orderCount = \App\Models\Order::whereHas('items.product', function ($query) use ($id) {
+            $query->where('pharma_company_id', $id);
+        })->count();
+
+        $revenue = \App\Models\OrderItem::whereHas('product', function ($query) use ($id) {
+            $query->where('pharma_company_id', $id);
+        })->sum(\Illuminate\Support\Facades\DB::raw('price * quantity'));
+
+        return view('admin.pharma.show', compact('pharma', 'orderCount', 'revenue'));
     }
 
     public function edit($id)

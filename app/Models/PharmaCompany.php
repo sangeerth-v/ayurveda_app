@@ -19,4 +19,9 @@ class PharmaCompany extends Authenticatable
         'address',
         'logo',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
