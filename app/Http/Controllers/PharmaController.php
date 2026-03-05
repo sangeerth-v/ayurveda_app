@@ -56,11 +56,19 @@ class PharmaController extends Controller
             $query->where('pharma_company_id', $id);
         })->count();
 
+        $orders = \App\Models\Order::whereHas('items.product', function ($query) use ($id) {
+            $query->where('pharma_company_id', $id);
+        })->with(['user', 'items' => function ($query) use ($id) {
+            $query->whereHas('product', function ($q) use ($id) {
+                $q->where('pharma_company_id', $id);
+            });
+        }])->latest()->get();
+
         $revenue = \App\Models\OrderItem::whereHas('product', function ($query) use ($id) {
             $query->where('pharma_company_id', $id);
         })->sum(\Illuminate\Support\Facades\DB::raw('price * quantity'));
 
-        return view('admin.pharma.show', compact('pharma', 'orderCount', 'revenue'));
+        return view('admin.pharma.show', compact('pharma', 'orderCount', 'revenue', 'orders'));
     }
 
     public function edit($id)

@@ -37,11 +37,29 @@ class AdminController extends Controller
     public function logout()
     {
         Auth::guard('admin')->logout();
-        return redirect()->route('admin.login');
+        return redirect()->route('home');
+    }
+
+    public function showOrder($id)
+    {
+        $order = \App\Models\Order::with(['user', 'items.product'])->findOrFail($id);
+        return view('admin.orders.show', compact('order'));
     }
 
     public function dashboard()
     {
         return view('admin.dashboard');
+    }
+
+    public function usersIndex()
+    {
+        $users = \App\Models\User::latest()->paginate(20);
+        return view('admin.users.index', compact('users'));
+    }
+
+    public function destroyUser($id)
+    {
+        \App\Models\User::findOrFail($id)->delete();
+        return back()->with('success', 'User deleted successfully');
     }
 }

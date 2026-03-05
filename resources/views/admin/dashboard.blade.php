@@ -61,7 +61,7 @@
                 </div>
                 <h5 class="card-title text-muted mb-0">Total Users</h5>
                 <h2 class="display-6 fw-bold my-2" style="color: var(--text-dark);">{{ \App\Models\User::count() }}</h2>
-                <span class="text-muted small">Platform Users</span>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-info stretched-link mt-2">View Users <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
         </div>
     </div>

@@ -20,7 +20,7 @@
 
 <div class="row g-4 mb-4">
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 h-100">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 h-100" style="cursor: pointer;" onclick="document.getElementById('orders-section').scrollIntoView({behavior: 'smooth'})">
             <div class="card-body p-4 text-center">
                 <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
                 <h2 class="fw-bold text-primary mb-1">{{ $orderCount }}</h2>
@@ -104,6 +104,72 @@
                     <a href="{{ route('admin.pharmas.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i> Return to List
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4" id="orders-section">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-shopping-basket me-2 text-primary"></i> Orders for {{ $pharma->company_name }}</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Order ID</th>
+                                <th class="py-3 text-uppercase small fw-bold text-muted">Customer</th>
+                                <th class="py-3 text-uppercase small fw-bold text-muted">Items (This Pharma)</th>
+                                <th class="py-3 text-uppercase small fw-bold text-muted">Pharma's Share</th>
+                                <th class="py-3 text-uppercase small fw-bold text-muted text-center">Status</th>
+                                <th class="py-3 text-uppercase small fw-bold text-muted text-center">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($orders as $order)
+                                @php
+                                    $pharmaTotal = $order->items->sum(function($i) { return $i->price * $i->quantity; });
+                                @endphp
+                                <tr>
+                                    <td class="ps-4 py-4 fw-bold text-dark">#ORD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="py-4">
+                                        <div class="fw-bold">{{ $order->user->name ?? 'N/A' }}</div>
+                                        <div class="small text-muted">{{ $order->delivery_phone }}</div>
+                                    </td>
+                                    <td class="py-4">
+                                        @foreach($order->items as $item)
+                                            <div class="small text-truncate" style="max-width: 200px;">{{ $item->product->name }} (x{{ $item->quantity }})</div>
+                                        @endforeach
+                                    </td>
+                                    <td class="py-4 fw-bold text-success">₹{{ number_format($pharmaTotal, 2) }}</td>
+                                    <td class="py-4 text-center">
+                                        <span class="badge rounded-pill px-3 py-2 
+                                            {{ $order->order_status == 'Delivered' ? 'bg-success bg-opacity-10 text-success' : 'bg-primary bg-opacity-10 text-primary' }}">
+                                            {{ $order->order_status }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 text-center">
+                                        <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3 shadow-sm">
+                                            <i class="fas fa-eye me-1"></i>Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-history fa-3x mb-3 opacity-25"></i>
+                                            <p class="mb-0">No orders found for this pharma company.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

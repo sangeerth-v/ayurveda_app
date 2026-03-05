@@ -61,12 +61,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth:admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
+        Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
         
         // Doctor Management by Admin
         Route::resource('doctors', DoctorController::class);
 
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);
+
+        // User Management by Admin
+        Route::get('/users', [AdminController::class, 'usersIndex'])->name('users.index');
+        Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 
         // Category & Subcategory Management
         Route::get('/doctor-categories', [\App\Http\Controllers\Admin\CategoryController::class, 'doctorIndex'])->name('categories.doctor');
