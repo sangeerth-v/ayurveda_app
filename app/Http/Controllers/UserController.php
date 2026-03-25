@@ -132,7 +132,11 @@ class UserController extends Controller
     // --- Public Views ---
     public function index()
     {
-        return view('home');
+        $advertisements = \App\Models\Advertisement::where('is_active', true)
+                            ->orderBy('order_index')
+                            ->get();
+        $popupAd = \App\Models\Advertisement::where('is_popup', true)->first();
+        return view('home', compact('advertisements', 'popupAd'));
     }
 
     public function products(Request $request)

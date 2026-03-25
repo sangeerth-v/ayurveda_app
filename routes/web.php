@@ -85,6 +85,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/product-subcategories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
         Route::delete('/product-categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductCategory'])->name('categories.product.destroy');
         Route::delete('/product-subcategories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
+        
+        // Advertisements Management
+        Route::get('/advertisements', [AdminController::class, 'advertisementsIndex'])->name('advertisements.index');
+        Route::get('/advertisements/create', [AdminController::class, 'advertisementsCreate'])->name('advertisements.create');
+        Route::post('/advertisements', [AdminController::class, 'advertisementsStore'])->name('advertisements.store');
+        Route::get('/advertisements/{id}/edit', [AdminController::class, 'advertisementsEdit'])->name('advertisements.edit');
+        Route::put('/advertisements/{id}', [AdminController::class, 'advertisementsUpdate'])->name('advertisements.update');
+        Route::delete('/advertisements/{id}', [AdminController::class, 'advertisementsDestroy'])->name('advertisements.destroy');
+        Route::post('/advertisements/set-popup/{id}', [AdminController::class, 'advertisementsSetPopup'])->name('advertisements.set_popup');
     });
 });
 

@@ -5,6 +5,22 @@
 @endsection
 
 @section('content')
+<!-- Single Popup Ad Overlay -->
+@if(isset($popupAd))
+<div id="singleAdPopup" class="adware-overlay" style="display: none;">
+    <div class="adware-content d-flex justify-content-center align-items-center">
+        <button class="adware-close" onclick="closePopupAd()">&times;</button>
+        @if($popupAd->link)
+            <a href="{{ $popupAd->link }}" target="_blank">
+                <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded" alt="{{ $popupAd->title }}">
+            </a>
+        @else
+            <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded" alt="{{ $popupAd->title }}">
+        @endif
+    </div>
+</div>
+@endif
+
 <div class="container-fluid p-0">
     <!-- Hero Slider -->
     <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
@@ -81,6 +97,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Fixed Bottom Advertisements Section -->
+    @if(isset($advertisements) && $advertisements->count() > 0)
+    <div class="fixed-bottom-banner shadow z-3 border-top">
+        <div id="bottomAdCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
+            <div class="carousel-inner" style="height: 80px;">
+                @foreach($advertisements as $index => $ad)
+                    <div class="carousel-item h-100 w-100 bg-white {{ $index == 0 ? 'active' : '' }}">
+                        @if($ad->link)
+                            <a href="{{ $ad->link }}" target="_blank" class="d-block w-100 h-100">
+                                <img src="{{ asset('storage/' . $ad->image_path) }}" alt="{{ $ad->title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/' . $ad->image_path) }}" alt="{{ $ad->title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <style>
@@ -91,5 +128,103 @@
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
 }
+
+.fixed-bottom-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    background-color: #fff;
+    z-index: 1050; /* Stay above normal content */
+    height: 80px;
+    overflow: hidden;
+}
+
+body {
+    padding-bottom: 110px; /* Leave space for bottom fixed banner */
+}
+
+/* Single Adware Modal CSS */
+.adware-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.85);
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.adware-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.adware-img {
+    max-height: 85vh;
+    object-fit: contain;
+}
+
+.adware-close {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: #ef3b2d;
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.adware-close:hover {
+    background: #d32f2f;
+}
 </style>
+@endsection
+
+@section('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script>
+    function closePopupAd() {
+        const popup = document.getElementById('singleAdPopup');
+        if(popup) {
+            gsap.to(popup, {opacity: 0, duration: 0.3, onComplete: () => popup.style.display = 'none'});
+            @if(isset($popupAd))
+            sessionStorage.setItem('popupAdClosed_{{ $popupAd->id }}', 'true');
+            @endif
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        @if(isset($popupAd))
+        if(!sessionStorage.getItem('popupAdClosed_{{ $popupAd->id }}')) {
+            const popup = document.getElementById('singleAdPopup');
+            if(popup) {
+                popup.style.display = 'flex';
+                gsap.fromTo(popup, {opacity: 0}, {opacity: 1, duration: 0.5});
+                const content = popup.querySelector('.adware-content');
+                if(content) {
+                    gsap.fromTo(content, {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 0.5, delay: 0.2, ease: "back.out(1.5)"});
+                }
+            }
+        }
+        @endif
+
+        // Bottom banner is handled natively by Bootstrap Carousel data attributes
+    });
+</script>
 @endsection

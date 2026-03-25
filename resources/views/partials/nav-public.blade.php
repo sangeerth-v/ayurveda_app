@@ -28,21 +28,6 @@
                             <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
                         </form>
                     </li>
-                @elseif(Auth::guard('admin')->check() || Auth::guard('doctor')->check() || Auth::guard('pharma')->check())
-                    {{-- Professional logged in viewing public pages --}}
-                    @if(Auth::guard('admin')->check())
-                        <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Admin Dashboard</a></li>
-                    @elseif(Auth::guard('doctor')->check())
-                        <li class="nav-item"><a href="{{ route('doctor.dashboard') }}" class="nav-link">Doctor Dashboard</a></li>
-                    @elseif(Auth::guard('pharma')->check())
-                        <li class="nav-item"><a href="{{ route('pharma.dashboard') }}" class="nav-link">Pharma Dashboard</a></li>
-                    @endif
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
-                        </form>
-                    </li>
                 @else
                     <li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Login</a></li>
                     <li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Register</a></li>
