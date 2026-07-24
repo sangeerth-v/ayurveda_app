@@ -29,8 +29,18 @@
                         </form>
                     </li>
                 @else
-                    <li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Login</a></li>
-                    <li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Register</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="{{ route('login') }}" class="nav-link dropdown-toggle" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Login
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'patient']) }}">Patient Login</a></li>
+                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'doctor']) }}">Doctor Login</a></li>
+                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'pharma']) }}">Pharmaceutical Company Login</a></li>
+                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'hospital']) }}">Hospital Login</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Patient Register</a></li>
                 @endif
             </ul>
         </div>

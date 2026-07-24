@@ -14,7 +14,7 @@ class DoctorController extends Controller
 {
     public function index()
     {
-        $doctors = Doctor::with(['district'])->paginate(10);
+        $doctors = Doctor::with(['district', 'hospital'])->paginate(10);
         return view('admin.doctors.index', compact('doctors'));
     }
 
@@ -22,7 +22,8 @@ class DoctorController extends Controller
     {
         $districts = District::all();
         $categories = DoctorCategory::all();
-        return view('admin.doctors.create', compact('districts', 'categories'));
+        $hospitals = \App\Models\Hospital::orderBy('name')->get();
+        return view('admin.doctors.create', compact('districts', 'categories', 'hospitals'));
     }
 
     public function store(Request $request)
@@ -41,6 +42,7 @@ class DoctorController extends Controller
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hospital_id' => 'nullable|exists:hospitals,id',
         ]);
 
         $photoPath = null;
@@ -67,6 +69,7 @@ class DoctorController extends Controller
             'consultation_fee' => $request->consultation_fee,
             'available_time' => $request->available_from . ' to ' . $request->available_to,
             'photo' => $photoPath,
+            'hospital_id' => $request->hospital_id,
         ]);
 
         return redirect()->route('admin.doctors.index')->with('success', 'Doctor added successfully');
@@ -85,10 +88,11 @@ class DoctorController extends Controller
 
     public function edit($id)
     {
-        $doctor = Doctor::with(['district'])->findOrFail($id);
+        $doctor = Doctor::with(['district', 'hospital'])->findOrFail($id);
         $districts = District::all();
         $categories = DoctorCategory::all();
-        return view('admin.doctors.edit', compact('doctor', 'districts', 'categories'));
+        $hospitals = \App\Models\Hospital::orderBy('name')->get();
+        return view('admin.doctors.edit', compact('doctor', 'districts', 'categories', 'hospitals'));
     }
 
     public function update(Request $request, $id)
@@ -109,6 +113,7 @@ class DoctorController extends Controller
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hospital_id' => 'nullable|exists:hospitals,id',
         ]);
 
         // Resolve Category Names
@@ -126,6 +131,7 @@ class DoctorController extends Controller
             'experience' => $request->experience,
             'consultation_fee' => $request->consultation_fee,
             'available_time' => $request->available_from . ' to ' . $request->available_to,
+            'hospital_id' => $request->hospital_id,
         ];
 
         if ($request->filled('password')) {

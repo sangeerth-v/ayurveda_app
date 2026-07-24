@@ -154,6 +154,14 @@
             background-color: #ffebee;
             color: #c62828;
         }
+
+        .navbar-nav .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .navbar-nav .dropdown-menu {
+            margin-top: 0.2rem;
+        }
     </style>
 </head>
 <body>
@@ -195,6 +203,13 @@
                 icon.classList.add('fa-eye');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
     </script>
     @yield('scripts')
 </body>

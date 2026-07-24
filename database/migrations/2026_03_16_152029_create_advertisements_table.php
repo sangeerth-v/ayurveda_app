@@ -13,14 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('advertisements');
         Schema::create('advertisements', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
-            $table->string('image_path');
-            $table->string('link')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->integer('order_index')->default(0);
             $table->timestamps();
         });
     }

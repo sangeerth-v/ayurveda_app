@@ -71,6 +71,17 @@
                                 </div>
 
                                 <div class="col-md-6">
+                                    <label class="form-label fw-bold">Hospital / Center</label>
+                                    <select name="hospital_id" class="form-select @error('hospital_id') is-invalid @enderror">
+                                        <option value="">Independent Doctor</option>
+                                        @foreach($hospitals as $hospital)
+                                            <option value="{{ $hospital->id }}" {{ old('hospital_id', $doctor->hospital_id) == $hospital->id ? 'selected' : '' }}>{{ $hospital->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('hospital_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
                                     <label class="form-label fw-bold">Password (Leave blank to keep current)</label>
                                     <div class="input-group">
                                         <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••">

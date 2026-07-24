@@ -151,7 +151,19 @@
 </head>
 <body>
     <div class="login-card">
-        <h2>🌿 Welcome Back</h2>
+        @php
+            $role = request('role', 'patient');
+            $roleLabels = [
+                'patient' => 'Patient Login',
+                'doctor' => 'Doctor Login',
+                'pharma' => 'Pharmaceutical Company Login',
+                'hospital' => 'Hospital Login',
+            ];
+            $loginTitle = $roleLabels[$role] ?? 'Login';
+        @endphp
+
+        <h2>🌿 {{ $loginTitle }}</h2>
+        <p style="text-align:center; color:#4a6f54; margin-bottom:1.5rem;">Choose the correct login type above to access your account.</p>
         
         @if ($errors->any())
             <div class="error">

@@ -36,7 +36,7 @@ class UserController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
-        $guards = ['web', 'admin', 'doctor', 'pharma'];
+        $guards = ['web', 'admin', 'doctor', 'pharma', 'hospital'];
 
         \Log::info("USER_LOGIN: Attempt for email: " . $request->email);
 
@@ -59,10 +59,15 @@ class UserController extends Controller
                     'web' => \App\Models\User::class,
                     'doctor' => \App\Models\Doctor::class,
                     'pharma' => \App\Models\PharmaCompany::class,
+                    'hospital' => \App\Models\Hospital::class,
                 };
                 
                 $user = $userModel::where('email', $request->email)->first();
                 if ($user && ($user->password === $request->password || Auth::guard($guard)->attempt($credentials))) {
+                    if ($guard === 'hospital' && isset($user->is_active) && !$user->is_active) {
+                        return back()->withErrors(['email' => 'This hospital account is not active. Please contact admin.']);
+                    }
+
                     Auth::guard($guard)->login($user);
                     \Log::info("USER_LOGIN: Success for $guard.");
                     
@@ -85,6 +90,7 @@ class UserController extends Controller
         Auth::guard('admin')->logout();
         Auth::guard('doctor')->logout();
         Auth::guard('pharma')->logout();
+        Auth::guard('hospital')->logout();
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
@@ -135,6 +141,7 @@ class UserController extends Controller
             'admin' => route('admin.dashboard'),
             'doctor' => route('doctor.dashboard'),
             'pharma' => route('pharma.dashboard'),
+            'hospital' => route('hospital.dashboard'),
             'web' => '/',
             default => '/',
         };
@@ -185,6 +192,12 @@ class UserController extends Controller
         $doctors = Doctor::with(['district'])->get();
         $districts = \App\Models\District::all();
         return view('doctors.index', compact('doctors', 'districts'));
+    }
+
+    public function hospitals()
+    {
+        $hospitals = \App\Models\Hospital::where('is_active', true)->with('district')->latest()->get();
+        return view('hospitals.index', compact('hospitals'));
     }
 
     public function showProduct($id)
@@ -291,6 +304,25 @@ class UserController extends Controller
                 'price' => $item->price,
             ]);
         }
+        // Notify pharmaceutical companies about the new order
+        $companiesToNotify = [];
+        foreach ($cart->items as $item) {
+            if ($item->product && $item->product->pharma_company_id) {
+                $companiesToNotify[$item->product->pharma_company_id][] = $item;
+            }
+        }
+
+        foreach ($companiesToNotify as $companyId => $itemsList) {
+            $company = \App\Models\PharmaCompany::find($companyId);
+            if ($company && $company->email) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($company->email)->send(new \App\Mail\NewOrderNotification($order, $company, $itemsList));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to send order email to pharma: " . $e->getMessage());
+                }
+            }
+        }
+
         $cart->items()->delete();
 
         // Preload relationships to prevent N+1 query issues during email rendering
@@ -404,7 +436,7 @@ class UserController extends Controller
             \Log::error("Failed to send appointment request email: " . $e->getMessage());
         }
 
-        return redirect()->route('home')->with('success', 'Appointment booked successfully and is pending doctor approval!');
+        return redirect()->route('bookings.my')->with('success', 'Appointment booking request submitted! Awaiting doctor approval.');
     }
 
     public function myBookings()
