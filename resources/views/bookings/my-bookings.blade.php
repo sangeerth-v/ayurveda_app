@@ -45,7 +45,9 @@
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-end">
-                                    @if($booking->status == 'Booked')
+                                    @if($booking->status == 'Pending')
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Pending Approval</span>
+                                    @elseif($booking->status == 'Booked')
                                         <span class="badge bg-primary px-3 py-2 rounded-pill">Confirmed</span>
                                     @elseif($booking->status == 'Completed')
                                         <span class="badge bg-success px-3 py-2 rounded-pill">Completed</span>

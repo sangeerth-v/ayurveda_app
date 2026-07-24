@@ -26,6 +26,7 @@ class Doctor extends Authenticatable
         'consultation_fee',
         'available_time',
         'photo',
+        'hospital_id',
     ];
 
 
@@ -37,5 +38,10 @@ class Doctor extends Authenticatable
     public function appointments()
     {
         return $this->hasMany(DoctorToken::class);
+    }
+
+    public function hospital()
+    {
+        return $this->belongsTo(Hospital::class);
     }
 }

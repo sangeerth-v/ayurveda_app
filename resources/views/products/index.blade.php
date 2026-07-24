@@ -64,17 +64,23 @@
 
             <!-- Product Grid -->
             <div class="col-md-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="fw-bold text-dark">Our Products <span class="text-muted fs-6">({{ $products->count() }})</span></h4>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Sort By: {{ str_replace('_', ' ', ucwords($sort ?? 'price_asc', '_')) }}
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item {{ (request('sort') == 'price_asc' || !request('sort')) ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">Price - Low to High</a></li>
-                            <li><a class="dropdown-item {{ request('sort') == 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">Price - High to Low</a></li>
-                            <li><a class="dropdown-item {{ request('sort') == 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Newest First</a></li>
-                        </ul>
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-1">Our Products <span class="text-muted fs-6">({{ $products->count() }})</span></h4>
+                        <p class="text-muted mb-0">Browse Ayurvedic essentials and register as a patient to get personalized care.</p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <a href="{{ route('register') }}" class="btn btn-success btn-sm">Patient Register</a>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Sort By: {{ str_replace('_', ' ', ucwords($sort ?? 'price_asc', '_')) }}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item {{ (request('sort') == 'price_asc' || !request('sort')) ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">Price - Low to High</a></li>
+                                <li><a class="dropdown-item {{ request('sort') == 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">Price - High to Low</a></li>
+                                <li><a class="dropdown-item {{ request('sort') == 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Newest First</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

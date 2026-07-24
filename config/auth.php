@@ -52,6 +52,14 @@ return [
             'driver' => 'session',
             'provider' => 'pharma_companies',
         ],
+        'hospital' => [
+            'driver' => 'session',
+            'provider' => 'hospitals',
+        ],
+        'hospital' => [
+            'driver' => 'session',
+            'provider' => 'hospitals',
+        ],
     ],
 
     /*
@@ -87,6 +95,14 @@ return [
         'pharma_companies' => [
             'driver' => 'eloquent',
             'model' => App\Models\PharmaCompany::class,
+        ],
+        'hospitals' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Hospital::class,
+        ],
+        'hospitals' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Hospital::class,
         ],
     ],
 

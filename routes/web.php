@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PharmaController;
+use App\Http\Controllers\HospitalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,7 @@ use App\Http\Controllers\PharmaController;
 Route::get('/', [UserController::class, 'index'])->name('home');
 Route::get('/products', [UserController::class, 'products'])->name('products.index');
 Route::get('/doctors', [UserController::class, 'doctors'])->name('doctors.index');
+Route::get('/hospitals', [UserController::class, 'hospitals'])->name('hospitals.index');
 Route::get('/product/{id}', [UserController::class, 'showProduct'])->name('products.show');
 
 // --- Auth Routes (UserController) ---
@@ -66,6 +68,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Doctor Management by Admin
         Route::resource('doctors', DoctorController::class);
 
+        // Hospital Management by Admin
+        Route::resource('hospitals', HospitalController::class);
+
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);
 
@@ -85,6 +90,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/product-subcategories', [\App\Http\Controllers\Admin\CategoryController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
         Route::delete('/product-categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductCategory'])->name('categories.product.destroy');
         Route::delete('/product-subcategories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
+        
+        // Advertisements Management
+        Route::get('/advertisements', [AdminController::class, 'advertisementsIndex'])->name('advertisements.index');
+        Route::get('/advertisements/create', [AdminController::class, 'advertisementsCreate'])->name('advertisements.create');
+        Route::post('/advertisements', [AdminController::class, 'advertisementsStore'])->name('advertisements.store');
+        Route::get('/advertisements/{id}/edit', [AdminController::class, 'advertisementsEdit'])->name('advertisements.edit');
+        Route::put('/advertisements/{id}', [AdminController::class, 'advertisementsUpdate'])->name('advertisements.update');
+        Route::delete('/advertisements/{id}', [AdminController::class, 'advertisementsDestroy'])->name('advertisements.destroy');
+        Route::post('/advertisements/set-popup/{id}', [AdminController::class, 'advertisementsSetPopup'])->name('advertisements.set_popup');
     });
 });
 
@@ -98,6 +112,10 @@ Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(funct
     Route::post('/unavailability', [DoctorController::class, 'toggleAvailability'])->name('unavailability.toggle');
     Route::get('/profile', [DoctorController::class, 'profile'])->name('profile');
     Route::put('/profile', [DoctorController::class, 'updateProfile'])->name('profile.update');
+    
+    // Booking approval actions
+    Route::post('/bookings/{id}/accept', [DoctorController::class, 'acceptBooking'])->name('bookings.accept');
+    Route::post('/bookings/{id}/reject', [DoctorController::class, 'rejectBooking'])->name('bookings.reject');
 });
 
 // --- Pharma Role Routes (PharmaController) ---
@@ -119,4 +137,16 @@ Route::prefix('pharma')->name('pharma.')->middleware('auth:pharma')->group(funct
     Route::post('/product-subcategories', [PharmaController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
     Route::delete('/product-categories/{id}', [PharmaController::class, 'destroyProductCategory'])->name('categories.product.destroy');
     Route::delete('/product-subcategories/{id}', [PharmaController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
+});
+
+// --- Hospital Role Routes (HospitalController) ---
+Route::prefix('hospital')->name('hospital.')->middleware('auth:hospital')->group(function () {
+    Route::get('/dashboard', [HospitalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [HospitalController::class, 'profile'])->name('profile');
+    Route::put('/profile', [HospitalController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/doctors/create', [HospitalController::class, 'doctorsCreate'])->name('doctors.create');
+    Route::post('/doctors', [HospitalController::class, 'doctorsStore'])->name('doctors.store');
+    Route::get('/doctors/{id}/edit', [HospitalController::class, 'doctorsEdit'])->name('doctors.edit');
+    Route::put('/doctors/{id}', [HospitalController::class, 'doctorsUpdate'])->name('doctors.update');
+    Route::delete('/doctors/{id}', [HospitalController::class, 'doctorsDestroy'])->name('doctors.destroy');
 });

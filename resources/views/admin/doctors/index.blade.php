@@ -28,6 +28,7 @@
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%">Doctor Information</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Specialization Category</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Subcategory</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Hospital</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Login Password</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Location</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Contact</th>
@@ -61,6 +62,9 @@
                             <span class="text-muted small">
                                 {{ $doctor->specialization_subcategory ?? 'N/A' }}
                             </span>
+                        </td>
+                        <td class="py-4">
+                            <span class="text-muted small">{{ $doctor->hospital->name ?? 'Independent' }}</span>
                         </td>
                         <td class="py-4">
                             <code class="text-primary">{{ $doctor->password_plain ?? 'N/A' }}</code>

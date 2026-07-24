@@ -16,7 +16,23 @@
 
 <div class="row g-4 mb-5">
     <!-- Doctors Stat Card -->
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid #198754 !important;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="rounded-circle p-3" style="background-color: #e8f5e9; color: #198754;">
+                        <i class="fas fa-hospital fa-2x"></i>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success">Centers</span>
+                </div>
+                <h5 class="card-title text-muted mb-0">Hospitals</h5>
+                <h2 class="display-6 fw-bold my-2" style="color: var(--text-dark);">{{ \App\Models\Hospital::count() }}</h2>
+                <a href="{{ route('admin.hospitals.index') }}" class="btn btn-sm btn-outline-success stretched-link mt-2">Manage Hospitals <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid var(--primary-green) !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -33,7 +49,7 @@
     </div>
 
     <!-- Pharmas Stat Card -->
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid var(--accent-gold) !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -50,7 +66,7 @@
     </div>
 
     <!-- Users Stat Card -->
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid #4a90e2 !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -77,6 +93,9 @@
                 <div class="d-flex gap-3">
                     <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle"></i> Add New Doctor
+                    </a>
+                    <a href="{{ route('admin.hospitals.create') }}" class="btn btn-outline-success d-flex align-items-center gap-2">
+                        <i class="fas fa-hospital"></i> Register Hospital
                     </a>
                     <a href="{{ route('admin.pharmas.create') }}" class="btn btn-outline-dark d-flex align-items-center gap-2">
                         <i class="fas fa-building"></i> Register Pharma
