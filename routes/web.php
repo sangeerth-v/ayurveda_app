@@ -107,6 +107,7 @@ Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(funct
     Route::post('/unavailability', [DoctorController::class, 'toggleAvailability'])->name('unavailability.toggle');
     Route::get('/profile', [DoctorController::class, 'profile'])->name('profile');
     Route::put('/profile', [DoctorController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/bookings/{id}/status', [DoctorController::class, 'updateBookingStatus'])->name('bookings.status.update');
 });
 
 // --- Pharma Role Routes (PharmaController) ---

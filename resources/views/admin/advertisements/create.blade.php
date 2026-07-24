@@ -41,13 +41,13 @@
                         </div>
                     </div>
 
-                    <div class="row mb-4">
+                    <!-- <div class="row mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label for="order_index" class="form-label fw-bold">Display Order</label>
                             <input type="number" class="form-control @error('order_index') is-invalid @enderror" id="order_index" name="order_index" value="{{ old('order_index', 0) }}">
                             <div class="form-text">Lower numbers appear first. 0 is default.</div>
                             @error('order_index')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
+                        </div> -->
                         <div class="col-md-6 d-flex align-items-center">
                             <div class="form-check form-switch mt-md-4">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>

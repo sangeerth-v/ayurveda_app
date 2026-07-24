@@ -337,6 +337,13 @@ class PharmaController extends Controller
         $order = \App\Models\Order::findOrFail($id);
         $order->update(['order_status' => $request->order_status]);
 
+        // Send order status updated email to User
+        try {
+            \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderStatusUpdatedMail($order));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send order status updated email to {$order->user->email}: " . $e->getMessage());
+        }
+
         return back()->with('success', 'Order status updated to ' . $request->order_status);
     }
 }

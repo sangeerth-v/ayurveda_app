@@ -100,6 +100,7 @@
                             <th class="py-3 border-0 small text-uppercase text-muted">Patient Name</th>
                             <th class="py-3 border-0 small text-uppercase text-muted">Contact Info</th>
                             <th class="py-3 border-0 small text-uppercase text-muted">Status</th>
+                            <th class="py-3 border-0 small text-uppercase text-muted">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,7 +123,9 @@
                                     <div class="small text-muted text-truncate" style="max-width: 150px;">{{ $booking->user->email ?? '' }}</div>
                                 </td>
                                 <td>
-                                    @if($booking->status == 'Booked')
+                                    @if($booking->status == 'Pending')
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 px-3 py-1 rounded-pill">Pending</span>
+                                    @elseif($booking->status == 'Booked')
                                         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 px-3 py-1 rounded-pill">Scheduled</span>
                                     @elseif($booking->status == 'Completed')
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 px-3 py-1 rounded-pill">Completed</span>
@@ -130,10 +133,41 @@
                                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10 px-3 py-1 rounded-pill">Cancelled</span>
                                     @endif
                                 </td>
+                                <td>
+                                    @if($booking->status == 'Pending')
+                                        <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="Booked">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 me-1"><i class="fas fa-check me-1 small"></i> Accept</button>
+                                        </form>
+                                        <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="Cancelled">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 py-1"><i class="fas fa-times me-1 small"></i> Reject</button>
+                                        </form>
+                                    @elseif($booking->status == 'Booked')
+                                        <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="Completed">
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 me-1"><i class="fas fa-check-double me-1 small"></i> Complete</button>
+                                        </form>
+                                        <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="Cancelled">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1"><i class="fas fa-ban me-1 small"></i> Cancel</button>
+                                        </form>
+                                    @else
+                                        <span class="text-muted small">-</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="py-5 text-center text-muted">
+                                <td colspan="5" class="py-5 text-center text-muted">
                                     <i class="fas fa-calendar-times mb-3 fa-2x opacity-25"></i>
                                     <p class="mb-0">No appointments found.</p>
                                 </td>

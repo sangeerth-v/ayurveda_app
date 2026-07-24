@@ -45,12 +45,14 @@
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-end">
-                                    @if($booking->status == 'Booked')
-                                        <span class="badge bg-primary px-3 py-2 rounded-pill">Confirmed</span>
+                                    @if($booking->status == 'Pending')
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-clock me-1"></i>Pending Approval</span>
+                                    @elseif($booking->status == 'Booked')
+                                        <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="fas fa-check-circle me-1"></i>Confirmed</span>
                                     @elseif($booking->status == 'Completed')
-                                        <span class="badge bg-success px-3 py-2 rounded-pill">Completed</span>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill"><i class="fas fa-check-double me-1"></i>Completed</span>
                                     @else
-                                        <span class="badge bg-secondary px-3 py-2 rounded-pill">Cancelled</span>
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i>Cancelled</span>
                                     @endif
                                 </div>
                             </div>

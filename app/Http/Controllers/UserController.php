@@ -14,6 +14,11 @@ use App\Models\User;
 use App\Models\District;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserRegisteredMail;
+use App\Mail\AppointmentRequestMail;
+use App\Mail\OrderPlacedUserMail;
+use App\Mail\OrderPlacedPharmaMail;
 
 class UserController extends Controller
 {
@@ -108,6 +113,12 @@ class UserController extends Controller
             'phone' => $request->phone,
             'password' => $request->password,
         ]);
+
+        try {
+            Mail::to($user->email)->send(new UserRegisteredMail($user));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send welcome email to {$user->email}: " . $e->getMessage());
+        }
 
         Auth::login($user);
 
@@ -281,6 +292,33 @@ class UserController extends Controller
             ]);
         }
         $cart->items()->delete();
+
+        // Preload relationships to prevent N+1 query issues during email rendering
+        $order->load(['items.product', 'user']);
+
+        // Send order confirmation email to User
+        try {
+            Mail::to($order->user->email ?? Auth::user()->email)->send(new OrderPlacedUserMail($order));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send order placed user email: " . $e->getMessage());
+        }
+
+        // Send order notification email to Pharma Companies
+        try {
+            $itemsByPharma = $order->items()->with('product.pharmaCompany')->get()->groupBy(function($item) {
+                return $item->product->pharma_company_id;
+            });
+
+            foreach ($itemsByPharma as $pharmaId => $items) {
+                $pharma = \App\Models\PharmaCompany::find($pharmaId);
+                if ($pharma && $pharma->email) {
+                    Mail::to($pharma->email)->send(new OrderPlacedPharmaMail($order, $pharma, $items));
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("Failed to send order placed pharma email: " . $e->getMessage());
+        }
+
         return redirect()->route('orders.show', $order->id)->with('success', 'Order placed successfully!');
     }
 
@@ -289,7 +327,7 @@ class UserController extends Controller
     {
         $doctor = Doctor::with(['district'])->findOrFail($doctorId);
         $bookedSlots = DoctorToken::where('doctor_id', $doctorId)
-            ->where('status', 'Booked')
+            ->whereIn('status', ['Booked', 'Pending'])
             ->where('booking_date', '>=', now()->toDateString())
             ->get(['booking_date', 'booking_time']);
 
@@ -333,10 +371,10 @@ class UserController extends Controller
         $exists = DoctorToken::where('doctor_id', $request->doctor_id)
             ->where('booking_date', $request->booking_date)
             ->where('booking_time', $request->booking_time)
-            ->where('status', 'Booked')
+            ->whereIn('status', ['Booked', 'Pending'])
             ->exists();
 
-        if ($exists) return back()->withErrors(['booking_time' => 'This time slot is already booked.'])->withInput();
+        if ($exists) return back()->withErrors(['booking_time' => 'This time slot is already booked or pending approval.'])->withInput();
 
         $isUnavailable = \App\Models\DoctorUnavailability::where('doctor_id', $request->doctor_id)
             ->where('unavailable_date', $request->booking_date)
@@ -351,15 +389,22 @@ class UserController extends Controller
             }
         }
 
-        DoctorToken::create([
+        $booking = DoctorToken::create([
             'user_id'      => Auth::id(),
             'doctor_id'    => $request->doctor_id,
             'booking_date' => $request->booking_date,
             'booking_time' => $request->booking_time,
-            'status'       => 'Booked',
+            'status'       => 'Pending',
         ]);
 
-        return redirect()->route('home')->with('success', 'Appointment booked successfully!');
+        // Send appointment request email to Doctor
+        try {
+            Mail::to($booking->doctor->email)->send(new AppointmentRequestMail($booking));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send appointment request email: " . $e->getMessage());
+        }
+
+        return redirect()->route('home')->with('success', 'Appointment booked successfully and is pending doctor approval!');
     }
 
     public function myBookings()

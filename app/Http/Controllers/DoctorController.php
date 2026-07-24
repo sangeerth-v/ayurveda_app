@@ -255,4 +255,25 @@ class DoctorController extends Controller
 
         return back()->with('success', 'Profile updated successfully!');
     }
+
+    public function updateBookingStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Booked,Cancelled,Completed'
+        ]);
+
+        $booking = \App\Models\DoctorToken::where('doctor_id', \Illuminate\Support\Facades\Auth::guard('doctor')->id())
+            ->findOrFail($id);
+
+        $booking->update(['status' => $request->status]);
+
+        // Send appointment status update email to User
+        try {
+            \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\AppointmentStatusUpdatedMail($booking));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send appointment status update email: " . $e->getMessage());
+        }
+
+        return back()->with('success', 'Appointment status updated successfully.');
+    }
 }
