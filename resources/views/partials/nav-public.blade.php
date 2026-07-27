@@ -1,7 +1,39 @@
-<nav class="navbar navbar-expand-lg sticky-top">
+<style>
+    .public-navbar {
+        background-color: #1a4d2e !important;
+        padding: 0.75rem 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1050;
+    }
+    .public-navbar .navbar-brand {
+        color: #c5a059 !important;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .public-navbar .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 500;
+        margin-left: 1.2rem;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+    }
+    .public-navbar .nav-link:hover, 
+    .public-navbar .nav-link:focus {
+        color: #c5a059 !important;
+    }
+    .public-navbar .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    .public-navbar .navbar-toggler-icon {
+        filter: invert(1);
+    }
+</style>
+<nav class="navbar navbar-expand-lg sticky-top public-navbar">
     <div class="container-fluid">
         <a href="{{ url('/') }}" class="navbar-brand">
-            <i class="fas fa-leaf me-2"></i> Ayurveda
+            <i class="fas fa-leaf me-2 text-warning"></i> Ayurveda
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -29,18 +61,7 @@
                         </form>
                     </li>
                 @else
-                    <li class="nav-item dropdown">
-                        <a href="{{ route('login') }}" class="nav-link dropdown-toggle" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Login
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="loginDropdown">
-                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'patient']) }}">Patient Login</a></li>
-                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'doctor']) }}">Doctor Login</a></li>
-                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'pharma']) }}">Pharmaceutical Company Login</a></li>
-                            <li><a class="dropdown-item" href="{{ route('login', ['role' => 'hospital']) }}">Hospital Login</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Patient Register</a></li>
+                    <li class="nav-item"><a href="{{ route('login') }}" class="nav-link"><i class="fas fa-user me-1"></i> Login / Register</a></li>
                 @endif
             </ul>
         </div>

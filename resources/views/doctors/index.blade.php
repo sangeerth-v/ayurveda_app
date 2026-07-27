@@ -24,7 +24,7 @@
 
         {{-- ── Search & Filter Row ── --}}
         <div class="row mb-4 g-3">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="input-group shadow-sm h-100">
                     <span class="input-group-text bg-white border-end-0" style="border-color:#c8dfc8;">
                         <i class="fas fa-search text-success"></i>
@@ -39,7 +39,7 @@
                     </button>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="input-group shadow-sm h-100">
                     <span class="input-group-text bg-white border-end-0" style="border-color:#c8dfc8;">
                         <i class="fas fa-map-marker-alt text-success"></i>
@@ -50,6 +50,22 @@
                             <option value="{{ $dist->id }}">{{ $dist->name }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2 h-100">
+                    <a href="{{ route('doctors.index') }}"
+                       class="btn {{ ($activeType ?? 'all') === 'all' ? 'btn-success' : 'btn-outline-success' }} fw-semibold flex-fill">
+                        All
+                    </a>
+                    <a href="{{ route('doctors.index', ['type' => 'Online']) }}"
+                       class="btn {{ ($activeType ?? 'all') === 'Online' ? 'btn-primary' : 'btn-outline-primary' }} fw-semibold flex-fill">
+                        <i class="fas fa-video me-1"></i>Online
+                    </a>
+                    <a href="{{ route('doctors.index', ['type' => 'Offline']) }}"
+                       class="btn {{ ($activeType ?? 'all') === 'Offline' ? 'btn-secondary' : 'btn-outline-secondary' }} fw-semibold flex-fill">
+                        <i class="fas fa-hospital me-1"></i>Offline
+                    </a>
                 </div>
             </div>
         </div>
@@ -72,10 +88,19 @@
                 <div class="col doctor-card"
                      data-name="{{ strtolower($doctor->name) }}"
                      data-category="{{ strtolower($doctor->specialization_category ?? '') }}"
-                     data-district="{{ $doctor->district_id }}">
+                     data-district="{{ $doctor->district_id }}"
+                     data-constype="{{ strtolower($doctor->consultation_type ?? 'offline') }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.2s, box-shadow 0.2s;">
                         {{-- Header band --}}
-                        <div class="py-4 text-center" style="background: linear-gradient(135deg, #1a4d2e, #4f772d);">
+                        <div class="py-4 text-center position-relative" style="background: linear-gradient(135deg, #1a4d2e, #4f772d);">
+                            {{-- Consultation Badge --}}
+                            @if($doctor->consultation_type === 'Online')
+                                <span class="position-absolute top-0 end-0 mt-2 me-2 badge" style="background:#0d6efd; font-size:0.7rem;">🎥 Online</span>
+                            @elseif($doctor->consultation_type === 'Both')
+                                <span class="position-absolute top-0 end-0 mt-2 me-2 badge" style="background:#6f42c1; font-size:0.7rem;">🌐 Online + Offline</span>
+                            @else
+                                <span class="position-absolute top-0 end-0 mt-2 me-2 badge bg-secondary" style="font-size:0.7rem;">🏥 Offline</span>
+                            @endif
                             <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2"
                                  style="width:70px;height:70px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);">
                                 <i class="fas fa-user-md fa-2x text-white"></i>
@@ -86,7 +111,7 @@
                                 <br><small class="text-white opacity-50 small" style="font-size: 0.7rem;">{{ $doctor->specialization_subcategory }}</small>
                             @endif
                         </div>
-                        <div class="card-body d-flex flex-column p-4">
+                            <div class="card-body d-flex flex-column p-4">
                             <div class="mb-3">
                                 @if($doctor->qualification)
                                     <p class="mb-1 small text-muted"><i class="fas fa-graduation-cap me-2 text-success"></i>{{ $doctor->qualification }}</p>
@@ -98,13 +123,16 @@
                                     <p class="mb-1 small text-muted"><i class="fas fa-map-marker-alt me-2 text-success"></i>{{ $doctor->district->name }}</p>
                                 @endif
                                 @if($doctor->available_time)
-                                    <p class="mb-1 small text-muted"><i class="fas fa-clock me-2 text-success"></i>Available: {{ $doctor->available_time }}</p>
+                                    <p class="mb-1 small text-muted"><i class="fas fa-clock me-2 text-success"></i><strong>In-person:</strong> {{ $doctor->available_time }}</p>
+                                @endif
+                                @if($doctor->online_available_time && in_array($doctor->consultation_type, ['Online', 'Both']))
+                                    <p class="mb-1 small" style="color:#0d6efd;"><i class="fas fa-video me-2"></i><strong>Online:</strong> {{ $doctor->online_available_time }}</p>
                                 @endif
                             </div>
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="fw-bold" style="color:#1a4d2e; font-size:1.1rem;">
-                                        ₹{{ number_format($doctor->consultation_fee, 2) }}
+                                        ₹{{ number_format($doctor->consultation_fee, 0) }}
                                     </span>
                                     <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill small">Consultation Fee</span>
                                 </div>

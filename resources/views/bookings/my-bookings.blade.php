@@ -42,15 +42,26 @@
                                     </h5>
                                     <p class="mb-0 text-muted small">
                                         {{ $booking->doctor->specialization_category ?? 'General' }}
+                                        @if($booking->consultation_type)
+                                            <span class="badge bg-light text-dark border ms-1">{{ $booking->consultation_type }}</span>
+                                        @endif
                                     </p>
+                                    @if($booking->status == 'Booked' && $booking->consultation_type == 'Online' && !empty($booking->doctor->google_meet_link))
+                                        <div class="mt-2">
+                                            <a href="{{ $booking->doctor->google_meet_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="fas fa-video me-1"></i> Join Meeting
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="col-md-4 text-end">
                                     @if($booking->status == 'Pending')
-                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-clock me-1"></i>Pending Approval</span>
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-clock me-1"></i>Awaiting Doctor Approval</span>
                                     @elseif($booking->status == 'Booked')
-                                        <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="fas fa-check-circle me-1"></i>Confirmed</span>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill mb-2"><i class="fas fa-check-circle me-1"></i>Doctor Approved</span>
+                                        <div class="small text-success fw-bold"><i class="fas fa-mobile-alt me-1"></i> SMS Alert Sent to Phone</div>
                                     @elseif($booking->status == 'Completed')
-                                        <span class="badge bg-success px-3 py-2 rounded-pill"><i class="fas fa-check-double me-1"></i>Completed</span>
+                                        <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="fas fa-check-double me-1"></i>Completed</span>
                                     @else
                                         <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i>Cancelled</span>
                                     @endif

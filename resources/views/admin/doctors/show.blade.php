@@ -41,6 +41,10 @@
                         <span class="fw-bold">#DOC-{{ str_pad($doctor->id, 4, '0', STR_PAD_LEFT) }}</span>
                     </li>
                     <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small text-uppercase fw-bold">Reg. Number</span>
+                        <span class="fw-bold text-primary">{{ $doctor->medical_registration_no ?? 'N/A' }}</span>
+                    </li>
+                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted small text-uppercase fw-bold">Consultation Fee</span>
                         <span class="text-success fw-bold">₹{{ $doctor->consultation_fee ?? '0' }}</span>
                     </li>
@@ -55,7 +59,7 @@
         <!-- Contact Info -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-address-book me-2 text-success"></i> Contact Info</h5>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-address-book me-2 text-success"></i> Contact Info & Address</h5>
             </div>
             <div class="card-body">
                 <div class="mb-3">
@@ -70,9 +74,13 @@
                     <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Phone Number</label>
                     <div class="text-dark">{{ $doctor->phone ?? 'Not provided' }}</div>
                 </div>
-                <div>
-                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Practice Location</label>
+                <div class="mb-3">
+                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">District</label>
                     <div class="text-dark">{{ $doctor->district->name ?? 'N/A' }}</div>
+                </div>
+                <div>
+                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Practice Address</label>
+                    <div class="text-dark">{{ $doctor->address ?? 'Not specified' }}</div>
                 </div>
             </div>
         </div>
@@ -82,18 +90,49 @@
         <!-- Professional Summary -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-graduation-cap me-2 text-success"></i> Professional Summary</h5>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-graduation-cap me-2 text-success"></i> Professional Credentials</h5>
             </div>
             <div class="card-body p-4">
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Qualifications</h6>
-                        <p class="text-dark fs-5">{{ $doctor->qualification ?? 'MBBS, BAMS (Ayurveda)' }}</p>
+                        <h6 class="text-muted small text-uppercase fw-bold mb-2">Qualifications</h6>
+                        <p class="text-dark fs-5 mb-0">{{ $doctor->qualification }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Availability</h6>
-                        <p class="text-dark fw-medium"><i class="far fa-clock me-2 text-warning"></i> {{ $doctor->available_time ?? 'Mon - Fri (9:00 AM - 5:00 PM)' }}</p>
+                        <h6 class="text-muted small text-uppercase fw-bold mb-2">Medical Reg No</h6>
+                        <p class="text-dark fs-5 fw-bold mb-0 text-primary">{{ $doctor->medical_registration_no ?? 'N/A' }}</p>
                     </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted small text-uppercase fw-bold mb-2">Availability</h6>
+                        <p class="text-dark fw-medium mb-0"><i class="far fa-clock me-2 text-warning"></i> {{ $doctor->available_time ?? 'Mon - Fri' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted small text-uppercase fw-bold mb-2">Consultation Mode</h6>
+                        <p class="text-dark fw-medium mb-0"><i class="fas fa-video me-2 text-info"></i> {{ $doctor->consultation_type ?? 'Offline' }}</p>
+                    </div>
+                </div>
+
+                <!-- Verification Certificates -->
+                <h6 class="text-muted small text-uppercase fw-bold mb-3 pt-3 border-top">Verification Certificates</h6>
+                <div class="d-flex gap-3 flex-wrap">
+                    @if($doctor->registration_certificate)
+                        <a href="{{ asset('storage/' . $doctor->registration_certificate) }}" target="_blank" class="btn btn-outline-success">
+                            <i class="fas fa-file-pdf me-2"></i> Registration Certificate
+                        </a>
+                    @else
+                        <span class="badge bg-secondary p-2">No Registration Certificate</span>
+                    @endif
+
+                    @if($doctor->council_certificate)
+                        <a href="{{ asset('storage/' . $doctor->council_certificate) }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-certificate me-2"></i> Medical Council Certificate
+                        </a>
+                    @else
+                        <span class="badge bg-secondary p-2">No Council Certificate</span>
+                    @endif
                 </div>
                 
                 <hr class="my-4 opacity-10">

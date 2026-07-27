@@ -18,15 +18,27 @@ class Doctor extends Authenticatable
         'password',
         'password_plain',
         'phone',
+        'medical_registration_no',
         'specialization_category',
         'specialization_subcategory',
         'district_id',
+        'address',
         'qualification',
         'experience',
         'consultation_fee',
         'available_time',
+        'consultation_type',
+        'online_available_time',
+        'google_meet_link',
         'photo',
+        'registration_certificate',
+        'council_certificate',
         'hospital_id',
+    ];
+
+    protected $casts = [
+        'consultation_fee' => 'integer',
+        'experience' => 'integer',
     ];
 
 

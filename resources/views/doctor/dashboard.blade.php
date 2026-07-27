@@ -306,6 +306,17 @@
         box-shadow: 0 0 5px rgba(239, 68, 68, 0.5) !important;
     }
 
+    .calendar-day.past-date {
+        background-color: #f1f3f5 !important;
+        color: #a0aec0 !important;
+        opacity: 0.45 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        border-color: #e9ecef !important;
+        text-decoration: line-through;
+    }
+
     .date-pill.unavailable {
         background: #f1f3f5 !important;
         border-color: #dee2e6 !important;
@@ -351,6 +362,8 @@ document.addEventListener('DOMContentLoaded', function() {
             calendarDays.appendChild(div);
         }
         
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
         for (let i = 1; i <= new Date(year, month + 1, 0).getDate(); i++) {
             const div = document.createElement('div');
             div.className = 'calendar-day';
@@ -367,13 +380,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 div.title = 'Marked as Leave';
             }
             
-            if (year === now.getFullYear() && month === now.getMonth() && i === now.getDate()) {
-                div.classList.add('today');
+            if (dateStr < todayStr) {
+                div.classList.add('past-date');
+                div.title = 'Past Date (Disabled)';
+            } else {
+                if (year === now.getFullYear() && month === now.getMonth() && i === now.getDate()) {
+                    div.classList.add('today');
+                }
+                
+                div.addEventListener('click', () => {
+                    window.location.href = `{{ route('doctor.dashboard') }}?filter=upcoming&date=${dateStr}`;
+                });
             }
-            
-            div.addEventListener('click', () => {
-                window.location.href = `{{ route('doctor.dashboard') }}?filter=upcoming&date=${dateStr}`;
-            });
             
             calendarDays.appendChild(div);
         }

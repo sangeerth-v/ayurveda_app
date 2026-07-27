@@ -11,8 +11,12 @@
         .content h2 { color: #1a4d2e; font-size: 20px; margin-top: 0; }
         .details-card { background-color: #f9fbf9; border-left: 4px solid #1a4d2e; padding: 20px; border-radius: 8px; margin: 20px 0; }
         .details-row { display: flex; margin-bottom: 10px; font-size: 15px; }
-        .details-label { font-weight: bold; width: 120px; color: #7a8a7a; }
+        .details-label { font-weight: bold; width: 160px; color: #7a8a7a; flex-shrink: 0; }
         .details-value { color: #2e3b2e; }
+        .badge-online { background-color: #0d6efd; color: #fff; padding: 4px 14px; border-radius: 30px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .badge-offline { background-color: #6c757d; color: #fff; padding: 4px 14px; border-radius: 30px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .meet-box { background: #e8f4fd; border: 1px solid #b8d9f7; padding: 16px 20px; border-radius: 10px; margin: 14px 0; }
+        .meet-box a { color: #0d6efd; font-weight: bold; word-break: break-all; }
         .footer { background-color: #f1f5f1; text-align: center; padding: 20px; font-size: 12px; color: #7a8a7a; border-top: 1px solid #e1e8e1; }
         .btn { display: inline-block; background-color: #1a4d2e; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 30px; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 6px rgba(26,77,46,0.2); }
     </style>
@@ -33,6 +37,10 @@
                     <span class="details-value">{{ $booking->user->name }}</span>
                 </div>
                 <div class="details-row">
+                    <span class="details-label">Phone:</span>
+                    <span class="details-value">{{ $booking->user->phone ?? 'N/A' }}</span>
+                </div>
+                <div class="details-row">
                     <span class="details-label">Date:</span>
                     <span class="details-value">{{ \Carbon\Carbon::parse($booking->booking_date)->format('l, d M Y') }}</span>
                 </div>
@@ -40,7 +48,24 @@
                     <span class="details-label">Time:</span>
                     <span class="details-value">{{ \Carbon\Carbon::parse($booking->booking_time)->format('h:i A') }}</span>
                 </div>
+                <div class="details-row">
+                    <span class="details-label">Consultation Type:</span>
+                    <span class="details-value">
+                        @if($booking->consultation_type === 'Online')
+                            <span class="badge-online">Video Online Consultation</span>
+                        @else
+                            <span class="badge-offline">In-Person / Offline</span>
+                        @endif
+                    </span>
+                </div>
             </div>
+
+            @if($booking->consultation_type === 'Online' && $booking->doctor->google_meet_link)
+            <div class="meet-box">
+                <strong>Google Meet Link (share with patient after approving):</strong><br>
+                <a href="{{ $booking->doctor->google_meet_link }}">{{ $booking->doctor->google_meet_link }}</a>
+            </div>
+            @endif
 
             <p>Please log in to your doctor dashboard to review, accept, or reject this appointment request.</p>
             <center>
@@ -53,3 +78,4 @@
     </div>
 </body>
 </html>
+

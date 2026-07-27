@@ -27,6 +27,15 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::get('/register', [UserController::class, 'showRegister'])->name('register');
 Route::post('/register', [UserController::class, 'register']);
+Route::get('/doctor/register', [UserController::class, 'showDoctorRegister'])->name('doctor.register');
+Route::post('/doctor/register', [UserController::class, 'processDoctorRegister'])->name('doctor.register.submit');
+Route::get('/hospital/register', [UserController::class, 'showHospitalRegister'])->name('hospital.register');
+Route::post('/hospital/register', [UserController::class, 'processHospitalRegister'])->name('hospital.register.submit');
+Route::get('/pharma/register', [UserController::class, 'showPharmaRegister'])->name('pharma.register');
+Route::post('/pharma/register', [UserController::class, 'processPharmaRegister'])->name('pharma.register.submit');
+Route::get('/register/verify-otp', [UserController::class, 'showVerifyOtp'])->name('register.verify_otp');
+Route::post('/register/verify-otp', [UserController::class, 'verifyOtp']);
+Route::post('/register/resend-otp', [UserController::class, 'resendOtp'])->name('register.resend_otp');
 
 // --- Protected User Routes (UserController) ---
 Route::middleware('auth')->group(function () {

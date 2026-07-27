@@ -31,7 +31,6 @@
                                 <span class="badge bg-success bg-opacity-15 text-success me-1 mb-1">{{ $specialty }}</span>
                             @endforeach
                         </div>
-                        <a href="{{ route('login', ['role' => 'hospital']) }}" class="btn btn-success btn-sm">Hospital Login</a>
                     </div>
                 </div>
             </div>

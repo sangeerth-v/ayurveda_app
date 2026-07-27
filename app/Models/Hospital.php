@@ -17,6 +17,9 @@ class Hospital extends Authenticatable
         'password',
         'password_plain',
         'phone',
+        'license_number',
+        'gst_number',
+        'contact_person',
         'address',
         'district_id',
         'specialties',
@@ -24,6 +27,7 @@ class Hospital extends Authenticatable
         'facilities',
         'description',
         'logo',
+        'license_document',
         'is_active',
     ];
 

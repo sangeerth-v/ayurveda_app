@@ -132,7 +132,7 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Consultation Fee (₹)</label>
-                                    <input type="number" name="consultation_fee" class="form-control @error('consultation_fee') is-invalid @enderror" value="{{ old('consultation_fee', $doctor->consultation_fee) }}">
+                                    <input type="number" step="1" min="0" name="consultation_fee" class="form-control @error('consultation_fee') is-invalid @enderror" value="{{ old('consultation_fee', (int)$doctor->consultation_fee) }}">
                                     @error('consultation_fee') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
@@ -174,6 +174,59 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Consultation Type --}}
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Consultation Type</label>
+                                    <div class="d-flex gap-3 flex-wrap">
+                                        @foreach(['Offline' => '🏥 Offline (In-Person)', 'Online' => '🎥 Online', 'Both' => '🌐 Both'] as $val => $label)
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="consultation_type" id="pct_{{ $val }}" value="{{ $val }}"
+                                                    {{ old('consultation_type', $doctor->consultation_type ?? 'Offline') === $val ? 'checked' : '' }}
+                                                    onchange="toggleOnlineProfileFields()">
+                                                <label class="form-check-label fw-semibold" for="pct_{{ $val }}">{{ $label }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- Online Availability and Meet Link --}}
+                                @php
+                                    $onTimes = explode(' to ', $doctor->online_available_time ?? '');
+                                    $onFrom = $onTimes[0] ?? '09:00';
+                                    $onTo = $onTimes[1] ?? '17:00';
+                                @endphp
+                                <div id="onlineProfileFields" class="col-12" style="{{ in_array($doctor->consultation_type ?? 'Offline', ['Online', 'Both']) ? '' : 'display:none;' }}">
+                                    <div class="row g-3 p-3 rounded-3" style="background:#e8f4fd; border:1px solid #b8d9f7;">
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold text-primary">🎥 Online Availability Hours</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Online Available From</label>
+                                            <select name="online_available_from" class="form-select">
+                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
+                                                    <option value="{{ $time }}" {{ $onFrom == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Online Available To</label>
+                                            <select name="online_available_to" class="form-select">
+                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
+                                                    <option value="{{ $time }}" {{ $onTo == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold">Google Meet Link</label>
+                                            <input type="url" name="google_meet_link" class="form-control @error('google_meet_link') is-invalid @enderror"
+                                                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                                                value="{{ old('google_meet_link', $doctor->google_meet_link) }}">
+                                            <div class="form-text">Your personal Google Meet room link shared with patients after you approve their online appointment.</div>
+                                            @error('google_meet_link') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <hr class="my-5">
@@ -200,6 +253,16 @@ function previewImage(input, previewId) {
             preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
         }
         reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function toggleOnlineProfileFields() {
+    const selected = document.querySelector('input[name="consultation_type"]:checked');
+    const fields = document.getElementById('onlineProfileFields');
+    if (selected && (selected.value === 'Online' || selected.value === 'Both')) {
+        fields.style.display = 'block';
+    } else {
+        fields.style.display = 'none';
     }
 }
 </script>

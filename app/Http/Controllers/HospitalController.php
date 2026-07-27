@@ -206,15 +206,23 @@ class HospitalController extends Controller
             'email' => 'required|email|unique:doctors,email' . ($id ? ',' . $id : ''),
             'password' => ($id ? 'nullable' : 'required') . '|string|min:6',
             'phone' => 'required|digits:10',
+            'medical_registration_no' => 'nullable|string|max:100',
             'specialization_category' => 'required|string|max:255',
             'specialization_subcategory' => 'nullable|string|max:255',
             'district_id' => 'required|exists:districts,id',
+            'address' => 'nullable|string',
             'qualification' => 'nullable|string',
             'experience' => 'nullable|integer',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'consultation_type' => 'required|in:Online,Offline,Both',
+            'online_available_from' => 'nullable|string',
+            'online_available_to' => 'nullable|string',
+            'google_meet_link' => 'nullable|url|max:500',
         ]);
     }
 
@@ -227,7 +235,23 @@ class HospitalController extends Controller
         $data['specialization_subcategory'] = $subcategory ? $subcategory->name : $request->specialization_subcategory;
         $data['password_plain'] = $request->password;
         $data['available_time'] = trim(($request->available_from ?? '') . ' to ' . ($request->available_to ?? ''));
-        unset($data['available_from'], $data['available_to']);
+        $data['consultation_type'] = $request->consultation_type ?? 'Offline';
+
+        if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
+            $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+        }
+
+        $data['google_meet_link'] = $request->google_meet_link;
+
+        if ($request->hasFile('registration_certificate')) {
+            $data['registration_certificate'] = $request->file('registration_certificate')->store('doctor_docs', 'public');
+        }
+
+        if ($request->hasFile('council_certificate')) {
+            $data['council_certificate'] = $request->file('council_certificate')->store('doctor_docs', 'public');
+        }
+
+        unset($data['available_from'], $data['available_to'], $data['online_available_from'], $data['online_available_to']);
 
         return $data;
     }

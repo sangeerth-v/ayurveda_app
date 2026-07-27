@@ -56,6 +56,18 @@
                     <span class="details-label">Time:</span>
                     <span class="details-value">{{ \Carbon\Carbon::parse($booking->booking_time)->format('h:i A') }}</span>
                 </div>
+                @if($booking->consultation_type)
+                <div class="details-row">
+                    <span class="details-label">Type:</span>
+                    <span class="details-value">{{ $booking->consultation_type }}</span>
+                </div>
+                @endif
+                @if($booking->status == 'Booked' && $booking->consultation_type == 'Online' && !empty($booking->doctor->google_meet_link))
+                <div class="details-row">
+                    <span class="details-label">Meeting:</span>
+                    <span class="details-value"><a href="{{ $booking->doctor->google_meet_link }}" style="color: #1a4d2e; font-weight: bold;">{{ $booking->doctor->google_meet_link }}</a></span>
+                </div>
+                @endif
             </div>
 
             <p>If you have any questions, please contact the support team or visit your dashboard.</p>

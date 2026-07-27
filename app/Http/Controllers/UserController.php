@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRegisteredMail;
+use App\Mail\RegistrationOtpMail;
 use App\Mail\AppointmentRequestMail;
 use App\Mail\OrderPlacedUserMail;
 use App\Mail\OrderPlacedPharmaMail;
@@ -104,6 +105,161 @@ class UserController extends Controller
         return view('auth.register');
     }
 
+    public function showDoctorRegister()
+    {
+        $districts = \App\Models\District::all();
+        $categories = \App\Models\DoctorCategory::all();
+        $hospitals = \App\Models\Hospital::orderBy('name')->get();
+        return view('auth.doctor-register', compact('districts', 'categories', 'hospitals'));
+    }
+
+    public function processDoctorRegister(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:doctors,email',
+            'password' => 'required|string|min:6',
+            'phone' => 'required|digits:10',
+            'medical_registration_no' => 'required|string|max:100',
+            'qualification' => 'required|string|max:255',
+            'specialization_category' => 'required',
+            'specialization_subcategory' => 'nullable',
+            'district_id' => 'required|exists:districts,id',
+            'experience' => 'required|integer|min:0',
+            'address' => 'required|string',
+            'hospital_id' => 'nullable|exists:hospitals,id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('doctors', 'public');
+        }
+
+        $regCertPath = null;
+        if ($request->hasFile('registration_certificate')) {
+            $regCertPath = $request->file('registration_certificate')->store('doctor_docs', 'public');
+        }
+
+        $councilCertPath = null;
+        if ($request->hasFile('council_certificate')) {
+            $councilCertPath = $request->file('council_certificate')->store('doctor_docs', 'public');
+        }
+
+        $category = \App\Models\DoctorCategory::find($request->specialization_category);
+        $subcategory = \App\Models\DoctorSubcategory::find($request->specialization_subcategory);
+
+        \App\Models\Doctor::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+            'password_plain' => $request->password,
+            'phone' => $request->phone,
+            'medical_registration_no' => $request->medical_registration_no,
+            'specialization_category' => $category ? $category->name : $request->specialization_category,
+            'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
+            'district_id' => $request->district_id,
+            'address' => $request->address,
+            'qualification' => $request->qualification,
+            'experience' => $request->experience,
+            'consultation_fee' => 0,
+            'consultation_type' => 'Offline',
+            'photo' => $photoPath,
+            'registration_certificate' => $regCertPath,
+            'council_certificate' => $councilCertPath,
+            'hospital_id' => $request->hospital_id,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Doctor application submitted successfully! Your account credentials will be active after admin verification.');
+    }
+
+    public function showHospitalRegister()
+    {
+        $districts = \App\Models\District::all();
+        return view('auth.hospital-register', compact('districts'));
+    }
+
+    public function processHospitalRegister(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'license_number' => 'required|string|max:100',
+            'gst_number' => 'nullable|string|max:100',
+            'address' => 'required|string',
+            'contact_person' => 'required|string|max:255',
+            'email' => 'required|email|unique:hospitals,email',
+            'phone' => 'required|digits:10',
+            'password' => 'required|string|min:6',
+            'district_id' => 'required|exists:districts,id',
+            'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $licenseDocPath = null;
+        if ($request->hasFile('license_document')) {
+            $licenseDocPath = $request->file('license_document')->store('hospital_docs', 'public');
+        }
+
+        \App\Models\Hospital::create([
+            'name' => $request->name,
+            'license_number' => $request->license_number,
+            'gst_number' => $request->gst_number,
+            'address' => $request->address,
+            'contact_person' => $request->contact_person,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => $request->password,
+            'password_plain' => $request->password,
+            'district_id' => $request->district_id,
+            'license_document' => $licenseDocPath,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Hospital registration submitted successfully! You can now log in.');
+    }
+
+    public function showPharmaRegister()
+    {
+        return view('auth.pharma-register');
+    }
+
+    public function processPharmaRegister(Request $request)
+    {
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'drug_license_no' => 'required|string|max:100',
+            'gst_number' => 'required|string|max:100',
+            'address' => 'required|string',
+            'contact_person' => 'required|string|max:255',
+            'email' => 'required|email|unique:pharma_companies,email',
+            'phone' => 'required|digits:10',
+            'password' => 'required|string|min:6',
+            'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $licenseDocPath = null;
+        if ($request->hasFile('license_document')) {
+            $licenseDocPath = $request->file('license_document')->store('pharma_docs', 'public');
+        }
+
+        \App\Models\PharmaCompany::create([
+            'company_name' => $request->company_name,
+            'drug_license_no' => $request->drug_license_no,
+            'gst_number' => $request->gst_number,
+            'address' => $request->address,
+            'contact_person' => $request->contact_person,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => $request->password,
+            'password_plain' => $request->password,
+            'license_document' => $licenseDocPath,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Pharma Company registration submitted successfully! You can now log in.');
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -113,11 +269,65 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $otp = sprintf("%06d", mt_rand(100000, 999999));
+
+        session([
+            'pending_registration' => [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => $request->password,
+                'redirect' => $request->input('redirect'),
+            ],
+            'registration_otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(10)->timestamp,
+        ]);
+
+        try {
+            Mail::to($request->email)->send(new RegistrationOtpMail($otp, $request->name));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send registration OTP email to {$request->email}: " . $e->getMessage());
+        }
+
+        return redirect()->route('register.verify_otp')->with('success', 'OTP code sent to your email address!');
+    }
+
+    public function showVerifyOtp()
+    {
+        if (!session()->has('pending_registration')) {
+            return redirect()->route('register')->withErrors(['email' => 'Registration session expired. Please register again.']);
+        }
+        return view('auth.verify-otp');
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6',
+        ]);
+
+        $pending = session('pending_registration');
+        $sessionOtp = session('registration_otp');
+        $expiresAt = session('otp_expires_at');
+
+        if (!$pending || !$sessionOtp) {
+            return redirect()->route('register')->withErrors(['email' => 'Registration session expired. Please register again.']);
+        }
+
+        if (now()->timestamp > $expiresAt) {
+            return back()->withErrors(['otp' => 'The OTP code has expired. Please click "Resend OTP" for a new code.']);
+        }
+
+        if ($request->otp !== (string)$sessionOtp) {
+            return back()->withErrors(['otp' => 'Invalid OTP code. Please check your email and try again.']);
+        }
+
+        // OTP is valid - Create User
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => $request->password,
+            'name' => $pending['name'],
+            'email' => $pending['email'],
+            'phone' => $pending['phone'],
+            'password' => $pending['password'],
         ]);
 
         try {
@@ -126,13 +336,40 @@ class UserController extends Controller
             \Log::error("Failed to send welcome email to {$user->email}: " . $e->getMessage());
         }
 
+        // Clear session OTP data
+        session()->forget(['pending_registration', 'registration_otp', 'otp_expires_at']);
+
         Auth::login($user);
 
-        if ($request->filled('redirect')) {
-            return redirect($request->redirect);
+        if (!empty($pending['redirect'])) {
+            return redirect($pending['redirect'])->with('success', 'Email verified successfully! Welcome to Ayurveda.');
         }
 
-        return redirect()->intended($this->redirectPath('web'));
+        return redirect()->intended($this->redirectPath('web'))->with('success', 'Email verified successfully! Welcome to Ayurveda.');
+    }
+
+    public function resendOtp(Request $request)
+    {
+        $pending = session('pending_registration');
+
+        if (!$pending) {
+            return redirect()->route('register')->withErrors(['email' => 'Registration session expired. Please register again.']);
+        }
+
+        $otp = sprintf("%06d", mt_rand(100000, 999999));
+
+        session([
+            'registration_otp' => $otp,
+            'otp_expires_at' => now()->addMinutes(10)->timestamp,
+        ]);
+
+        try {
+            Mail::to($pending['email'])->send(new RegistrationOtpMail($otp, $pending['name']));
+        } catch (\Exception $e) {
+            \Log::error("Failed to resend registration OTP email to {$pending['email']}: " . $e->getMessage());
+        }
+
+        return back()->with('success', 'A new OTP code has been sent to your email.');
     }
 
     protected function redirectPath($role)
@@ -161,12 +398,22 @@ class UserController extends Controller
     {
         $query = Product::where('stock', '>', 0);
         
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('category', 'LIKE', "%{$search}%")
+                  ->orWhere('subcategory', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+        
         if ($request->has('categories')) {
-            $query->whereIn('category', $request->categories);
+            $query->whereIn('category', (array)$request->categories);
         }
         
         if ($request->has('subcategories')) {
-            $query->whereIn('subcategory', $request->subcategories);
+            $query->whereIn('subcategory', (array)$request->subcategories);
         }
 
         $sort = $request->get('sort', 'price_asc');
@@ -184,14 +431,27 @@ class UserController extends Controller
             ->get()
             ->groupBy('category');
             
-        return view('products.index', compact('products', 'categoryData', 'sort'));
+        $search = $request->get('search', '');
+            
+        return view('products.index', compact('products', 'categoryData', 'sort', 'search'));
     }
 
-    public function doctors()
+    public function doctors(Request $request)
     {
-        $doctors = Doctor::with(['district'])->get();
+        $query = Doctor::with(['district']);
+
+        // Filter by consultation type if requested
+        if ($request->filled('type') && in_array($request->type, ['Online', 'Offline'])) {
+            $query->where(function ($q) use ($request) {
+                $q->where('consultation_type', $request->type)
+                  ->orWhere('consultation_type', 'Both');
+            });
+        }
+
+        $doctors = $query->get();
         $districts = \App\Models\District::all();
-        return view('doctors.index', compact('doctors', 'districts'));
+        $activeType = $request->get('type', 'all');
+        return view('doctors.index', compact('doctors', 'districts', 'activeType'));
     }
 
     public function hospitals()
@@ -395,10 +655,17 @@ class UserController extends Controller
     public function storeBooking(Request $request)
     {
         $request->validate([
-            'doctor_id'    => 'required|exists:doctors,id',
-            'booking_date' => 'required|date|after_or_equal:today',
-            'booking_time' => 'required',
+            'doctor_id'         => 'required|exists:doctors,id',
+            'booking_date'      => 'required|date|after_or_equal:today',
+            'booking_time'      => 'required',
+            'consultation_type' => 'required|in:Online,Offline',
         ]);
+
+        // Validate that doctor supports the requested consultation type
+        $doctor = Doctor::findOrFail($request->doctor_id);
+        if ($doctor->consultation_type !== 'Both' && $doctor->consultation_type !== $request->consultation_type) {
+            return back()->withErrors(['consultation_type' => 'This doctor does not offer ' . $request->consultation_type . ' consultations.'])->withInput();
+        }
 
         $exists = DoctorToken::where('doctor_id', $request->doctor_id)
             ->where('booking_date', $request->booking_date)
@@ -422,11 +689,12 @@ class UserController extends Controller
         }
 
         $booking = DoctorToken::create([
-            'user_id'      => Auth::id(),
-            'doctor_id'    => $request->doctor_id,
-            'booking_date' => $request->booking_date,
-            'booking_time' => $request->booking_time,
-            'status'       => 'Pending',
+            'user_id'           => Auth::id(),
+            'doctor_id'         => $request->doctor_id,
+            'booking_date'      => $request->booking_date,
+            'booking_time'      => $request->booking_time,
+            'status'            => 'Pending',
+            'consultation_type' => $request->consultation_type,
         ]);
 
         // Send appointment request email to Doctor

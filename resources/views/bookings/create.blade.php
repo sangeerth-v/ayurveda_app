@@ -26,20 +26,18 @@
                         <p class="mb-0 text-muted small">
                             {{ $doctor->specialization_category ?? 'General' }} &bull; {{ $doctor->district->name ?? '' }}
                         </p>
-                        <p class="mb-0 text-muted small">
-                            <i class="fas fa-rupee-sign me-1"></i>{{ number_format($doctor->consultation_fee, 2) }} consultation fee
-                            @if($doctor->available_time)
-                                &bull; <i class="fas fa-clock me-1"></i>Available: 
-                                @php
-                                    $times = explode(' to ', $doctor->available_time);
-                                    if(count($times) == 2) {
-                                        echo \Carbon\Carbon::parse(trim($times[0]))->format('h:i A') . ' - ' . \Carbon\Carbon::parse(trim($times[1]))->format('h:i A');
-                                    } else {
-                                        echo $doctor->available_time;
-                                    }
-                                @endphp
-                            @endif
+                        <p class="mb-0 small">
+                            <strong>₹{{ number_format($doctor->consultation_fee, 0) }}</strong>
+                            <span class="text-muted">consultation fee</span>
                         </p>
+                        <div class="mt-1 d-flex gap-2 flex-wrap">
+                            @if(in_array($doctor->consultation_type, ['Offline', 'Both']) && $doctor->available_time)
+                                <span class="badge bg-secondary"><i class="fas fa-hospital me-1"></i>In-person: {{ $doctor->available_time }}</span>
+                            @endif
+                            @if(in_array($doctor->consultation_type, ['Online', 'Both']) && $doctor->online_available_time)
+                                <span class="badge" style="background:#0d6efd;"><i class="fas fa-video me-1"></i>Online: {{ $doctor->online_available_time }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -56,6 +54,50 @@
                 <form action="{{ route('bookings.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">
+
+                    {{-- Consultation Type Selection --}}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Consultation Type</label>
+                        @if($doctor->consultation_type === 'Both')
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <input type="radio" name="consultation_type" value="Offline" id="type_offline" class="btn-check" {{ old('consultation_type') === 'Online' ? '' : 'checked' }} required>
+                                    <label for="type_offline" class="btn btn-outline-secondary w-100 py-3 rounded-3">
+                                        <i class="fas fa-hospital d-block mb-1 fa-lg"></i>
+                                        <strong>In-Person</strong>
+                                        <div class="small opacity-75">{{ $doctor->available_time ?? 'Check schedule' }}</div>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" name="consultation_type" value="Online" id="type_online" class="btn-check" {{ old('consultation_type') === 'Online' ? 'checked' : '' }} required>
+                                    <label for="type_online" class="btn btn-outline-primary w-100 py-3 rounded-3">
+                                        <i class="fas fa-video d-block mb-1 fa-lg"></i>
+                                        <strong>Online Video</strong>
+                                        <div class="small opacity-75">{{ $doctor->online_available_time ?? 'Check schedule' }}</div>
+                                    </label>
+                                </div>
+                            </div>
+                        @elseif($doctor->consultation_type === 'Online')
+                            <input type="hidden" name="consultation_type" value="Online">
+                            <div class="alert alert-info d-flex align-items-center gap-3 mb-0">
+                                <i class="fas fa-video fa-2x"></i>
+                                <div>
+                                    <strong>Online Consultation Only</strong>
+                                    <div class="small">This doctor is available online via Google Meet. A meeting link will be sent to you upon approval.</div>
+                                </div>
+                            </div>
+                        @else
+                            <input type="hidden" name="consultation_type" value="Offline">
+                            <div class="alert alert-secondary d-flex align-items-center gap-3 mb-0">
+                                <i class="fas fa-hospital fa-2x"></i>
+                                <div>
+                                    <strong>In-Person Consultation Only</strong>
+                                    <div class="small">This doctor is available for in-person visits at their clinic.</div>
+                                </div>
+                            </div>
+                        @endif
+                        @error('consultation_type') <div class="text-danger small mt-2">{{ $message }}</div> @enderror
+                    </div>
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -122,6 +164,16 @@
                         function updateSlots() {
                             const selectedDate = dateInput.value;
                             if(!selectedDate) return;
+
+                            const now = new Date();
+                            const todayStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+
+                            if (selectedDate < todayStr) {
+                                alert("Past dates cannot be selected for appointment bookings. Please choose today or a future date.");
+                                dateInput.value = todayStr;
+                                updateSlots();
+                                return;
+                            }
 
                             const isUnavailable = leaveDates.includes(selectedDate);
                             

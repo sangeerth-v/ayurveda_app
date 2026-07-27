@@ -15,6 +15,7 @@ class DoctorToken extends Model
         'booking_date',
         'booking_time',
         'status',
+        'consultation_type',
     ];
 
     public function user()

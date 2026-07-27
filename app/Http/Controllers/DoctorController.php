@@ -33,21 +33,39 @@ class DoctorController extends Controller
             'email' => 'required|email|unique:doctors,email',
             'password' => 'required|string|min:6',
             'phone' => 'required|digits:10',
+            'medical_registration_no' => 'nullable|string|max:100',
             'specialization_category' => 'required|string|max:255',
             'specialization_subcategory' => 'nullable|string|max:255',
             'district_id' => 'required|exists:districts,id',
+            'address' => 'nullable|string',
             'qualification' => 'nullable|string',
             'experience' => 'nullable|integer',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'hospital_id' => 'nullable|exists:hospitals,id',
+            'consultation_type' => 'required|in:Online,Offline,Both',
+            'online_available_from' => 'nullable|string',
+            'online_available_to' => 'nullable|string',
+            'google_meet_link' => 'nullable|url|max:500',
         ]);
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('doctors', 'public');
+        }
+
+        $regCertPath = null;
+        if ($request->hasFile('registration_certificate')) {
+            $regCertPath = $request->file('registration_certificate')->store('doctor_docs', 'public');
+        }
+
+        $councilCertPath = null;
+        if ($request->hasFile('council_certificate')) {
+            $councilCertPath = $request->file('council_certificate')->store('doctor_docs', 'public');
         }
 
         // Resolve Category Names
@@ -58,17 +76,26 @@ class DoctorController extends Controller
         Doctor::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password, 
+            'password' => $request->password,
             'password_plain' => $request->password,
             'phone' => $request->phone,
+            'medical_registration_no' => $request->medical_registration_no,
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
+            'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
             'consultation_fee' => $request->consultation_fee,
             'available_time' => $request->available_from . ' to ' . $request->available_to,
+            'consultation_type' => $request->consultation_type ?? 'Offline',
+            'online_available_time' => ($request->filled('online_available_from') && $request->filled('online_available_to'))
+                ? $request->online_available_from . ' to ' . $request->online_available_to
+                : null,
+            'google_meet_link' => $request->google_meet_link,
             'photo' => $photoPath,
+            'registration_certificate' => $regCertPath,
+            'council_certificate' => $councilCertPath,
             'hospital_id' => $request->hospital_id,
         ]);
 
@@ -104,16 +131,24 @@ class DoctorController extends Controller
             'email' => 'required|email|unique:doctors,email,' . $id,
             'password' => 'nullable|string|min:6',
             'phone' => 'required|digits:10',
+            'medical_registration_no' => 'nullable|string|max:100',
             'specialization_category' => 'required',
             'specialization_subcategory' => 'nullable',
             'district_id' => 'required|exists:districts,id',
+            'address' => 'nullable|string',
             'qualification' => 'nullable|string',
             'experience' => 'nullable|integer',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'hospital_id' => 'nullable|exists:hospitals,id',
+            'consultation_type' => 'required|in:Online,Offline,Both',
+            'online_available_from' => 'nullable|string',
+            'online_available_to' => 'nullable|string',
+            'google_meet_link' => 'nullable|url|max:500',
         ]);
 
         // Resolve Category Names
@@ -124,14 +159,21 @@ class DoctorController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'medical_registration_no' => $request->medical_registration_no,
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
+            'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
             'consultation_fee' => $request->consultation_fee,
             'available_time' => $request->available_from . ' to ' . $request->available_to,
             'hospital_id' => $request->hospital_id,
+            'consultation_type' => $request->consultation_type ?? 'Offline',
+            'online_available_time' => ($request->filled('online_available_from') && $request->filled('online_available_to'))
+                ? $request->online_available_from . ' to ' . $request->online_available_to
+                : null,
+            'google_meet_link' => $request->google_meet_link,
         ];
 
         if ($request->filled('password')) {
@@ -140,11 +182,24 @@ class DoctorController extends Controller
         }
 
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
             if ($doctor->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($doctor->photo)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($doctor->photo);
             }
             $data['photo'] = $request->file('photo')->store('doctors', 'public');
+        }
+
+        if ($request->hasFile('registration_certificate')) {
+            if ($doctor->registration_certificate && \Illuminate\Support\Facades\Storage::disk('public')->exists($doctor->registration_certificate)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($doctor->registration_certificate);
+            }
+            $data['registration_certificate'] = $request->file('registration_certificate')->store('doctor_docs', 'public');
+        }
+
+        if ($request->hasFile('council_certificate')) {
+            if ($doctor->council_certificate && \Illuminate\Support\Facades\Storage::disk('public')->exists($doctor->council_certificate)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($doctor->council_certificate);
+            }
+            $data['council_certificate'] = $request->file('council_certificate')->store('doctor_docs', 'public');
         }
 
         $doctor->update($data);
@@ -237,12 +292,27 @@ class DoctorController extends Controller
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'consultation_type' => 'nullable|in:Online,Offline,Both',
+            'online_available_from' => 'nullable|string',
+            'online_available_to' => 'nullable|string',
+            'google_meet_link' => 'nullable|url|max:500',
         ]);
 
-        $data = $request->except(['photo', 'password', 'available_from', 'available_to']);
+        $data = $request->except(['photo', 'password', 'available_from', 'available_to', 'online_available_from', 'online_available_to']);
         
         if ($request->filled('available_from') && $request->filled('available_to')) {
             $data['available_time'] = $request->available_from . ' to ' . $request->available_to;
+        }
+
+        if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
+            $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+        }
+
+        if ($request->has('consultation_type')) {
+            $data['consultation_type'] = $request->consultation_type;
+        }
+        if ($request->has('google_meet_link')) {
+            $data['google_meet_link'] = $request->google_meet_link;
         }
 
         if ($request->hasFile('photo')) {
@@ -269,17 +339,57 @@ class DoctorController extends Controller
         ]);
 
         $booking = \App\Models\DoctorToken::where('doctor_id', \Illuminate\Support\Facades\Auth::guard('doctor')->id())
+            ->with(['user', 'doctor'])
             ->findOrFail($id);
 
         $booking->update(['status' => $request->status]);
 
+        $user = $booking->user;
+        $doctor = $booking->doctor;
+        $date = \Carbon\Carbon::parse($booking->booking_date)->format('d M Y');
+        $time = \Carbon\Carbon::parse($booking->booking_time)->format('h:i A');
+
         // Send appointment status update email to User
-        try {
-            \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\AppointmentStatusUpdatedMail($booking));
-        } catch (\Exception $e) {
-            \Log::error("Failed to send appointment status update email: " . $e->getMessage());
+        if ($user && $user->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\AppointmentStatusUpdatedMail($booking));
+            } catch (\Exception $e) {
+                \Log::error("Failed to send appointment status update email: " . $e->getMessage());
+            }
         }
 
-        return back()->with('success', 'Appointment status updated successfully.');
+        // --- MOBILE NOTIFICATION ON APPROVAL / ACCEPTANCE ---
+        if ($request->status === 'Booked') {
+            $consultationType = $booking->consultation_type ?? 'Offline';
+            $smsMessage = "✅ APPOINTMENT APPROVED: Dear {$user->name}, your appointment with Dr. {$doctor->name} on {$date} at {$time} ({$consultationType}) has been APPROVED by the doctor. Ref: #BK-{$booking->id}. - Ayurveda App";
+
+            if ($user && $user->phone) {
+                // Send Mobile SMS Notification
+                \App\Services\SmsService::sendSms($user->phone, $smsMessage);
+            }
+
+            // Additional WhatsApp Meet Link if Online
+            if ($booking->consultation_type === 'Online') {
+                $meetLink = $doctor->google_meet_link ?? 'Link will be shared shortly';
+                $waMessage = "✅ *Appointment Confirmed!*\n\n";
+                $waMessage .= "Dear {$user->name},\n";
+                $waMessage .= "Your online consultation with *Dr. {$doctor->name}* has been confirmed.\n\n";
+                $waMessage .= "📅 *Date:* {$date}\n";
+                $waMessage .= "⏰ *Time:* {$time}\n\n";
+                $waMessage .= "🎥 *Google Meet Link:* {$meetLink}\n\n";
+                $waMessage .= "Please join on time. - Ayurveda App";
+
+                if ($user && $user->phone) {
+                    \App\Services\WhatsAppService::send($user->phone, $waMessage);
+                }
+            }
+        } elseif ($request->status === 'Cancelled') {
+            $smsMessage = "❌ APPOINTMENT CANCELLED: Dear {$user->name}, your appointment with Dr. {$doctor->name} scheduled for {$date} at {$time} has been cancelled. - Ayurveda App";
+            if ($user && $user->phone) {
+                \App\Services\SmsService::sendSms($user->phone, $smsMessage);
+            }
+        }
+
+        return back()->with('success', 'Appointment status updated and mobile notification sent to patient!');
     }
 }

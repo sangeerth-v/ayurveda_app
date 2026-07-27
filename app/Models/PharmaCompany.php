@@ -15,9 +15,15 @@ class PharmaCompany extends Authenticatable
         'company_name',
         'email',
         'password',
+        'password_plain',
         'phone',
+        'drug_license_no',
+        'gst_number',
+        'contact_person',
         'address',
         'logo',
+        'license_document',
+        'is_active',
     ];
 
     public function products()
