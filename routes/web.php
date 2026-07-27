@@ -76,9 +76,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // Doctor Management by Admin
         Route::resource('doctors', DoctorController::class);
+        Route::put('/doctors/{id}/toggle-active', [DoctorController::class, 'toggleActive'])->name('doctors.toggle_active');
 
         // Hospital Management by Admin
         Route::resource('hospitals', HospitalController::class);
+        Route::put('/hospitals/{id}/toggle-active', [HospitalController::class, 'toggleActive'])->name('hospitals.toggle_active');
 
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);

@@ -47,9 +47,16 @@
                             <span class="badge {{ $hospital->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $hospital->is_active ? 'Active' : 'Inactive' }}</span>
                         </td>
                         <td class="py-4 text-center">
-                            <div class="d-flex justify-content-center gap-2">
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
                                 <a href="{{ route('admin.hospitals.show', $hospital->id) }}" class="btn btn-sm btn-outline-success"><i class="fas fa-eye"></i></a>
                                 <a href="{{ route('admin.hospitals.edit', $hospital->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                <form action="{{ route('admin.hospitals.toggle_active', $hospital->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-sm {{ $hospital->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}" title="{{ $hospital->is_active ? 'Deactivate' : 'Approve' }} Hospital">
+                                        <i class="fas {{ $hospital->is_active ? 'fa-user-slash' : 'fa-check' }}"></i>
+                                    </button>
+                                </form>
                                 <form action="{{ route('admin.hospitals.destroy', $hospital->id) }}" method="POST" onsubmit="return confirm('Delete this hospital? Doctors will become independent.');">
                                     @csrf
                                     @method('DELETE')
