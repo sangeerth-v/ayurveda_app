@@ -4,6 +4,8 @@
     @include('partials.nav-public')
 @endsection
 
+@section('title', 'Ayurveda Management System | Traditional Healing & Clinical Care')
+
 @section('content')
 <!-- Single Popup Ad Overlay -->
 @if(isset($popupAd))
@@ -12,61 +14,226 @@
         <button class="adware-close" onclick="closePopupAd()">&times;</button>
         @if($popupAd->link)
             <a href="{{ $popupAd->link }}" target="_blank">
-                <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded" alt="{{ $popupAd->title }}">
+                <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded-4" alt="{{ $popupAd->title }}">
             </a>
         @else
-            <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded" alt="{{ $popupAd->title }}">
+            <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded-4" alt="{{ $popupAd->title }}">
         @endif
     </div>
 </div>
 @endif
 
 <div class="container-fluid p-0">
-    <section class="hero-section overflow-hidden mb-5">
-        <div class="hero-overlay"></div>
-        <div class="container position-relative py-6">
-            <div class="row align-items-center gx-5">
-                <div class="col-lg-6 text-white">
-                    <span class="badge rounded-pill bg-white text-success mb-3 px-4 py-2 shadow-sm">Verified Ayurveda</span>
-                    <h1 class="display-5 fw-bold mb-4">Professional Ayurveda care built for modern wellness.</h1>
-                    <p class="lead text-white-75 mb-4">Connect with certified practitioners, source trusted herbal remedies, and manage wellbeing in one elegant platform.</p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('doctors.index') }}" class="btn btn-light btn-lg text-success px-4">Find a Doctor</a>
-                        <a href="{{ route('hospitals.index') }}" class="btn btn-light btn-lg text-success px-4">Find a Hospital</a>
+
+    <!-- HERO SECTION: ROYAL FOREST & SAGE MINT -->
+    <section class="royal-hero py-6 text-white position-relative overflow-hidden">
+        <div class="container position-relative z-1">
+            <div class="row align-items-center gx-5 py-5">
+                <div class="col-lg-7">
+                    <span class="badge rounded-pill bg-white bg-opacity-15 text-warning fw-bold px-3 py-2 mb-3 shadow-sm border border-white border-opacity-20">
+                        <i class="fas fa-leaf me-1"></i> Authentic Ayurvedic Healthcare Network
+                    </span>
+                    <h1 class="display-4 fw-bold mb-3" style="line-height: 1.25;">
+                        Natural Healing &<br>
+                        <span style="color: #ffba08;">Clinical Ayurvedic Care</span>
+                    </h1>
+                    <p class="lead text-white-75 mb-4 max-w-600" style="font-size: 1.1rem; line-height: 1.7;">
+                        Connect with verified Ayurvedic doctors, order authentic herbal formulations, and manage your health seamlessly on one trusted digital platform.
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <a href="{{ route('doctors.index') }}" class="btn btn-honey-amber btn-lg px-4 py-3 fw-bold rounded-pill shadow">
+                            <i class="fas fa-user-md me-2"></i> Book Doctor Consultation
+                        </a>
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold rounded-pill">
+                            <i class="fas fa-pills me-2"></i> Order Medicines
+                        </a>
+                    </div>
+
+                    <!-- Trust Stats -->
+                    <div class="d-flex align-items-center gap-4 text-white-50 small pt-3 border-top border-white border-opacity-15">
+                        <span class="text-white"><i class="fas fa-check-circle text-warning me-1.5"></i> 100% Certified Practitioners</span>
+                        <span class="text-white"><i class="fas fa-shield-alt text-warning me-1.5"></i> GMP Licensed Products</span>
                     </div>
                 </div>
-                <div class="col-lg-5 offset-lg-1">
-                    <div class="hero-card p-4 p-md-5 rounded-4 shadow-lg bg-white">
+
+                <!-- Right Card: Glassmorphic Quick Access -->
+                <div class="col-lg-5 mt-4 mt-lg-0">
+                    <div class="glass-card p-4 p-md-5 rounded-4 bg-white shadow-lg text-dark">
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                            <span class="badge bg-success text-white rounded-pill px-3 py-2">Trusted platform</span>
-                            <span class="text-success fw-semibold">100% authentic</span>
+                            <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-2 fw-semibold">
+                                <i class="fas fa-heartbeat me-1"></i> Wellness Portal
+                            </span>
+                            <span class="text-muted small"><i class="fas fa-shield-alt text-success me-1"></i> Verified</span>
                         </div>
-                        <h2 class="h4 fw-bold mb-3">Health made simple</h2>
-                        <p class="text-muted mb-4">A seamless digital entry point for consultations, medicines, and preventive care with a calming, premium feel.</p>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="feature-box p-3 rounded-4 bg-success bg-opacity-10">
-                                    <p class="mb-1 fw-semibold text-success">Certified Doctors</p>
-                                    <h3 class="h5 fw-bold mb-0">150+</h3>
+
+                        <h3 class="h4 fw-bold mb-3 text-dark">Healthcare Services</h3>
+                        <p class="text-muted small mb-4">Choose a service below for instant care and consultations.</p>
+
+                        <div class="d-grid gap-3">
+                            <a href="{{ route('doctors.index') }}" class="service-tile p-3 rounded-3 border d-flex align-items-center justify-content-between text-decoration-none text-dark">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="tile-icon bg-success bg-opacity-10 text-success rounded-circle p-2.5">
+                                        <i class="fas fa-user-md fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Doctor Appointments</h6>
+                                        <small class="text-muted">Online video & clinic visits</small>
+                                    </div>
                                 </div>
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </a>
+
+                            <a href="{{ route('products.index') }}" class="service-tile p-3 rounded-3 border d-flex align-items-center justify-content-between text-decoration-none text-dark">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="tile-icon bg-success bg-opacity-10 text-success rounded-circle p-2.5">
+                                        <i class="fas fa-mortar-pestle fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Herbal Pharmacy</h6>
+                                        <small class="text-muted">Authentic Ayurvedic products</small>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </a>
+
+                            <a href="{{ route('hospitals.index') }}" class="service-tile p-3 rounded-3 border d-flex align-items-center justify-content-between text-decoration-none text-dark">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="tile-icon bg-success bg-opacity-10 text-success rounded-circle p-2.5">
+                                        <i class="fas fa-hospital fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Ayurvedic Hospitals</h6>
+                                        <small class="text-muted">Accredited Panchakarma centers</small>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUICK CATEGORY BAR -->
+    <section class="bg-white py-3 border-bottom shadow-sm">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between gap-3 overflow-x-auto py-1 hide-scrollbar">
+                <a href="{{ route('doctors.index') }}" class="pill-btn btn btn-light rounded-pill px-4 py-2 border text-nowrap fw-medium text-dark">
+                    🩺 Doctor Consultations
+                </a>
+                <a href="{{ route('products.index') }}" class="pill-btn btn btn-light rounded-pill px-4 py-2 border text-nowrap fw-medium text-dark">
+                    🌿 Herbal Medicines
+                </a>
+                <a href="{{ route('hospitals.index') }}" class="pill-btn btn btn-light rounded-pill px-4 py-2 border text-nowrap fw-medium text-dark">
+                    🏥 Care Hospitals
+                </a>
+               
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 HEALTHCARE PILLARS -->
+    <section class="container py-5">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-2 mb-2 fw-semibold">Services</span>
+            <h2 class="fw-bold mb-3" style="color: var(--primary-green);">Complete Ayurvedic Healthcare Services</h2>
+            <p class="text-muted">Providing traditional healing, verified practitioners, and authentic herbal remedies in one unified platform.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card h-100 border-0 rounded-4 shadow-sm p-4 hover-lift bg-white">
+                    <div class="icon-box bg-success bg-opacity-10 text-success rounded-4 p-3 d-inline-block mb-3">
+                        <i class="fas fa-user-md fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-dark">Verified Practitioners</h4>
+                    <p class="text-muted small mb-4">Connect with accredited BAMS & MD Ayurvedic doctors for online video consultations or clinic appointments.</p>
+                    <a href="{{ route('doctors.index') }}" class="fw-bold text-success text-decoration-none mt-auto small">
+                        Book Consultation <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card h-100 border-0 rounded-4 shadow-sm p-4 hover-lift bg-white">
+                    <div class="icon-box bg-success bg-opacity-10 text-success rounded-4 p-3 d-inline-block mb-3">
+                        <i class="fas fa-leaf fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-dark">Authentic Medicines</h4>
+                    <p class="text-muted small mb-4">Source genuine herbal products, oils, and Rasayanas manufactured by verified pharmaceutical companies.</p>
+                    <a href="{{ route('products.index') }}" class="fw-bold text-success text-decoration-none mt-auto small">
+                        Shop Medicines <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card h-100 border-0 rounded-4 shadow-sm p-4 hover-lift bg-white">
+                    <div class="icon-box bg-success bg-opacity-10 text-success rounded-4 p-3 d-inline-block mb-3">
+                        <i class="fas fa-hospital-user fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-dark">Integrated Hospitals</h4>
+                    <p class="text-muted small mb-4">Explore specialized Panchakarma centers and accredited Ayurvedic hospitals with transparent details.</p>
+                    <a href="{{ route('hospitals.index') }}" class="fw-bold text-success text-decoration-none mt-auto small">
+                        Explore Hospitals <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS OVERVIEW SECTION -->
+    <section class="bg-white py-5 border-top border-bottom">
+        <div class="container">
+            <div class="row align-items-center gx-5">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-2 mb-2 fw-semibold">Our Impact</span>
+                    <h2 class="fw-bold mb-3" style="color: var(--primary-green);">Trusted Network for Ayurvedic Health</h2>
+                    <p class="text-muted mb-4">Connecting patients, certified doctors, accredited hospitals, and pharmaceutical partners across India.</p>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                            <span class="fw-medium text-dark">SMS & Mobile Notifications on Appointments</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                            <span class="fw-medium text-dark">Google Meet Online Video Consultations</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                            <span class="fw-medium text-dark">Admin Verified Drug Licenses & Certificates</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-4 rounded-4 bg-light text-center border">
+                                <h2 class="display-6 fw-bold text-success mb-1">150+</h2>
+                                <p class="text-muted small mb-0 fw-medium">Verified Doctors</p>
                             </div>
-                            <div class="col-6">
-                                <div class="feature-box p-3 rounded-4 bg-success bg-opacity-10">
-                                    <p class="mb-1 fw-semibold text-success">Herbal Products</p>
-                                    <h3 class="h5 fw-bold mb-0">145+</h3>
-                                </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-4 rounded-4 bg-light text-center border">
+                                <h2 class="display-6 fw-bold text-success mb-1">145+</h2>
+                                <p class="text-muted small mb-0 fw-medium">Herbal Products</p>
                             </div>
-                            <div class="col-6">
-                                <div class="feature-box p-3 rounded-4 bg-success bg-opacity-10">
-                                    <p class="mb-1 fw-semibold text-success">Support</p>
-                                    <h3 class="h5 fw-bold mb-0">24/7</h3>
-                                </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-4 rounded-4 bg-light text-center border">
+                                <h2 class="display-6 fw-bold text-success mb-1">14</h2>
+                                <p class="text-muted small mb-0 fw-medium">Districts Covered</p>
                             </div>
-                            <div class="col-6">
-                                <div class="feature-box p-3 rounded-4 bg-success bg-opacity-10">
-                                    <p class="mb-1 fw-semibold text-success">Natural Care</p>
-                                    <h3 class="h5 fw-bold mb-0">Authentic</h3>
-                                </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-4 rounded-4 bg-light text-center border">
+                                <h2 class="display-6 fw-bold text-success mb-1">98%</h2>
+                                <p class="text-muted small mb-0 fw-medium">Positive Feedback</p>
                             </div>
                         </div>
                     </div>
@@ -75,175 +242,116 @@
         </div>
     </section>
 
-    <section class="container mb-5">
-        <div class="row text-center g-4">
-            <div class="col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
-                    <div class="mb-3 text-success display-6">⚕️</div>
-                    <h3 class="h5 fw-bold mb-3">Consult Verified Doctors</h3>
-                    <p class="text-muted">Book consultations with certified Ayurveda practitioners and get clear treatment guidance.</p>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
-                    <div class="mb-3 text-success display-6">🌿</div>
-                    <h3 class="h5 fw-bold mb-3">Authentic Herbal Remedies</h3>
-                    <p class="text-muted">Choose from trusted products sourced directly for healing, immunity, and balance.</p>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
-                    <div class="mb-3 text-success display-6">📱</div>
-                    <h3 class="h5 fw-bold mb-3">Modern Digital Care</h3>
-                    <p class="text-muted">Experience a polished website flow with fast bookings, clear pricing, and smart wellness tracking.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+</div>
 
-    <section class="container mb-5">
-        <div class="row align-items-center gx-5">
-            <div class="col-lg-6">
-                <h2 class="fw-bold mb-4">How Ayurveda Connect works</h2>
-                <div class="step-card rounded-4 p-4 mb-3 border shadow-sm">
-                    <div class="d-flex align-items-center mb-3 gap-3">
-                        <div class="step-badge bg-success text-white rounded-circle">1</div>
-                        <h4 class="mb-0">Search your need</h4>
-                    </div>
-                    <p class="text-muted mb-0">Find doctors, conditions, or products with clear categories and trusted results.</p>
-                </div>
-                <div class="step-card rounded-4 p-4 mb-3 border shadow-sm">
-                    <div class="d-flex align-items-center mb-3 gap-3">
-                        <div class="step-badge bg-success text-white rounded-circle">2</div>
-                        <h4 class="mb-0">Choose expert care</h4>
-                    </div>
-                    <p class="text-muted mb-0">Select a verified Ayurveda practitioner or product and review key details before booking.</p>
-                </div>
-                <div class="step-card rounded-4 p-4 border shadow-sm">
-                    <div class="d-flex align-items-center mb-3 gap-3">
-                        <div class="step-badge bg-success text-white rounded-circle">3</div>
-                        <h4 class="mb-0">Receive authentic support</h4>
-                    </div>
-                    <p class="text-muted mb-0">Enjoy personalized consultation, medicine delivery, and wellness guidance in one place.</p>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card border-0 rounded-4 shadow-lg overflow-hidden">
-                    <div class="card-body p-5 bg-success bg-opacity-10">
-                        <h3 class="fw-bold mb-4">Trusted by thousands across India</h3>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="stat-box rounded-4 bg-white p-4 text-center shadow-sm">
-                                    <div class="h2 fw-bold text-success mb-1">150+</div>
-                                    <p class="mb-0 text-muted">Doctors</p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-box rounded-4 bg-white p-4 text-center shadow-sm">
-                                    <div class="h2 fw-bold text-success mb-1">145+</div>
-                                    <p class="mb-0 text-muted">Herbal products</p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-box rounded-4 bg-white p-4 text-center shadow-sm">
-                                    <div class="h2 fw-bold text-success mb-1">98%</div>
-                                    <p class="mb-0 text-muted">Positive feedback</p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-box rounded-4 bg-white p-4 text-center shadow-sm">
-                                    <div class="h2 fw-bold text-success mb-1">Fast</div>
-                                    <p class="mb-0 text-muted">Consultation support</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- MODALS -->
 
-    @if(isset($advertisements) && $advertisements->count() > 0)
-    <section class="container mb-5">
-        <div class="rounded-4 border shadow-sm p-4 bg-white">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h3 class="h5 fw-bold mb-1">Featured partners</h3>
-                    <p class="text-muted mb-0">Trusted brands and Ayurvedic partners in our network.</p>
-                </div>
+<!-- Dosha Assessment Modal -->
+<div class="modal fade" id="doshaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 bg-success text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-brain me-2"></i> Dosha Assessment</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="row g-3 align-items-center">
-                @foreach($advertisements as $ad)
-                    <div class="col-6 col-md-3">
-                        <div class="partner-logo rounded-4 overflow-hidden border p-2 h-100 d-flex align-items-center justify-content-center bg-light">
-                            @if($ad->link)
-                                <a href="{{ $ad->link }}" target="_blank" class="d-block w-100 h-100">
-                                    <img src="{{ asset('storage/' . $ad->image_path) }}" alt="{{ $ad->title }}" class="img-fluid mx-auto" style="max-height: 70px; object-fit: contain;">
-                                </a>
-                            @else
-                                <img src="{{ asset('storage/' . $ad->image_path) }}" alt="{{ $ad->title }}" class="img-fluid mx-auto" style="max-height: 70px; object-fit: contain;">
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
+            <div class="modal-body p-4">
+                <p class="text-muted small">Select your primary physical characteristic to discover your Dosha recommendations:</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-success text-start p-3 rounded-3" onclick="showDoshaResult('Vata')">
+                        <strong>Vata (Air & Space)</strong>
+                        <div class="small opacity-75">Creative, fast-moving, energetic, dry skin</div>
+                    </button>
+                    <button class="btn btn-outline-success text-start p-3 rounded-3" onclick="showDoshaResult('Pitta')">
+                        <strong>Pitta (Fire & Water)</strong>
+                        <div class="small opacity-75">Focused, strong digestion, warm body temperature</div>
+                    </button>
+                    <button class="btn btn-outline-success text-start p-3 rounded-3" onclick="showDoshaResult('Kapha')">
+                        <strong>Kapha (Earth & Water)</strong>
+                        <div class="small opacity-75">Calm, steady stamina, strong build, smooth skin</div>
+                    </button>
+                </div>
+                <div id="doshaInfo" class="alert alert-success mt-3 d-none border-0 small"></div>
             </div>
         </div>
-    </section>
-    @endif
+    </div>
+</div>
+
+<!-- Dinacharya Routine Modal -->
+<div class="modal fade" id="dinacharyaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 bg-success text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-clock me-2"></i> Daily Dinacharya Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 small">
+                <h6 class="fw-bold text-success mb-1">🌅 Morning Routine (Brahma Muhurta):</h6>
+                <p class="text-muted mb-3">Wake up before sunrise, drink warm water, cleanse tongue & practice oil pulling.</p>
+
+                <h6 class="fw-bold text-success mb-1">☀️ Mid-Day Routine:</h6>
+                <p class="text-muted mb-3">Eat main meal when digestive fire (Agni) is highest, stay hydrated.</p>
+
+                <h6 class="fw-bold text-success mb-1">🌙 Evening Rejuvenation:</h6>
+                <p class="text-muted mb-0">Light dinner before 8 PM, early sleep for vitality & Rasayana rejuvenation.</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
-.hero-section {
-    position: relative;
-    background: linear-gradient(145deg, #194f35 0%, #266944 45%, #0f3824 100%);
-    color: white;
+.royal-hero {
+    background: linear-gradient(135deg, #0c3b2e 0%, #1d5c42 60%, #6d9773 100%);
 }
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 20%),
-                radial-gradient(circle at bottom right, rgba(255,255,255,0.08), transparent 18%);
-    pointer-events: none;
+
+.btn-honey-amber {
+    background: linear-gradient(135deg, #ffba08 0%, #f4a261 100%);
+    color: #072a21;
+    border: none;
+    transition: all 0.25s ease;
 }
-.hero-section .container {
-    position: relative;
-    z-index: 1;
+
+.btn-honey-amber:hover {
+    color: #072a21;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 186, 8, 0.35) !important;
 }
-.hero-card {
-    min-height: 320px;
+
+.glass-card {
+    border: 1px solid rgba(109, 151, 115, 0.2);
+    border-radius: 24px !important;
 }
-.feature-box {
-    border: 1px solid rgba(45, 106, 79, 0.15);
+
+.service-tile {
+    transition: all 0.25s ease;
 }
-.step-card {
-    background-color: #ffffff;
+
+.service-tile:hover {
+    background-color: #f4f7f4 !important;
+    border-color: #6d9773 !important;
+    transform: translateY(-2px);
 }
-.step-badge {
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
+
+.pill-btn {
+    transition: all 0.25s ease;
 }
-.stat-box {
-    min-height: 130px;
+
+.pill-btn:hover {
+    background-color: #0c3b2e !important;
+    color: #ffffff !important;
+    border-color: #0c3b2e !important;
 }
-.partner-logo {
-    min-height: 110px;
-}
+
 .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
 .hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.08) !important;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 35px rgba(12, 59, 46, 0.12) !important;
 }
-@media (max-width: 767px) {
-    .hero-section {
-        border-radius: 0;
-    }
-}
+
+.max-w-600 { max-width: 600px; }
+.max-w-700 { max-width: 700px; }
 
 /* Single Adware Modal CSS */
 .adware-overlay {
@@ -289,43 +397,21 @@
     justify-content: center;
     transition: background 0.3s ease;
 }
-
-.adware-close:hover {
-    background: #d32f2f;
-}
 </style>
-@endsection
 
-@section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script>
-    function closePopupAd() {
-        const popup = document.getElementById('singleAdPopup');
-        if(popup) {
-            gsap.to(popup, {opacity: 0, duration: 0.3, onComplete: () => popup.style.display = 'none'});
-            @if(isset($popupAd))
-            sessionStorage.setItem('popupAdClosed_{{ $popupAd->id }}', 'true');
-            @endif
-        }
+function showDoshaResult(type) {
+    const info = document.getElementById('doshaInfo');
+    let text = '';
+    if (type === 'Vata') {
+        text = '<strong>Vata Recommendation:</strong> Warm sesame oil, Ashwagandha, and calming herbs.';
+    } else if (type === 'Pitta') {
+        text = '<strong>Pitta Recommendation:</strong> Shatavari, Brahmi, coconut oil, and cooling herbs.';
+    } else {
+        text = '<strong>Kapha Recommendation:</strong> Trikatu, Tulsi tea, and energizing spices.';
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        @if(isset($popupAd))
-        if(!sessionStorage.getItem('popupAdClosed_{{ $popupAd->id }}')) {
-            const popup = document.getElementById('singleAdPopup');
-            if(popup) {
-                popup.style.display = 'flex';
-                gsap.fromTo(popup, {opacity: 0}, {opacity: 1, duration: 0.5});
-                const content = popup.querySelector('.adware-content');
-                if(content) {
-                    gsap.fromTo(content, {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 0.5, delay: 0.2, ease: "back.out(1.5)"});
-                }
-            }
-        }
-        @endif
-
-        // Bottom banner is handled natively by Bootstrap Carousel data attributes
-    });
+    info.innerHTML = text + '<br><a href="{{ route("products.index") }}" class="btn btn-sm btn-success mt-2">Browse Herbs</a>';
+    info.classList.remove('d-none');
+}
 </script>
 @endsection

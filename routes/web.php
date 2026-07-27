@@ -58,6 +58,10 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+
+    // Notifications
+    Route::post('/notifications/mark-read', [UserController::class, 'markNotificationsRead'])->name('notifications.mark_read');
+    Route::get('/notifications/unread-latest', [UserController::class, 'getUnreadLatestNotification'])->name('notifications.unread_latest');
 });
 
 // --- Admin Routes (AdminController + DoctorController + PharmaController) ---

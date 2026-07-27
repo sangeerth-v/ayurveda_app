@@ -358,17 +358,30 @@ class DoctorController extends Controller
             }
         }
 
-        // --- MOBILE NOTIFICATION ON APPROVAL / ACCEPTANCE ---
+        // --- MOBILE & IN-APP NOTIFICATIONS ON STATUS UPDATE ---
         if ($request->status === 'Booked') {
             $consultationType = $booking->consultation_type ?? 'Offline';
+
+            // 1. In-App Notification
+            if ($user) {
+                \App\Models\UserNotification::create([
+                    'user_id' => $user->id,
+                    'title'   => 'Appointment Approved! ✅',
+                    'message' => "Dr. {$doctor->name} has approved your appointment for {$date} at {$time} ({$consultationType}).",
+                    'type'    => 'appointment_approved',
+                    'link'    => route('bookings.my'),
+                    'is_read' => false,
+                ]);
+            }
+
+            // 2. Mobile SMS Notification
             $smsMessage = "✅ APPOINTMENT APPROVED: Dear {$user->name}, your appointment with Dr. {$doctor->name} on {$date} at {$time} ({$consultationType}) has been APPROVED by the doctor. Ref: #BK-{$booking->id}. - Ayurveda App";
 
             if ($user && $user->phone) {
-                // Send Mobile SMS Notification
                 \App\Services\SmsService::sendSms($user->phone, $smsMessage);
             }
 
-            // Additional WhatsApp Meet Link if Online
+            // 3. Additional WhatsApp Meet Link if Online
             if ($booking->consultation_type === 'Online') {
                 $meetLink = $doctor->google_meet_link ?? 'Link will be shared shortly';
                 $waMessage = "✅ *Appointment Confirmed!*\n\n";
@@ -384,12 +397,34 @@ class DoctorController extends Controller
                 }
             }
         } elseif ($request->status === 'Cancelled') {
+            if ($user) {
+                \App\Models\UserNotification::create([
+                    'user_id' => $user->id,
+                    'title'   => 'Appointment Cancelled ❌',
+                    'message' => "Your appointment with Dr. {$doctor->name} scheduled for {$date} at {$time} was cancelled.",
+                    'type'    => 'appointment_cancelled',
+                    'link'    => route('bookings.my'),
+                    'is_read' => false,
+                ]);
+            }
+
             $smsMessage = "❌ APPOINTMENT CANCELLED: Dear {$user->name}, your appointment with Dr. {$doctor->name} scheduled for {$date} at {$time} has been cancelled. - Ayurveda App";
             if ($user && $user->phone) {
                 \App\Services\SmsService::sendSms($user->phone, $smsMessage);
             }
+        } elseif ($request->status === 'Completed') {
+            if ($user) {
+                \App\Models\UserNotification::create([
+                    'user_id' => $user->id,
+                    'title'   => 'Consultation Completed 🌟',
+                    'message' => "Your consultation with Dr. {$doctor->name} has been completed. Thank you!",
+                    'type'    => 'appointment_completed',
+                    'link'    => route('bookings.my'),
+                    'is_read' => false,
+                ]);
+            }
         }
 
-        return back()->with('success', 'Appointment status updated and mobile notification sent to patient!');
+        return back()->with('success', 'Appointment status updated and in-app/mobile notification sent to patient!');
     }
 }

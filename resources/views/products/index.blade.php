@@ -10,7 +10,7 @@
 <style>
     /* Apollo Pharmacy Inspired Ayurvedic Design System */
     .pharmacy-hero {
-        background: linear-gradient(135deg, #1a4d2e 0%, #2d6a4f 60%, #40916c 100%);
+        background: linear-gradient(135deg, #0c3b2e 0%, #1d5c42 60%, #6d9773 100%);
         color: #ffffff;
         padding: 2.5rem 1rem 3rem;
         position: relative;

@@ -1,30 +1,31 @@
 <style>
     .public-navbar {
-        background-color: #1a4d2e !important;
-        padding: 0.75rem 2rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #0c3b2e 0%, #1d5c42 60%, #6d9773 100%) !important;
+        padding: 0.85rem 2rem;
+        box-shadow: 0 4px 20px rgba(12, 59, 46, 0.25);
         z-index: 1050;
     }
     .public-navbar .navbar-brand {
-        color: #c5a059 !important;
+        color: #ffba08 !important;
         font-family: 'Playfair Display', serif;
-        font-size: 1.65rem;
+        font-size: 1.75rem;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
     .public-navbar .nav-link {
-        color: rgba(255, 255, 255, 0.9) !important;
+        color: rgba(255, 255, 255, 0.92) !important;
         font-weight: 500;
         margin-left: 1.2rem;
         font-size: 0.95rem;
-        transition: color 0.2s ease;
+        transition: all 0.2s ease;
     }
     .public-navbar .nav-link:hover, 
     .public-navbar .nav-link:focus {
-        color: #c5a059 !important;
+        color: #ffba08 !important;
+        transform: translateY(-1px);
     }
     .public-navbar .navbar-toggler {
-        border-color: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
     }
     .public-navbar .navbar-toggler-icon {
         filter: invert(1);
@@ -45,7 +46,6 @@
                 <li class="nav-item"><a href="{{ route('doctors.index') }}" class="nav-link">Doctors</a></li>
                 
                 @if(Auth::guard('web')->check())
-                    <!-- <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">My Dashboard</a></li> -->
                     <li class="nav-item"><a href="{{ route('cart.index') }}" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li class="nav-item"><a href="{{ route('orders.index') }}" class="nav-link">My Orders</a></li>
                     <li class="nav-item"><a href="{{ route('bookings.my') }}" class="nav-link"><i class="fas fa-calendar-check"></i> My Appointments</a></li>

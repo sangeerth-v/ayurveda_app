@@ -10,7 +10,7 @@
     {{-- Section Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold mb-1" style="color:#1a4d2e;"><i class="fas fa-user-md me-2"></i>Find an Ayurvedic Doctor</h2>
+            <h2 class="fw-bold mb-1" style="color:#15803d;"><i class="fas fa-user-md me-2"></i>Find an Ayurvedic Doctor</h2>
             <p class="text-muted mb-0">Book your consultation with our expert practitioners</p>
         </div>
         @auth
@@ -92,7 +92,7 @@
                      data-constype="{{ strtolower($doctor->consultation_type ?? 'offline') }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.2s, box-shadow 0.2s;">
                         {{-- Header band --}}
-                        <div class="py-4 text-center position-relative" style="background: linear-gradient(135deg, #1a4d2e, #4f772d);">
+                        <div class="py-4 text-center position-relative" style="background: linear-gradient(135deg, #0c3b2e, #1d5c42);">
                             {{-- Consultation Badge --}}
                             @if($doctor->consultation_type === 'Online')
                                 <span class="position-absolute top-0 end-0 mt-2 me-2 badge" style="background:#0d6efd; font-size:0.7rem;">🎥 Online</span>
@@ -131,7 +131,7 @@
                             </div>
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="fw-bold" style="color:#1a4d2e; font-size:1.1rem;">
+                                    <span class="fw-bold" style="color:#15803d; font-size:1.1rem;">
                                         ₹{{ number_format($doctor->consultation_fee, 0) }}
                                     </span>
                                     <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill small">Consultation Fee</span>

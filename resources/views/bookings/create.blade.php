@@ -143,12 +143,13 @@
                 <style>
                     .time-slot-label.booked {
                         background-color: #f8f9fa !important;
-                        border-color: #dee2e6 !important;
+                        border-color: #e9ecef !important;
                         color: #adb5bd !important;
-                        opacity: 0.5 !important;
+                        opacity: 0.55 !important;
                         cursor: not-allowed !important;
                         pointer-events: none !important;
-                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.04) !important;
+                        text-decoration: none !important;
                     }
                 </style>
 
@@ -156,28 +157,48 @@
                     document.addEventListener('DOMContentLoaded', function() {
                         const bookedData = {!! $bookedSlots->toJson() !!};
                         const leaveDates = {!! json_encode($unavailabilities) !!};
+                        const offlineSlots = {!! json_encode(array_values($offlineSlots ?? [])) !!};
+                        const onlineSlots = {!! json_encode(array_values($onlineSlots ?? [])) !!};
+
                         const dateInput = document.getElementById('booking_date');
                         const timeSlotsContainer = document.getElementById('time-slots-container');
-                        const slotLabels = timeSlotsContainer.querySelectorAll('.time-slot-label');
                         const submitBtn = document.querySelector('button[type="submit"]');
 
-                        function updateSlots() {
+                        function getSelectedConsultationType() {
+                            const onlineRadio = document.getElementById('type_online');
+                            const offlineRadio = document.getElementById('type_offline');
+                            if (onlineRadio && onlineRadio.checked) return 'Online';
+                            if (offlineRadio && offlineRadio.checked) return 'Offline';
+                            const hiddenType = document.querySelector('input[name="consultation_type"]');
+                            return hiddenType ? hiddenType.value : 'Offline';
+                        }
+
+                        function formatTime12h(time24) {
+                            if (!time24) return '';
+                            const [hStr, mStr] = time24.split(':');
+                            let h = parseInt(hStr, 10);
+                            const ampm = h >= 12 ? 'PM' : 'AM';
+                            h = h % 12;
+                            h = h ? h : 12;
+                            return (h < 10 ? '0' + h : h) + ':' + mStr + ' ' + ampm;
+                        }
+
+                        function renderAndFilterSlots() {
                             const selectedDate = dateInput.value;
-                            if(!selectedDate) return;
+                            if (!selectedDate) return;
 
                             const now = new Date();
                             const todayStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+                            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
                             if (selectedDate < todayStr) {
-                                alert("Past dates cannot be selected for appointment bookings. Please choose today or a future date.");
+                                alert("Past dates cannot be selected for appointment bookings. Resetting to today.");
                                 dateInput.value = todayStr;
-                                updateSlots();
+                                renderAndFilterSlots();
                                 return;
                             }
 
                             const isUnavailable = leaveDates.includes(selectedDate);
-                            
-                            // Handle Leave Dates
                             if (isUnavailable) {
                                 timeSlotsContainer.innerHTML = `
                                     <div class="col-12 w-100 mt-2">
@@ -185,7 +206,7 @@
                                             <i class="fas fa-calendar-times fa-3x me-4 opacity-50"></i>
                                             <div>
                                                 <h5 class="fw-bold mb-1">Doctor is Unavailable</h5>
-                                                <p class="mb-0 small opcaity-75">The doctor has marked this date as a leave. Please select another date for your appointment.</p>
+                                                <p class="mb-0 small opacity-75">The doctor has marked this date as a leave. Please select another date for your appointment.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -193,48 +214,57 @@
                                 submitBtn.disabled = true;
                                 submitBtn.classList.add('opacity-50');
                                 return;
-                            } else {
-                                // Restore slots HTML if it was replaced
-                                if (timeSlotsContainer.querySelector('.alert-danger')) {
-                                    location.reload(); // Simplest way to restore slots and logic
-                                    return;
-                                }
                             }
 
-                            const now = new Date();
-                            const todayStr = now.toLocaleDateString('en-CA'); // Gets YYYY-MM-DD in local time
-                            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+                            const currentType = getSelectedConsultationType();
+                            let rawSlots = (currentType === 'Online') ? onlineSlots : offlineSlots;
 
-                            slotLabels.forEach(label => {
-                                const slotTime = label.getAttribute('data-slot'); // e.g. "09:00"
-                                const radioInput = document.getElementById(label.getAttribute('for'));
-                                
-                                // Check if this slot for the selected date is in bookedData
+                            if (!rawSlots || rawSlots.length === 0) {
+                                rawSlots = (offlineSlots && offlineSlots.length > 0) ? offlineSlots : ((onlineSlots && onlineSlots.length > 0) ? onlineSlots : ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00']);
+                            }
+
+                            let html = '';
+                            rawSlots.forEach(slot => {
+                                const slotTimeNormalized = slot.substring(0, 5); // "HH:mm"
+                                const slotId = 'slot-' + slotTimeNormalized.replace(':', '-');
+                                const displayTime = formatTime12h(slotTimeNormalized);
+
+                                // Check if booked by another patient on this date
                                 const isBooked = bookedData.some(b => {
-                                    const bookedTimeNormalized = b.booking_time.substring(0, 5);
-                                    const slotTimeNormalized = slotTime.substring(0, 5);
-                                    return b.booking_date === selectedDate && bookedTimeNormalized === slotTimeNormalized;
+                                    const bTimeNorm = b.booking_time.substring(0, 5);
+                                    return b.booking_date === selectedDate && bTimeNorm === slotTimeNormalized;
                                 });
 
-                                // Check if slot is in the past for today
-                                const isPast = (selectedDate === todayStr && slotTime < currentTimeStr);
-                                
-                                if(isBooked || isPast) {
-                                    radioInput.disabled = true;
-                                    radioInput.checked = false;
-                                    label.classList.add('booked');
-                                } else {
-                                    radioInput.disabled = false;
-                                    label.classList.remove('booked');
-                                }
+                                // Check if slot is in the past for TODAY
+                                const isPast = (selectedDate === todayStr && slotTimeNormalized < currentTimeStr);
+
+                                const isBlocked = isBooked || isPast;
+                                const disabledAttr = isBlocked ? 'disabled' : '';
+                                const bookedClass = isBlocked ? 'booked' : '';
+
+                                html += `
+                                    <div class="col">
+                                        <input type="radio" name="booking_time" value="${slotTimeNormalized}" id="${slotId}" class="btn-check" ${disabledAttr} required>
+                                        <label class="btn btn-outline-success w-100 py-2 rounded-3 shadow-sm time-slot-label ${bookedClass}" for="${slotId}" data-slot="${slotTimeNormalized}">
+                                            ${displayTime}
+                                        </label>
+                                    </div>
+                                `;
                             });
-                            
+
+                            timeSlotsContainer.innerHTML = html;
                             submitBtn.disabled = false;
                             submitBtn.classList.remove('opacity-50');
                         }
 
-                        dateInput.addEventListener('change', updateSlots);
-                        updateSlots(); // Initialize on load
+                        dateInput.addEventListener('change', renderAndFilterSlots);
+
+                        const typeOnlineRadio = document.getElementById('type_online');
+                        const typeOfflineRadio = document.getElementById('type_offline');
+                        if (typeOnlineRadio) typeOnlineRadio.addEventListener('change', renderAndFilterSlots);
+                        if (typeOfflineRadio) typeOfflineRadio.addEventListener('change', renderAndFilterSlots);
+
+                        renderAndFilterSlots(); // Initial render
                     });
                 </script>
             </div>

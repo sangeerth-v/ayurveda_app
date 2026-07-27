@@ -12,20 +12,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Premium Ayurvedic Palette */
-            --primary-green: #1a4d2e;  /* Deep Forest Green */
-            --secondary-green: #4f772d; /* Herbal Green */
-            --accent-gold: #c5a059;    /* Muted Gold */
-            --light-bg: #fcfdfa;       /* Off-White/Mist */
+            /* Royal Forest & Sage Mint Clinical Theme */
+            --primary-green: #0c3b2e;       /* Deep Royal Forest Green */
+            --primary-green-dark: #06231b;  /* Dark Forest Accent */
+            --secondary-green: #6d9773;     /* Healing Sage Mint */
+            --accent-gold: #ffba08;         /* Warm Honey Amber Accent */
+            --light-bg: #f4f7f4;            /* Refreshing Soft Mint Cream */
             --card-bg: #ffffff;
-            --text-dark: #2b2b2b;
-            --text-muted: #6c757d;
-            --border-color: #e0e5d5;
+            --text-dark: #072a21;
+            --text-muted: #577568;
+            --border-color: rgba(109, 151, 115, 0.22);
             
-            --shadow-sm: 0 2px 8px rgba(26, 77, 46, 0.08);
-            --shadow-md: 0 8px 24px rgba(26, 77, 46, 0.12);
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --shadow-sm: 0 4px 15px rgba(12, 59, 46, 0.05);
+            --shadow-md: 0 10px 30px rgba(12, 59, 46, 0.10);
+            --shadow-lg: 0 18px 45px rgba(12, 59, 46, 0.16);
+            --radius-md: 16px;
+            --radius-lg: 24px;
         }
 
         body {
@@ -211,6 +213,65 @@
             });
         });
     </script>
+
+    @if(Auth::guard('web')->check())
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Request Native OS / Device Push Notification Permission
+        if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        function checkNativeNotifications() {
+            fetch("{{ route('notifications.unread_latest') }}")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.has_notification) {
+                        // 1. Trigger Native OS / Mobile Push Notification
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            const nativeNotif = new Notification(data.title, {
+                                body: data.message,
+                                icon: "{{ asset('favicon.ico') }}",
+                                vibrate: [200, 100, 200]
+                            });
+                            nativeNotif.onclick = function() {
+                                window.focus();
+                                if (data.link) window.location.href = data.link;
+                            };
+                        }
+
+                        // 2. Trigger Floating Web Banner Toast Alert
+                        showNativeToastAlert(data.title, data.message, data.link);
+                    }
+                })
+                .catch(err => console.log('Notification check:', err));
+        }
+
+        function showNativeToastAlert(title, message, link) {
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 m-4 p-4 rounded-4 shadow-lg text-white bg-success border-0 fade show';
+            toast.style.zIndex = '999999';
+            toast.style.maxWidth = '380px';
+            toast.innerHTML = `
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fas fa-check-circle fa-2x text-warning flex-shrink-0 mt-1"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">${title}</h6>
+                        <p class="mb-2 small opacity-90" style="line-height:1.4;">${message}</p>
+                        <a href="${link || '#'}" class="btn btn-sm btn-light text-success fw-bold rounded-pill px-3">View Details</a>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+        }
+
+        // Check every 6 seconds
+        setInterval(checkNativeNotifications, 6000);
+    });
+    </script>
+    @endif
+
     @yield('scripts')
 </body>
 </html>

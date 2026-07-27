@@ -628,28 +628,50 @@ class UserController extends Controller
             ->pluck('unavailable_date')
             ->toArray();
 
-        // Generate dynamic time slots based on doctor's available_time
+        $offlineSlots = $this->parseTimeSlots($doctor->available_time);
+        $onlineSlots = $this->parseTimeSlots($doctor->online_available_time);
+
+        // Fallback default slots if both are empty
+        if (empty($offlineSlots) && empty($onlineSlots)) {
+            $default = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+            $offlineSlots = $default;
+            $onlineSlots = $default;
+        }
+
+        // Backward compatibility
+        $slots = !empty($offlineSlots) ? $offlineSlots : $onlineSlots;
+
+        return view('bookings.create', compact('doctor', 'bookedSlots', 'slots', 'offlineSlots', 'onlineSlots', 'unavailabilities'));
+    }
+
+    private function parseTimeSlots(?string $timeRangeStr): array
+    {
+        if (!$timeRangeStr) {
+            return [];
+        }
+
         $slots = [];
-        if ($doctor->available_time && str_contains($doctor->available_time, ' to ')) {
-            [$startStr, $endStr] = explode(' to ', $doctor->available_time);
+        $parts = preg_split('/[,;]/', $timeRangeStr);
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (!str_contains(strtolower($part), ' to ')) continue;
+
+            [$startStr, $endStr] = explode(' to ', strtolower($part));
             try {
-                $start = \Carbon\Carbon::parse($startStr);
-                $end = \Carbon\Carbon::parse($endStr);
+                $start = \Carbon\Carbon::parse(trim($startStr));
+                $end = \Carbon\Carbon::parse(trim($endStr));
 
                 while ($start < $end) {
                     $slots[] = $start->format('H:i');
                     $start->addMinutes(30);
                 }
             } catch (\Exception $e) {
-                // Fallback to default slots if parsing fails
-                $slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+                // Ignore parsing errors
             }
-        } else {
-            // Default slots
-            $slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
         }
 
-        return view('bookings.create', compact('doctor', 'bookedSlots', 'slots', 'unavailabilities'));
+        return array_values(array_unique($slots));
     }
 
     public function storeBooking(Request $request)
@@ -741,5 +763,34 @@ class UserController extends Controller
         $user->save();
 
         return back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function markNotificationsRead(Request $request)
+    {
+        \App\Models\UserNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function getUnreadLatestNotification()
+    {
+        $notif = \App\Models\UserNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($notif) {
+            $notif->update(['is_read' => true]);
+            return response()->json([
+                'has_notification' => true,
+                'title'            => $notif->title,
+                'message'          => $notif->message,
+                'link'             => $notif->link ?? route('bookings.my'),
+            ]);
+        }
+
+        return response()->json(['has_notification' => false]);
     }
 }
