@@ -65,8 +65,8 @@ class UserController extends Controller
                 
                 $user = $userModel::where('email', $request->email)->first();
                 if ($user && ($user->password === $request->password || Auth::guard($guard)->attempt($credentials))) {
-                    if ($guard === 'hospital' && isset($user->is_active) && !$user->is_active) {
-                        return back()->withErrors(['email' => 'This hospital account is not active. Please contact admin.']);
+                    if ((($guard === 'hospital' || $guard === 'doctor') && isset($user->is_active) && !$user->is_active)) {
+                        return back()->withErrors(['email' => 'This account is not active. Please contact admin.']);
                     }
 
                     Auth::guard($guard)->login($user);
@@ -170,6 +170,7 @@ class UserController extends Controller
             'registration_certificate' => $regCertPath,
             'council_certificate' => $councilCertPath,
             'hospital_id' => $request->hospital_id,
+            'is_active' => false,
         ]);
 
         return redirect()->route('login')->with('success', 'Doctor application submitted successfully! Your account credentials will be active after admin verification.');
@@ -213,10 +214,10 @@ class UserController extends Controller
             'password_plain' => $request->password,
             'district_id' => $request->district_id,
             'license_document' => $licenseDocPath,
-            'is_active' => true,
+            'is_active' => false,
         ]);
 
-        return redirect()->route('login')->with('success', 'Hospital registration submitted successfully! You can now log in.');
+        return redirect()->route('login')->with('success', 'Hospital registration submitted successfully! Your account will be active after admin verification.');
     }
 
     public function showPharmaRegister()

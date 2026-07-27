@@ -34,11 +34,13 @@ class Doctor extends Authenticatable
         'registration_certificate',
         'council_certificate',
         'hospital_id',
+        'is_active',
     ];
 
     protected $casts = [
         'consultation_fee' => 'integer',
         'experience' => 'integer',
+        'is_active' => 'boolean',
     ];
 
 

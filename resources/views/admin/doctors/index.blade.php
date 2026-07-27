@@ -29,10 +29,11 @@
                         <th class="py-3 text-uppercase small fw-bold text-muted">Specialization Category</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Subcategory</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Hospital</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Status</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Login Password</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Location</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Contact</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 15%">Actions</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 18%">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,6 +68,11 @@
                             <span class="text-muted small">{{ $doctor->hospital->name ?? 'Independent' }}</span>
                         </td>
                         <td class="py-4">
+                            <span class="badge {{ $doctor->is_active ? 'bg-success' : 'bg-warning text-dark' }} rounded-pill px-3 py-2">
+                                {{ $doctor->is_active ? 'Active' : 'Pending Approval' }}
+                            </span>
+                        </td>
+                        <td class="py-4">
                             <code class="text-primary">{{ $doctor->password_plain ?? 'N/A' }}</code>
                         </td>
                         <td class="py-4">
@@ -86,6 +92,13 @@
                                 <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn btn-sm btn-outline-primary" title="Edit Doctor">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                <form action="{{ route('admin.doctors.toggle_active', $doctor->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-sm {{ $doctor->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}" title="{{ $doctor->is_active ? 'Deactivate' : 'Approve' }} Doctor">
+                                        <i class="fas {{ $doctor->is_active ? 'fa-user-slash' : 'fa-check' }}"></i>
+                                    </button>
+                                </form>
                                 <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this doctor? This action cannot be undone.');">
                                     @csrf
                                     @method('DELETE')

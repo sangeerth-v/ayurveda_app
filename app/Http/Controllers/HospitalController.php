@@ -85,6 +85,15 @@ class HospitalController extends Controller
         return back()->with('success', 'Hospital deleted successfully');
     }
 
+    public function toggleActive($id)
+    {
+        $hospital = Hospital::findOrFail($id);
+        $newStatus = !$hospital->is_active;
+        $hospital->update(['is_active' => $newStatus]);
+
+        return back()->with('success', 'Hospital account has been ' . ($newStatus ? 'approved' : 'deactivated') . ' successfully.');
+    }
+
     public function dashboard()
     {
         $hospital = Auth::guard('hospital')->user()->load(['district', 'doctors.district']);

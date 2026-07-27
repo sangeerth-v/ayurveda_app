@@ -97,6 +97,7 @@ class DoctorController extends Controller
             'registration_certificate' => $regCertPath,
             'council_certificate' => $councilCertPath,
             'hospital_id' => $request->hospital_id,
+            'is_active' => true,
         ]);
 
         return redirect()->route('admin.doctors.index')->with('success', 'Doctor added successfully');
@@ -216,6 +217,15 @@ class DoctorController extends Controller
         }
         $doctor->delete();
         return back()->with('success', 'Doctor deleted successfully');
+    }
+
+    public function toggleActive($id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        $newStatus = !$doctor->is_active;
+        $doctor->update(['is_active' => $newStatus]);
+
+        return back()->with('success', 'Doctor account has been ' . ($newStatus ? 'approved' : 'deactivated') . ' successfully.');
     }
 
     // --- Doctor Role Functions ---
