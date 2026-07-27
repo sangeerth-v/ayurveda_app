@@ -126,6 +126,12 @@ class UserController extends Controller
             'specialization_subcategory' => 'nullable',
             'district_id' => 'required|exists:districts,id',
             'experience' => 'required|integer|min:0',
+            'consultation_fee' => 'required|numeric|min:0',
+            'consultation_type' => 'required|in:Both,Offline,Online',
+            'available_from' => 'nullable|string',
+            'available_to' => 'nullable|string',
+            'online_available_from' => 'nullable|string',
+            'online_available_to' => 'nullable|string',
             'address' => 'required|string',
             'hospital_id' => 'nullable|exists:hospitals,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -151,6 +157,16 @@ class UserController extends Controller
         $category = \App\Models\DoctorCategory::find($request->specialization_category);
         $subcategory = \App\Models\DoctorSubcategory::find($request->specialization_subcategory);
 
+        $availableTime = null;
+        if ($request->filled('available_from') && $request->filled('available_to')) {
+            $availableTime = \Carbon\Carbon::parse($request->available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->available_to)->format('h:i A');
+        }
+
+        $onlineAvailableTime = null;
+        if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
+            $onlineAvailableTime = \Carbon\Carbon::parse($request->online_available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->online_available_to)->format('h:i A');
+        }
+
         \App\Models\Doctor::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -164,8 +180,10 @@ class UserController extends Controller
             'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
-            'consultation_fee' => 0,
-            'consultation_type' => 'Offline',
+            'consultation_fee' => $request->consultation_fee,
+            'consultation_type' => $request->consultation_type,
+            'available_time' => $availableTime,
+            'online_available_time' => $onlineAvailableTime,
             'photo' => $photoPath,
             'registration_certificate' => $regCertPath,
             'council_certificate' => $councilCertPath,
@@ -634,7 +652,7 @@ class UserController extends Controller
 
         // Fallback default slots if both are empty
         if (empty($offlineSlots) && empty($onlineSlots)) {
-            $default = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+            $default = ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00'];
             $offlineSlots = $default;
             $onlineSlots = $default;
         }
@@ -665,7 +683,7 @@ class UserController extends Controller
 
                 while ($start < $end) {
                     $slots[] = $start->format('H:i');
-                    $start->addMinutes(30);
+                    $start->addMinutes(15);
                 }
             } catch (\Exception $e) {
                 // Ignore parsing errors

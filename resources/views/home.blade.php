@@ -247,7 +247,7 @@
 <!-- MODALS -->
 
 <!-- Dosha Assessment Modal -->
-<div class="modal fade" id="doshaModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade" id="doshaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-0 bg-success text-white">
@@ -276,8 +276,8 @@
     </div>
 </div>
 
-<!-- Dinacharya Routine Modal -->
-<div class="modal fade" id="dinacharyaModal" tabindex="-1" aria-hidden="true">
+Dinacharya Routine Modal -->
+<!-- <div class="modal fade" id="dinacharyaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-0 bg-success text-white">
@@ -296,7 +296,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <style>
 .royal-hero {

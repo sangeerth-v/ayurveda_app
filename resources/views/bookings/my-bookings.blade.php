@@ -59,7 +59,7 @@
                                         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-clock me-1"></i>Awaiting Doctor Approval</span>
                                     @elseif($booking->status == 'Booked')
                                         <span class="badge bg-success px-3 py-2 rounded-pill mb-2"><i class="fas fa-check-circle me-1"></i>Doctor Approved</span>
-                                        <div class="small text-success fw-bold"><i class="fas fa-mobile-alt me-1"></i> SMS Alert Sent to Phone</div>
+                                        <!-- <div class="small text-success fw-bold"><i class="fas fa-mobile-alt me-1"></i> SMS Alert Sent to Phone</div> -->
                                     @elseif($booking->status == 'Completed')
                                         <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="fas fa-check-double me-1"></i>Completed</span>
                                     @else

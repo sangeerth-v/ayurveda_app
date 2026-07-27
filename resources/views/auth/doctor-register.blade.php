@@ -372,6 +372,57 @@
                             @error('experience') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
 
+                        <!-- Consultation Fee -->
+                        <div class="col-md-6">
+                            <label class="form-label">Consultation Fee (₹) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted">₹</span>
+                                <input type="number" name="consultation_fee" class="form-control @error('consultation_fee') is-invalid @enderror" placeholder="e.g. 500" min="0" value="{{ old('consultation_fee') }}" required>
+                            </div>
+                            @error('consultation_fee') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Consultation Mode -->
+                        <div class="col-md-6">
+                            <label class="form-label">Consultation Mode <span class="text-danger">*</span></label>
+                            <select name="consultation_type" id="consultation_type" class="form-select @error('consultation_type') is-invalid @enderror" required>
+                                <option value="Both" {{ old('consultation_type') == 'Both' ? 'selected' : '' }}>Both (In-Person & Online Video)</option>
+                                <option value="Offline" {{ old('consultation_type') == 'Offline' ? 'selected' : '' }}>In-Person Clinic Only</option>
+                                <option value="Online" {{ old('consultation_type') == 'Online' ? 'selected' : '' }}>Online Video Consultation Only</option>
+                            </select>
+                            @error('consultation_type') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- In-Person Working Hours (15-min Slot Generation) -->
+                        <div class="col-md-6">
+                            <label class="form-label">In-Person Working Hours (15-Min Slots) <span class="text-danger">*</span></label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="time" name="available_from" class="form-control" value="{{ old('available_from', '09:00') }}" required>
+                                    <div class="form-text small">Start Time</div>
+                                </div>
+                                <div class="col-6">
+                                    <input type="time" name="available_to" class="form-control" value="{{ old('available_to', '13:00') }}" required>
+                                    <div class="form-text small">End Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Online Working Hours (15-min Slot Generation) -->
+                        <div class="col-md-6">
+                            <label class="form-label">Online Video Working Hours (15-Min Slots)</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="time" name="online_available_from" class="form-control" value="{{ old('online_available_from', '16:00') }}">
+                                    <div class="form-text small">Start Time</div>
+                                </div>
+                                <div class="col-6">
+                                    <input type="time" name="online_available_to" class="form-control" value="{{ old('online_available_to', '20:00') }}">
+                                    <div class="form-text small">End Time</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Hospital Name / Selection -->
                         <div class="col-12">
                             <label class="form-label">Associated Hospital / Practice Center</label>
