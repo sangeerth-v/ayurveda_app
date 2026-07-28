@@ -219,7 +219,7 @@ class HospitalController extends Controller
             'email' => 'required|string|email|max:255|unique:doctors,email' . ($id ? ',' . $id : ''),
             'password' => ($id ? 'nullable' : 'required') . '|string|min:8',
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
-            'medical_registration_no' => ['nullable', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'medical_registration_no' => ['nullable', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/'],
             'specialization_category' => 'required|string|max:255',
             'specialization_subcategory' => 'nullable|string|max:255',
             'district_id' => 'required|exists:districts,id',

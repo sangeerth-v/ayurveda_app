@@ -82,8 +82,46 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Support Phone</label>
-                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="10 Digit Number" value="{{ old('phone', $pharma->phone) }}" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                                    <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="10 Digit Number" value="{{ old('phone', $pharma->phone) }}" maxlength="10" required>
                                     @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Contact Person</label>
+                                    <input type="text" name="contact_person" class="form-control @error('contact_person') is-invalid @enderror" placeholder="Primary Contact Manager" value="{{ old('contact_person', $pharma->contact_person) }}">
+                                    @error('contact_person') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Drug License No</label>
+                                    <input type="text" name="drug_license_no" class="form-control @error('drug_license_no') is-invalid @enderror" placeholder="e.g. DL-20B/12345/2025" value="{{ old('drug_license_no', $pharma->drug_license_no) }}">
+                                    @error('drug_license_no') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">GSTIN Number</label>
+                                    <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" placeholder="e.g. 29AAAAA0000A1Z5" value="{{ old('gst_number', $pharma->gst_number) }}" maxlength="15">
+                                    @error('gst_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">District</label>
+                                    <select name="district_id" class="form-select @error('district_id') is-invalid @enderror">
+                                        <option value="">Select District</option>
+                                        @foreach($districts ?? [] as $dist)
+                                            <option value="{{ $dist->id }}" {{ old('district_id', $pharma->district_id) == $dist->id ? 'selected' : '' }}>{{ $dist->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('district_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Drug License Document (PDF/Image)</label>
+                                    <input type="file" name="license_document" class="form-control @error('license_document') is-invalid @enderror" accept=".pdf,image/*">
+                                    @if($pharma->license_document)
+                                        <div class="form-text small"><a href="{{ asset('storage/' . $pharma->license_document) }}" target="_blank" class="text-success"><i class="fas fa-file-alt me-1"></i> View Current Document</a></div>
+                                    @endif
+                                    @error('license_document') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-12">

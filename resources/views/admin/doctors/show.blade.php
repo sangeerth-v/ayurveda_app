@@ -137,11 +137,19 @@
                 
                 <hr class="my-4 opacity-10">
 
-                <div class="d-flex gap-3">
-                    <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this doctor profile?');">
+                <div class="d-flex gap-3 flex-wrap">
+                    <form action="{{ route('admin.doctors.toggle_active', $doctor->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn {{ $doctor->is_active ? 'btn-warning' : 'btn-success' }}">
+                            <i class="fas {{ $doctor->is_active ? 'fa-user-slash' : 'fa-check-circle' }} me-2"></i>
+                            {{ $doctor->is_active ? 'Deactivate Doctor' : 'Approve & Activate Doctor' }}
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this doctor profile?');" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="btn btn-outline-danger">
                             <i class="fas fa-trash-alt me-2"></i> Delete Profile
                         </button>
                     </form>

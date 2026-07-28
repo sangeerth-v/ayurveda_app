@@ -88,6 +88,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);
+        Route::put('/pharmas/{id}/toggle-active', [PharmaController::class, 'toggleActive'])->name('pharmas.toggle_active');
 
         // User Management by Admin
         Route::get('/users', [AdminController::class, 'usersIndex'])->name('users.index');

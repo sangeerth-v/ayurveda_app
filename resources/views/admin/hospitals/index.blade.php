@@ -37,14 +37,27 @@
                     @forelse($hospitals as $hospital)
                     <tr>
                         <td class="ps-4 py-4">
-                            <div class="fw-bold">{{ $hospital->name }}</div>
-                            <div class="small text-muted">{{ $hospital->email }} | {{ $hospital->phone }}</div>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center me-3 shadow-sm overflow-hidden border" style="width: 44px; height: 44px; background-color: #e8f5e9; color: var(--primary-green);">
+                                    @if($hospital->logo)
+                                        <img src="{{ asset('storage/' . $hospital->logo) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @else
+                                        <i class="fas fa-hospital fa-lg"></i>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ $hospital->name }}</div>
+                                    <div class="small text-muted">{{ $hospital->email }} | {{ $hospital->phone }}</div>
+                                </div>
+                            </div>
                         </td>
                         <td class="py-4">{{ $hospital->doctors_count }}</td>
                         <td class="py-4"><code>{{ $hospital->password_plain ?? 'N/A' }}</code></td>
                         <td class="py-4">{{ $hospital->district->name ?? 'N/A' }}</td>
                         <td class="py-4">
-                            <span class="badge {{ $hospital->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $hospital->is_active ? 'Active' : 'Inactive' }}</span>
+                            <span class="badge {{ $hospital->is_active ? 'bg-success' : 'bg-warning text-dark' }} rounded-pill px-3 py-2">
+                                {{ $hospital->is_active ? 'Active' : 'Pending Approval' }}
+                            </span>
                         </td>
                         <td class="py-4 text-center">
                             <div class="d-flex justify-content-center gap-2 flex-wrap">
