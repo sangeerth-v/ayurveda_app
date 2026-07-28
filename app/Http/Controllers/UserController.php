@@ -65,8 +65,8 @@ class UserController extends Controller
                 
                 $user = $userModel::where('email', $request->email)->first();
                 if ($user && ($user->password === $request->password || Auth::guard($guard)->attempt($credentials))) {
-                    if ((($guard === 'hospital' || $guard === 'doctor') && isset($user->is_active) && !$user->is_active)) {
-                        return back()->withErrors(['email' => 'This account is not active. Please contact admin.']);
+                    if (in_array($guard, ['hospital', 'doctor', 'pharma']) && isset($user->is_active) && !$user->is_active) {
+                        return back()->withErrors(['email' => 'Your account is pending admin approval. Please wait for administrator verification.']);
                     }
 
                     Auth::guard($guard)->login($user);
@@ -107,7 +107,7 @@ class UserController extends Controller
 
     public function showDoctorRegister()
     {
-        $districts = \App\Models\District::all();
+        $districts = \App\Models\District::orderBy('name')->get();
         $categories = \App\Models\DoctorCategory::all();
         $hospitals = \App\Models\Hospital::orderBy('name')->get();
         return view('auth.doctor-register', compact('districts', 'categories', 'hospitals'));
@@ -120,11 +120,11 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:doctors,email',
             'password' => 'required|string|min:8',
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
-            'medical_registration_no' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'medical_registration_no' => ['required', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/'],
             'qualification' => 'required|string|min:2|max:255',
             'specialization_category' => 'required|exists:doctor_categories,id',
             'specialization_subcategory' => 'nullable|exists:doctor_subcategories,id',
-            'district_id' => 'required|exists:districts,id',
+            'district_name' => 'required|string|min:2|max:100',
             'experience' => 'required|integer|min:0|max:70',
             'consultation_fee' => 'required|numeric|min:0|max:100000',
             'consultation_type' => 'required|in:Both,Offline,Online',
@@ -139,12 +139,19 @@ class UserController extends Controller
             'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
-            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020 or MCI-98765-2022).',
-            'medical_registration_no.max' => 'Medical registration number cannot exceed 25 characters.',
+            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number (e.g. KMC/12345/2020).',
             'email.email' => 'Please enter a valid email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete clinic address (at least 10 characters).',
+            'district_name.required' => 'Please enter your district name.',
         ]);
+
+        // Find or create the district by name (case-insensitive)
+        $districtName = trim($request->district_name);
+        $district = \App\Models\District::whereRaw('LOWER(name) = ?', [strtolower($districtName)])->first();
+        if (!$district) {
+            $district = \App\Models\District::create(['name' => ucwords(strtolower($districtName))]);
+        }
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
@@ -183,7 +190,7 @@ class UserController extends Controller
             'medical_registration_no' => strtoupper($request->medical_registration_no),
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
-            'district_id' => $request->district_id,
+            'district_id' => $district->id,
             'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
@@ -203,7 +210,7 @@ class UserController extends Controller
 
     public function showHospitalRegister()
     {
-        $districts = \App\Models\District::all();
+        $districts = \App\Models\District::orderBy('name')->get();
         return view('auth.hospital-register', compact('districts'));
     }
 
@@ -211,25 +218,32 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|min:3|max:255',
-            'license_number' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z0-9]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'license_number' => ['required', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/'],
             'gst_number' => ['nullable', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
             'contact_person' => 'required|string|min:3|max:255',
             'email' => 'required|string|email|max:255|unique:hospitals,email',
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
             'password' => 'required|string|min:8',
-            'district_id' => 'required|exists:districts,id',
+            'district_name' => 'required|string|min:2|max:100',
             'address' => 'required|string|min:10|max:1000',
             'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
             'gst_number.regex' => 'Please enter a valid 15-character GSTIN format (e.g. 29AAAAA0000A1Z5).',
             'gst_number.size' => 'GST Number must be exactly 15 characters long.',
-            'license_number.regex' => 'Please enter a valid Hospital License Number format (e.g. HSP/2026/8942).',
-            'license_number.max' => 'License number cannot exceed 25 characters.',
+            'license_number.regex' => 'Please enter a valid Hospital License Number format (e.g. HSP/12345/2025).',
             'email.email' => 'Please enter a valid hospital email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete hospital address (at least 10 characters).',
+            'district_name.required' => 'Please enter the hospital district name.',
         ]);
+
+        // Find or create the district by name (case-insensitive)
+        $districtName = trim($request->district_name);
+        $district = \App\Models\District::whereRaw('LOWER(name) = ?', [strtolower($districtName)])->first();
+        if (!$district) {
+            $district = \App\Models\District::create(['name' => ucwords(strtolower($districtName))]);
+        }
 
         $licenseDocPath = null;
         if ($request->hasFile('license_document')) {
@@ -246,7 +260,7 @@ class UserController extends Controller
             'phone' => $request->phone,
             'password' => $request->password,
             'password_plain' => $request->password,
-            'district_id' => $request->district_id,
+            'district_id' => $district->id,
             'license_document' => $licenseDocPath,
             'is_active' => false,
         ]);
@@ -256,31 +270,40 @@ class UserController extends Controller
 
     public function showPharmaRegister()
     {
-        return view('auth.pharma-register');
+        $districts = \App\Models\District::orderBy('name')->get();
+        return view('auth.pharma-register', compact('districts'));
     }
 
     public function processPharmaRegister(Request $request)
     {
         $request->validate([
             'company_name' => 'required|string|min:3|max:255',
-            'drug_license_no' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z0-9]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'drug_license_no' => ['required', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/'],
             'gst_number' => ['required', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
             'contact_person' => 'required|string|min:3|max:255',
             'email' => 'required|string|email|max:255|unique:pharma_companies,email',
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
             'password' => 'required|string|min:8',
+            'district_name' => 'required|string|min:2|max:100',
             'address' => 'required|string|min:10|max:1000',
             'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
             'gst_number.regex' => 'Please enter a valid 15-character GSTIN format (e.g. 29AAAAA0000A1Z5).',
             'gst_number.size' => 'GST Number must be exactly 15 characters long.',
-            'drug_license_no.regex' => 'Please enter a valid Drug License Number format (e.g. DL-20B/1234/2026).',
-            'drug_license_no.max' => 'Drug license number cannot exceed 25 characters.',
+            'drug_license_no.regex' => 'Please enter a valid Drug License Number format (e.g. DL-20B/12345/2025).',
             'email.email' => 'Please enter a valid company email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete registered office address (at least 10 characters).',
+            'district_name.required' => 'Please enter the company district name.',
         ]);
+
+        // Find or create the district by name (case-insensitive)
+        $districtName = trim($request->district_name);
+        $district = \App\Models\District::whereRaw('LOWER(name) = ?', [strtolower($districtName)])->first();
+        if (!$district) {
+            $district = \App\Models\District::create(['name' => ucwords(strtolower($districtName))]);
+        }
 
         $licenseDocPath = null;
         if ($request->hasFile('license_document')) {
@@ -297,11 +320,11 @@ class UserController extends Controller
             'phone' => $request->phone,
             'password' => $request->password,
             'password_plain' => $request->password,
-            'license_document' => $licenseDocPath,
-            'is_active' => true,
+            'district_id' => $district->id,
+            'is_active' => false,
         ]);
 
-        return redirect()->route('login')->with('success', 'Pharma Company registration submitted successfully! You can now log in.');
+        return redirect()->route('login')->with('success', 'Pharma Company registration submitted successfully! Your account will be active after admin verification.');
     }
 
     public function register(Request $request)
@@ -499,7 +522,7 @@ class UserController extends Controller
         }
 
         $doctors = $query->get();
-        $districts = \App\Models\District::all();
+        $districts = \App\Models\District::orderBy('name')->get();
         $activeType = $request->get('type', 'all');
         return view('doctors.index', compact('doctors', 'districts', 'activeType'));
     }

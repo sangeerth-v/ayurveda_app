@@ -25,9 +25,11 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 30%">Company Name</th>
+                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%">Company Information</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Email Address</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted">Contact Number</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Contact</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Location</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Status</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted">Login Password</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted text-center" style="width: 15%">Actions</th>
                     </tr>
@@ -35,38 +37,61 @@
                 <tbody>
                     @forelse($pharmas as $pharma)
                     <tr>
-                        <td class="ps-4 py-4">
+                        <td class="ps-4 py-3">
                             <div class="d-flex align-items-center">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center me-3 shadow-sm overflow-hidden" style="width: 48px; height: 48px; background-color: #fff8e1; color: var(--accent-gold);">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center me-3 shadow-sm overflow-hidden border flex-shrink-0" style="width: 44px; height: 44px; background-color: #fff8e1; color: var(--accent-gold);">
                                     @if($pharma->logo)
                                         <img src="{{ asset('storage/' . $pharma->logo) }}" style="width: 100%; height: 100%; object-fit: contain; background: white;">
                                     @else
                                         <i class="fas fa-capsules fa-lg"></i>
                                     @endif
                                 </div>
-                                <div class="fw-bold text-dark">{{ $pharma->company_name }}</div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ $pharma->company_name }}</div>
+                                    @if($pharma->drug_license_no)
+                                        <div class="small text-muted">Lic: {{ $pharma->drug_license_no }}</div>
+                                    @endif
+                                </div>
                             </div>
                         </td>
-                        <td class="py-4 text-muted">
+                        <td class="py-3 text-muted small">
                             {{ $pharma->email }}
                         </td>
-                        <td class="py-4">
+                        <td class="py-3">
                             <div class="text-dark small">
-                                <i class="fas fa-phone-alt me-2 text-muted"></i>{{ $pharma->phone ?? 'Not provided' }}
+                                <i class="fas fa-phone-alt me-1 text-muted opacity-75"></i>{{ $pharma->phone ?? 'N/A' }}
                             </div>
                         </td>
-                        <td class="py-4">
-                            <code class="text-primary">{{ $pharma->password ?? 'N/A' }}</code>
+                        <td class="py-3">
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="fas fa-map-marker-alt me-1 text-danger opacity-50"></i>
+                                {{ $pharma->district->name ?? 'N/A' }}
+                            </div>
                         </td>
-                        <td class="py-4 text-center">
-                            <div class="d-flex justify-content-center gap-2">
+                        <td class="py-3">
+                            <span class="badge {{ $pharma->is_active ? 'bg-success' : 'bg-warning text-dark' }} rounded-pill px-3 py-2">
+                                {{ $pharma->is_active ? 'Active' : 'Pending Approval' }}
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <code class="text-primary">{{ $pharma->password_plain ?? ($pharma->password ?? 'N/A') }}</code>
+                        </td>
+                        <td class="py-3 text-center">
+                            <div class="d-flex justify-content-center align-items-center gap-1">
                                 <a href="{{ route('admin.pharmas.show', $pharma->id) }}" class="btn btn-sm btn-outline-warning text-dark" title="View Profile">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ route('admin.pharmas.edit', $pharma->id) }}" class="btn btn-sm btn-outline-primary" title="Edit Pharma">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this pharma company?');">
+                                <form action="{{ route('admin.pharmas.toggle_active', $pharma->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-sm {{ $pharma->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}" title="{{ $pharma->is_active ? 'Deactivate' : 'Approve' }} Pharma">
+                                        <i class="fas {{ $pharma->is_active ? 'fa-user-slash' : 'fa-check' }}"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this pharma company?');" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Pharma">
@@ -78,7 +103,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center py-5">
+                        <td colspan="7" class="text-center py-5">
                             <div class="text-muted">
                                 <i class="fas fa-building fa-3x mb-3 opacity-25"></i>
                                 <p class="mb-0">No pharma companies registered yet.</p>

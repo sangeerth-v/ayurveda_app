@@ -539,10 +539,6 @@ document.addEventListener('DOMContentLoaded', function() {
             function validateEmail() {
                 const val = input.value.trim();
                 if (!val) {
-                    if (input.hasAttribute('required')) {
-                        setError(input, 'Email address is required.');
-                        return false;
-                    }
                     clearFeedback(input);
                     return true;
                 }
@@ -558,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('input', function() {
                 const val = input.value.trim();
                 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (emailRegex.test(val)) clearFeedback(input);
+                if (!val || emailRegex.test(val)) clearFeedback(input);
             });
             input.addEventListener('blur', validateEmail);
         });

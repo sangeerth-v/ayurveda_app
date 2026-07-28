@@ -260,13 +260,13 @@
                         <!-- District -->
                         <div class="col-md-6">
                             <label class="form-label">Location District <span class="text-danger">*</span></label>
-                            <select name="district_id" class="form-select @error('district_id') is-invalid @enderror" required>
-                                <option value="">Select District</option>
+                            <input type="text" name="district_name" id="district_name" list="kerala_districts_list" class="form-control @error('district_name') is-invalid @enderror" placeholder="Type or select district (e.g. Ernakulam)" value="{{ old('district_name') }}" required autocomplete="off">
+                            <datalist id="kerala_districts_list">
                                 @foreach($districts as $district)
-                                    <option value="{{ $district->id }}" {{ old('district_id') == $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
+                                    <option value="{{ $district->name }}"></option>
                                 @endforeach
-                            </select>
-                            @error('district_id') <div class="invalid-feedback small">{{ $message }}</div> @enderror
+                            </datalist>
+                            @error('district_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Hospital Address -->
@@ -352,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.querySelectorAll('input[type="email"], input[name="email"]').forEach(inp => {
             inp.addEventListener('blur', () => {
                 const v = inp.value.trim();
-                if (!v && inp.required) { err(inp, 'Email address is required.'); return; }
                 if (!v) { clear(inp); return; }
                 if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
                     err(inp, 'Enter a valid email — e.g. hospital@domain.com');
@@ -375,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             inp.addEventListener('blur', () => {
                 const v = inp.value;
-                if (!v && inp.required) { err(inp, '10-digit mobile number is required.'); return; }
                 if (!v) { clear(inp); return; }
                 if (!/^[6-9]\d{9}$/.test(v)) { err(inp, 'Must be 10 digits starting with 6, 7, 8, or 9.'); }
                 else { ok(inp); }
@@ -420,7 +418,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             inp.addEventListener('blur', () => {
                 const v = inp.value;
-                if (!v && inp.required) { err(inp, 'GST number is required (15 characters).'); return; }
                 if (!v) { clear(inp); return; }
                 const gstFull = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
                 if (v.length !== 15 || !gstFull.test(v)) {
@@ -487,7 +484,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             inp.addEventListener('blur', () => {
                 const v = inp.value;
-                if (!v && inp.required) { err(inp, 'Hospital License Number is required.'); return; }
                 if (!v) { clear(inp); return; }
                 if (!/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/.test(v)) {
                     err(inp, 'Invalid — e.g. HSP/12345/2025  CH/98765/2024  NH/5678/2023');

@@ -44,21 +44,39 @@
         <!-- Profile Card -->
         <div class="card border-0 shadow-sm mb-4 overflow-hidden">
             <div class="card-body text-center p-5" style="background: linear-gradient(135deg, var(--accent-gold), #b38b4d);">
-                <div class="rounded-3 d-inline-flex align-items-center justify-content-center mb-3 bg-white shadow-lg overflow-hidden" style="width: 100px; height: 100px;">
+                <div class="rounded-3 d-inline-flex align-items-center justify-content-center mb-3 bg-white shadow-lg overflow-hidden border" style="width: 120px; height: 120px;">
                     @if($pharma->logo)
-                        <img src="{{ asset('storage/' . $pharma->logo) }}" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img src="{{ asset('storage/' . $pharma->logo) }}" style="width: 100%; height: 100%; object-fit: contain; background: white;">
                     @else
                         <i class="fas fa-capsules fa-3x" style="color: var(--accent-gold);"></i>
                     @endif
                 </div>
                 <h3 class="text-white mb-1">{{ $pharma->company_name }}</h3>
-                <span class="badge bg-white text-dark rounded-pill px-3 py-2 mt-2 opacity-90">Official Partner</span>
+                <span class="badge {{ $pharma->is_active ? 'bg-white text-dark' : 'bg-warning text-dark' }} rounded-pill px-3 py-2 mt-2">
+                    {{ $pharma->is_active ? 'Active Partner' : 'Pending Approval' }}
+                </span>
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted small text-uppercase fw-bold">Company ID</span>
                         <span class="fw-bold">#PHR-{{ str_pad($pharma->id, 4, '0', STR_PAD_LEFT) }}</span>
+                    </li>
+                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small text-uppercase fw-bold">Drug License No</span>
+                        <span class="fw-bold text-primary">{{ $pharma->drug_license_no ?? 'N/A' }}</span>
+                    </li>
+                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small text-uppercase fw-bold">GSTIN</span>
+                        <span class="fw-bold text-dark">{{ $pharma->gst_number ?? 'N/A' }}</span>
+                    </li>
+                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small text-uppercase fw-bold">District</span>
+                        <span class="fw-bold">{{ $pharma->district->name ?? 'N/A' }}</span>
+                    </li>
+                    <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small text-uppercase fw-bold">Login Password</span>
+                        <code class="text-primary fw-bold">{{ $pharma->password_plain ?? ($pharma->password ?? 'N/A') }}</code>
                     </li>
                     <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted small text-uppercase fw-bold">Partner Since</span>
@@ -82,23 +100,51 @@
                         <div class="text-dark fs-5">{{ $pharma->email }}</div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Contact Support</label>
+                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Contact Phone</label>
                         <div class="text-dark fs-5">{{ $pharma->phone ?? 'Not provided' }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Contact Person</label>
+                        <div class="text-dark fs-5">{{ $pharma->contact_person ?? 'Not provided' }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted text-uppercase fw-bold mb-1 d-block">District / Location</label>
+                        <div class="text-dark fs-5">{{ $pharma->district->name ?? 'Not specified' }}</div>
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Registered Address</label>
+                    <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Registered Office Address</label>
                     <div class="text-dark">{{ $pharma->address ?? 'Address details not available' }}</div>
+                </div>
+
+                <!-- Verification Document -->
+                <h6 class="text-muted small text-uppercase fw-bold mb-3 pt-3 border-top">Uploaded Drug License Document</h6>
+                <div class="mb-4">
+                    @if($pharma->license_document)
+                        <a href="{{ asset('storage/' . $pharma->license_document) }}" target="_blank" class="btn btn-outline-warning text-dark me-2">
+                            <i class="fas fa-file-pdf me-2 text-danger"></i> View Drug License Certificate Document
+                        </a>
+                    @else
+                        <span class="badge bg-secondary p-2">No Drug License Document Uploaded</span>
+                    @endif
                 </div>
                 
                 <hr class="my-4 opacity-10">
 
-                <div class="d-flex gap-3">
-                    <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Delete this pharma company and all associated data?');">
+                <div class="d-flex gap-3 flex-wrap">
+                    <form action="{{ route('admin.pharmas.toggle_active', $pharma->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn {{ $pharma->is_active ? 'btn-warning' : 'btn-success' }}">
+                            <i class="fas {{ $pharma->is_active ? 'fa-user-slash' : 'fa-check-circle' }} me-2"></i>
+                            {{ $pharma->is_active ? 'Deactivate Account' : 'Approve & Activate Account' }}
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.pharmas.destroy', $pharma->id) }}" method="POST" onsubmit="return confirm('Delete this pharma company and all associated data?');" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash-alt me-2"></i> Terminate Partnership
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Company
                         </button>
                     </form>
                     <a href="{{ route('admin.pharmas.index') }}" class="btn btn-outline-secondary">

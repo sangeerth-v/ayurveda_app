@@ -11,24 +11,44 @@ class PharmaController extends Controller
 {
     public function index()
     {
-        $pharmas = PharmaCompany::paginate(10);
+        $pharmas = PharmaCompany::with('district')->latest()->paginate(10);
         return view('admin.pharma.index', compact('pharmas'));
+    }
+
+    public function toggleActive($id)
+    {
+        $pharma = PharmaCompany::findOrFail($id);
+        $pharma->is_active = !$pharma->is_active;
+        $pharma->save();
+
+        $status = $pharma->is_active ? 'approved and activated' : 'deactivated';
+        return redirect()->back()->with('success', "Pharma company has been {$status}.");
     }
 
     public function create()
     {
-        return view('admin.pharma.create');
+        $districts = \App\Models\District::orderBy('name')->get();
+        return view('admin.pharma.create', compact('districts'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'company_name' => 'required',
-            'email' => 'required|email|unique:pharma_companies',
-            'password' => 'required|min:6',
-            'phone' => 'required|digits:10',
-            'address' => 'nullable',
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:pharma_companies,email',
+            'password' => 'required|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'drug_license_no' => ['nullable', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/'],
+            'gst_number' => ['nullable', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
+            'contact_person' => 'nullable|string|max:255',
+            'district_id' => 'nullable|exists:districts,id',
+            'address' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'gst_number.regex' => 'Please enter a valid 15-character GSTIN format (e.g. 29AAAAA0000A1Z5).',
+            'drug_license_no.regex' => 'Please enter a valid Drug License Number format (e.g. DL-20B/12345/2025).',
         ]);
 
         $logoPath = null;
@@ -36,21 +56,33 @@ class PharmaController extends Controller
             $logoPath = $request->file('logo')->store('pharmas', 'public');
         }
 
+        $licDocPath = null;
+        if ($request->hasFile('license_document')) {
+            $licDocPath = $request->file('license_document')->store('pharma_docs', 'public');
+        }
+
         PharmaCompany::create([
             'company_name' => $request->company_name,
             'email' => $request->email,
             'password' => $request->password,
+            'password_plain' => $request->password,
             'phone' => $request->phone,
+            'drug_license_no' => $request->drug_license_no ? strtoupper($request->drug_license_no) : null,
+            'gst_number' => $request->gst_number ? strtoupper($request->gst_number) : null,
+            'contact_person' => $request->contact_person,
+            'district_id' => $request->district_id,
             'address' => $request->address,
             'logo' => $logoPath,
+            'license_document' => $licDocPath,
+            'is_active' => true,
         ]);
 
-        return redirect()->route('admin.pharmas.index')->with('success', 'Pharma Company added successfully');
+        return redirect()->route('admin.pharmas.index')->with('success', 'Pharma Company added successfully.');
     }
 
     public function show($id)
     {
-        $pharma = PharmaCompany::withCount('products')->findOrFail($id);
+        $pharma = PharmaCompany::with(['district'])->withCount('products')->findOrFail($id);
         
         $orderCount = \App\Models\Order::whereHas('items.product', function ($query) use ($id) {
             $query->where('pharma_company_id', $id);
@@ -74,7 +106,8 @@ class PharmaController extends Controller
     public function edit($id)
     {
         $pharma = PharmaCompany::findOrFail($id);
-        return view('admin.pharma.edit', compact('pharma'));
+        $districts = \App\Models\District::orderBy('name')->get();
+        return view('admin.pharma.edit', compact('pharma', 'districts'));
     }
 
     public function update(Request $request, $id)
@@ -82,36 +115,46 @@ class PharmaController extends Controller
         $pharma = PharmaCompany::findOrFail($id);
 
         $request->validate([
-            'company_name' => 'required',
+            'company_name' => 'required|string|max:255',
             'email' => 'required|email|unique:pharma_companies,email,' . $id,
-            'password' => 'nullable|min:6',
-            'phone' => 'required|digits:10',
-            'address' => 'nullable',
+            'password' => 'nullable|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'drug_license_no' => ['nullable', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/'],
+            'gst_number' => ['nullable', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
+            'contact_person' => 'nullable|string|max:255',
+            'district_id' => 'nullable|exists:districts,id',
+            'address' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $data = [
             'company_name' => $request->company_name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'drug_license_no' => $request->drug_license_no ? strtoupper($request->drug_license_no) : null,
+            'gst_number' => $request->gst_number ? strtoupper($request->gst_number) : null,
+            'contact_person' => $request->contact_person,
+            'district_id' => $request->district_id,
             'address' => $request->address,
         ];
 
         if ($request->filled('password')) {
             $data['password'] = $request->password;
+            $data['password_plain'] = $request->password;
         }
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($pharma->logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($pharma->logo)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($pharma->logo);
-            }
             $data['logo'] = $request->file('logo')->store('pharmas', 'public');
+        }
+
+        if ($request->hasFile('license_document')) {
+            $data['license_document'] = $request->file('license_document')->store('pharma_docs', 'public');
         }
 
         $pharma->update($data);
 
-        return redirect()->route('admin.pharmas.index')->with('success', 'Pharma Company updated successfully');
+        return redirect()->route('admin.pharmas.index')->with('success', 'Pharma Company updated successfully.');
     }
 
     public function destroy($id)

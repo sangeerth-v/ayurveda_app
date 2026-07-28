@@ -329,10 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
             function validateEmail() {
                 const val = input.value.trim();
                 if (!val) {
-                    if (input.hasAttribute('required')) {
-                        setError(input, 'Email address is required.');
-                        return false;
-                    }
                     clearFeedback(input);
                     return true;
                 }
@@ -348,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('input', function() {
                 const val = input.value.trim();
                 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (emailRegex.test(val)) clearFeedback(input);
+                if (!val || emailRegex.test(val)) clearFeedback(input);
             });
             input.addEventListener('blur', validateEmail);
         });
@@ -358,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input.setAttribute('maxlength', '10');
             input.addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
-                if (this.value.length === 10 && ['6','7','8','9'].includes(this.value.charAt(0))) {
+                if (!this.value || (this.value.length === 10 && ['6','7','8','9'].includes(this.value.charAt(0)))) {
                     clearFeedback(input);
                 }
             });
@@ -366,10 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
             function validatePhone() {
                 const val = input.value;
                 if (!val) {
-                    if (input.hasAttribute('required')) {
-                        setError(input, '10-digit mobile number is required.');
-                        return false;
-                    }
                     clearFeedback(input);
                     return true;
                 }
