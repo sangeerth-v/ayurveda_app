@@ -29,17 +29,17 @@ class DoctorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:doctors,email',
-            'password' => 'required|string|min:6',
-            'phone' => 'required|digits:10',
-            'medical_registration_no' => 'nullable|string|max:100',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors,email',
+            'password' => 'required|string|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'medical_registration_no' => ['nullable', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
             'specialization_category' => 'required|string|max:255',
             'specialization_subcategory' => 'nullable|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'address' => 'nullable|string',
             'qualification' => 'nullable|string',
-            'experience' => 'nullable|integer',
+            'experience' => 'nullable|integer|min:0|max:70',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
@@ -51,7 +51,24 @@ class DoctorController extends Controller
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
             'google_meet_link' => 'nullable|url|max:500',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020).',
         ]);
+
+        // Resolve Category Names
+        $category = \App\Models\DoctorCategory::find($request->specialization_category);
+        $subcategory = \App\Models\DoctorSubcategory::find($request->specialization_subcategory);
+
+        $availableTime = null;
+        if ($request->filled('available_from') && $request->filled('available_to')) {
+            $availableTime = \Carbon\Carbon::parse($request->available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->available_to)->format('h:i A');
+        }
+
+        $onlineAvailableTime = null;
+        if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
+            $onlineAvailableTime = \Carbon\Carbon::parse($request->online_available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->online_available_to)->format('h:i A');
+        }
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
@@ -68,39 +85,32 @@ class DoctorController extends Controller
             $councilCertPath = $request->file('council_certificate')->store('doctor_docs', 'public');
         }
 
-        // Resolve Category Names
-        $category = DoctorCategory::find($request->specialization_category);
-        $subcategory = DoctorSubcategory::find($request->specialization_subcategory);
-
-        // Create Doctor
         Doctor::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
             'password_plain' => $request->password,
             'phone' => $request->phone,
-            'medical_registration_no' => $request->medical_registration_no,
+            'medical_registration_no' => $request->medical_registration_no ? strtoupper($request->medical_registration_no) : null,
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
             'address' => $request->address,
             'qualification' => $request->qualification,
-            'experience' => $request->experience,
-            'consultation_fee' => $request->consultation_fee,
-            'available_time' => $request->available_from . ' to ' . $request->available_to,
-            'consultation_type' => $request->consultation_type ?? 'Offline',
-            'online_available_time' => ($request->filled('online_available_from') && $request->filled('online_available_to'))
-                ? $request->online_available_from . ' to ' . $request->online_available_to
-                : null,
-            'google_meet_link' => $request->google_meet_link,
+            'experience' => $request->experience ?? 0,
+            'consultation_fee' => $request->consultation_fee ?? 0,
+            'consultation_type' => $request->consultation_type,
+            'available_time' => $availableTime,
+            'online_available_time' => $onlineAvailableTime,
             'photo' => $photoPath,
             'registration_certificate' => $regCertPath,
             'council_certificate' => $councilCertPath,
             'hospital_id' => $request->hospital_id,
+            'google_meet_link' => $request->google_meet_link,
             'is_active' => true,
         ]);
 
-        return redirect()->route('admin.doctors.index')->with('success', 'Doctor added successfully');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor created successfully.');
     }
 
     public function show($id)
@@ -116,9 +126,9 @@ class DoctorController extends Controller
 
     public function edit($id)
     {
-        $doctor = Doctor::with(['district', 'hospital'])->findOrFail($id);
-        $districts = District::all();
-        $categories = DoctorCategory::all();
+        $doctor = Doctor::findOrFail($id);
+        $districts = \App\Models\District::orderBy('name')->get();
+        $categories = \App\Models\DoctorCategory::orderBy('name')->get();
         $hospitals = \App\Models\Hospital::orderBy('name')->get();
         return view('admin.doctors.edit', compact('doctor', 'districts', 'categories', 'hospitals'));
     }
@@ -128,17 +138,17 @@ class DoctorController extends Controller
         $doctor = Doctor::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:doctors,email,' . $id,
-            'password' => 'nullable|string|min:6',
-            'phone' => 'required|digits:10',
-            'medical_registration_no' => 'nullable|string|max:100',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors,email,' . $id,
+            'password' => 'nullable|string|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'medical_registration_no' => ['nullable', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
             'specialization_category' => 'required',
             'specialization_subcategory' => 'nullable',
             'district_id' => 'required|exists:districts,id',
             'address' => 'nullable|string',
             'qualification' => 'nullable|string',
-            'experience' => 'nullable|integer',
+            'experience' => 'nullable|integer|min:0|max:70',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
@@ -150,6 +160,9 @@ class DoctorController extends Controller
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
             'google_meet_link' => 'nullable|url|max:500',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020).',
         ]);
 
         // Resolve Category Names

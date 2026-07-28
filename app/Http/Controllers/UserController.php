@@ -116,27 +116,34 @@ class UserController extends Controller
     public function processDoctorRegister(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:doctors,email',
-            'password' => 'required|string|min:6',
-            'phone' => 'required|digits:10',
-            'medical_registration_no' => 'required|string|max:100',
-            'qualification' => 'required|string|max:255',
-            'specialization_category' => 'required',
-            'specialization_subcategory' => 'nullable',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors,email',
+            'password' => 'required|string|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'medical_registration_no' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'qualification' => 'required|string|min:2|max:255',
+            'specialization_category' => 'required|exists:doctor_categories,id',
+            'specialization_subcategory' => 'nullable|exists:doctor_subcategories,id',
             'district_id' => 'required|exists:districts,id',
-            'experience' => 'required|integer|min:0',
-            'consultation_fee' => 'required|numeric|min:0',
+            'experience' => 'required|integer|min:0|max:70',
+            'consultation_fee' => 'required|numeric|min:0|max:100000',
             'consultation_type' => 'required|in:Both,Offline,Online',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
-            'address' => 'required|string',
+            'address' => 'required|string|min:10|max:1000',
             'hospital_id' => 'nullable|exists:hospitals,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020 or MCI-98765-2022).',
+            'medical_registration_no.max' => 'Medical registration number cannot exceed 25 characters.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'address.min' => 'Please enter a complete clinic address (at least 10 characters).',
         ]);
 
         $photoPath = null;
@@ -173,7 +180,7 @@ class UserController extends Controller
             'password' => $request->password,
             'password_plain' => $request->password,
             'phone' => $request->phone,
-            'medical_registration_no' => $request->medical_registration_no,
+            'medical_registration_no' => strtoupper($request->medical_registration_no),
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
@@ -203,16 +210,25 @@ class UserController extends Controller
     public function processHospitalRegister(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'license_number' => 'required|string|max:100',
-            'gst_number' => 'nullable|string|max:100',
-            'address' => 'required|string',
-            'contact_person' => 'required|string|max:255',
-            'email' => 'required|email|unique:hospitals,email',
-            'phone' => 'required|digits:10',
-            'password' => 'required|string|min:6',
+            'name' => 'required|string|min:3|max:255',
+            'license_number' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z0-9]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'gst_number' => ['nullable', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
+            'contact_person' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:hospitals,email',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'password' => 'required|string|min:8',
             'district_id' => 'required|exists:districts,id',
+            'address' => 'required|string|min:10|max:1000',
             'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'gst_number.regex' => 'Please enter a valid 15-character GSTIN format (e.g. 29AAAAA0000A1Z5).',
+            'gst_number.size' => 'GST Number must be exactly 15 characters long.',
+            'license_number.regex' => 'Please enter a valid Hospital License Number format (e.g. HSP/2026/8942).',
+            'license_number.max' => 'License number cannot exceed 25 characters.',
+            'email.email' => 'Please enter a valid hospital email address.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'address.min' => 'Please enter a complete hospital address (at least 10 characters).',
         ]);
 
         $licenseDocPath = null;
@@ -222,8 +238,8 @@ class UserController extends Controller
 
         \App\Models\Hospital::create([
             'name' => $request->name,
-            'license_number' => $request->license_number,
-            'gst_number' => $request->gst_number,
+            'license_number' => strtoupper($request->license_number),
+            'gst_number' => $request->gst_number ? strtoupper($request->gst_number) : null,
             'address' => $request->address,
             'contact_person' => $request->contact_person,
             'email' => $request->email,
@@ -246,15 +262,24 @@ class UserController extends Controller
     public function processPharmaRegister(Request $request)
     {
         $request->validate([
-            'company_name' => 'required|string|max:255',
-            'drug_license_no' => 'required|string|max:100',
-            'gst_number' => 'required|string|max:100',
-            'address' => 'required|string',
-            'contact_person' => 'required|string|max:255',
-            'email' => 'required|email|unique:pharma_companies,email',
-            'phone' => 'required|digits:10',
-            'password' => 'required|string|min:6',
+            'company_name' => 'required|string|min:3|max:255',
+            'drug_license_no' => ['required', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z0-9]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
+            'gst_number' => ['required', 'string', 'size:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
+            'contact_person' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:pharma_companies,email',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'password' => 'required|string|min:8',
+            'address' => 'required|string|min:10|max:1000',
             'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'gst_number.regex' => 'Please enter a valid 15-character GSTIN format (e.g. 29AAAAA0000A1Z5).',
+            'gst_number.size' => 'GST Number must be exactly 15 characters long.',
+            'drug_license_no.regex' => 'Please enter a valid Drug License Number format (e.g. DL-20B/1234/2026).',
+            'drug_license_no.max' => 'Drug license number cannot exceed 25 characters.',
+            'email.email' => 'Please enter a valid company email address.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'address.min' => 'Please enter a complete registered office address (at least 10 characters).',
         ]);
 
         $licenseDocPath = null;
@@ -265,7 +290,7 @@ class UserController extends Controller
         \App\Models\PharmaCompany::create([
             'company_name' => $request->company_name,
             'drug_license_no' => $request->drug_license_no,
-            'gst_number' => $request->gst_number,
+            'gst_number' => strtoupper($request->gst_number),
             'address' => $request->address,
             'contact_person' => $request->contact_person,
             'email' => $request->email,
@@ -282,10 +307,16 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|digits:10',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'],
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'phone.unique' => 'This mobile number is already registered.',
+            'email.unique' => 'This email address is already registered.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         $otp = sprintf("%06d", mt_rand(100000, 999999));

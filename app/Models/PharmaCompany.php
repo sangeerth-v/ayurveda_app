@@ -21,10 +21,16 @@ class PharmaCompany extends Authenticatable
         'gst_number',
         'contact_person',
         'address',
+        'district_id',
         'logo',
         'license_document',
         'is_active',
     ];
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
 
     public function products()
     {

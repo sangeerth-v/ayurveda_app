@@ -227,7 +227,7 @@
                     <!-- Full Name -->
                     <div class="form-floating mb-3 position-relative">
                         <i class="fas fa-user input-icon"></i>
-                        <input type="text" name="name" class="form-control" id="floatingName" placeholder="Full Name" value="{{ old('name') }}" required autofocus>
+                        <input type="text" name="name" class="form-control" id="floatingName" placeholder="Full Name" value="{{ old('name') }}" minlength="3" required autofocus>
                         <label for="floatingName">Full Name</label>
                     </div>
 
@@ -241,14 +241,14 @@
                     <!-- Phone Number -->
                     <div class="form-floating mb-3 position-relative">
                         <i class="fas fa-phone input-icon"></i>
-                        <input type="text" name="phone" class="form-control" id="floatingPhone" placeholder="Phone Number" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" minlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                        <input type="text" name="phone" class="form-control" id="floatingPhone" placeholder="Phone Number" value="{{ old('phone') }}" pattern="[6-9][0-9]{9}" maxlength="10" minlength="10" title="Valid 10-digit mobile number starting with 6-9" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         <label for="floatingPhone">10-Digit Mobile Number</label>
                     </div>
 
                     <!-- Password -->
                     <div class="form-floating mb-3 position-relative">
                         <i class="fas fa-lock input-icon"></i>
-                        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="8" required>
                         <label for="floatingPassword">Password (min 8 chars)</label>
                         <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('floatingPassword', this)">
                             <i class="fas fa-eye"></i>
@@ -258,7 +258,7 @@
                     <!-- Confirm Password -->
                     <div class="form-floating mb-4 position-relative">
                         <i class="fas fa-lock-open input-icon"></i>
-                        <input type="password" name="password_confirmation" class="form-control" id="floatingConfirm" placeholder="Confirm Password" required>
+                        <input type="password" name="password_confirmation" class="form-control" id="floatingConfirm" placeholder="Confirm Password" minlength="8" required>
                         <label for="floatingConfirm">Confirm Password</label>
                         <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('floatingConfirm', this)">
                             <i class="fas fa-eye"></i>
@@ -291,6 +291,134 @@ function togglePasswordVisibility(inputId, button) {
         icon.classList.add('fa-eye');
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+
+    forms.forEach(form => {
+        const emailInputs = form.querySelectorAll('input[type="email"], input[name="email"]');
+        const phoneInputs = form.querySelectorAll('input[name="phone"]');
+
+        function createOrGetFeedback(input) {
+            let container = input.closest('.form-floating') || input.parentNode;
+            let feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.className = 'live-feedback text-danger small mt-1 fw-semibold ps-1';
+                container.parentNode.appendChild(feedback);
+            }
+            return feedback;
+        }
+
+        function clearFeedback(input) {
+            input.classList.remove('is-invalid');
+            let container = input.closest('.form-floating') || input.parentNode;
+            const feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
+            if (feedback) feedback.textContent = '';
+        }
+
+        function setError(input, msg) {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            const feedback = createOrGetFeedback(input);
+            feedback.textContent = msg;
+        }
+
+        // --- Email Validation ---
+        emailInputs.forEach(input => {
+            function validateEmail() {
+                const val = input.value.trim();
+                if (!val) {
+                    if (input.hasAttribute('required')) {
+                        setError(input, 'Email address is required.');
+                        return false;
+                    }
+                    clearFeedback(input);
+                    return true;
+                }
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(val)) {
+                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
+                    return false;
+                }
+                clearFeedback(input);
+                return true;
+            }
+
+            input.addEventListener('input', function() {
+                const val = input.value.trim();
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (emailRegex.test(val)) clearFeedback(input);
+            });
+            input.addEventListener('blur', validateEmail);
+        });
+
+        // --- Phone Validation ---
+        phoneInputs.forEach(input => {
+            input.setAttribute('maxlength', '10');
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length === 10 && ['6','7','8','9'].includes(this.value.charAt(0))) {
+                    clearFeedback(input);
+                }
+            });
+
+            function validatePhone() {
+                const val = input.value;
+                if (!val) {
+                    if (input.hasAttribute('required')) {
+                        setError(input, '10-digit mobile number is required.');
+                        return false;
+                    }
+                    clearFeedback(input);
+                    return true;
+                }
+                if (!['6', '7', '8', '9'].includes(val.charAt(0))) {
+                    setError(input, 'Mobile number must start with 6, 7, 8, or 9.');
+                    return false;
+                }
+                if (val.length !== 10) {
+                    setError(input, `Mobile number must be exactly 10 digits (entered ${val.length}/10).`);
+                    return false;
+                }
+                clearFeedback(input);
+                return true;
+            }
+            input.addEventListener('blur', validatePhone);
+        });
+
+        // --- Form Submit Guard ---
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            emailInputs.forEach(input => {
+                const val = input.value.trim();
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!val && input.hasAttribute('required')) {
+                    setError(input, 'Email address is required.');
+                    isValid = false;
+                } else if (val && !emailRegex.test(val)) {
+                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
+                    isValid = false;
+                }
+            });
+            phoneInputs.forEach(input => {
+                const val = input.value;
+                if (!val && input.hasAttribute('required')) {
+                    setError(input, '10-digit mobile number is required.');
+                    isValid = false;
+                } else if (val && (val.length !== 10 || !['6','7','8','9'].includes(val.charAt(0)))) {
+                    setError(input, 'Please enter a valid 10-digit mobile number starting with 6-9.');
+                    isValid = false;
+                }
+            });
+            if (!isValid) {
+                e.preventDefault();
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) firstInvalid.focus();
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>

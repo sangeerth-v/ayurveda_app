@@ -502,8 +502,90 @@ function showPartnerNotice(roleName) {
     const partnerModal = new bootstrap.Modal(document.getElementById('partnerModal'));
     partnerModal.show();
 }
-</script>
 
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+
+    forms.forEach(form => {
+        const emailInputs = form.querySelectorAll('input[type="email"], input[name="email"]');
+
+        function createOrGetFeedback(input) {
+            let container = input.closest('.form-floating') || input.parentNode;
+            let feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.className = 'live-feedback text-danger small mt-1 fw-semibold ps-1';
+                container.parentNode.appendChild(feedback);
+            }
+            return feedback;
+        }
+
+        function clearFeedback(input) {
+            input.classList.remove('is-invalid');
+            let container = input.closest('.form-floating') || input.parentNode;
+            const feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
+            if (feedback) feedback.textContent = '';
+        }
+
+        function setError(input, msg) {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            const feedback = createOrGetFeedback(input);
+            feedback.textContent = msg;
+        }
+
+        // --- EMAIL VALIDATION ---
+        emailInputs.forEach(input => {
+            function validateEmail() {
+                const val = input.value.trim();
+                if (!val) {
+                    if (input.hasAttribute('required')) {
+                        setError(input, 'Email address is required.');
+                        return false;
+                    }
+                    clearFeedback(input);
+                    return true;
+                }
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(val)) {
+                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
+                    return false;
+                }
+                clearFeedback(input);
+                return true;
+            }
+
+            input.addEventListener('input', function() {
+                const val = input.value.trim();
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (emailRegex.test(val)) clearFeedback(input);
+            });
+            input.addEventListener('blur', validateEmail);
+        });
+
+        // --- FORM SUBMIT GUARD ---
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            emailInputs.forEach(input => {
+                const val = input.value.trim();
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!val && input.hasAttribute('required')) {
+                    setError(input, 'Email address is required.');
+                    isValid = false;
+                } else if (val && !emailRegex.test(val)) {
+                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
+                    isValid = false;
+                }
+            });
+            if (!isValid) {
+                e.preventDefault();
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) firstInvalid.focus();
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
 

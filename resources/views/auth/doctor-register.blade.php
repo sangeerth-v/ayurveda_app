@@ -277,7 +277,7 @@
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="fas fa-user"></i></span>
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Dr. Firstname Lastname" value="{{ old('name') }}" required>
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Dr. Firstname Lastname" value="{{ old('name') }}" minlength="3" required>
                             </div>
                             @error('name') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
@@ -297,17 +297,17 @@
                             <label class="form-label">Phone Number (10 Digits) <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="fas fa-phone"></i></span>
-                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="9876543210" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" minlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="9876543210" value="{{ old('phone') }}" pattern="[6-9][0-9]{9}" maxlength="10" minlength="10" title="Valid 10-digit mobile number starting with 6-9" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             @error('phone') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Password -->
                         <div class="col-md-6">
-                            <label class="form-label">Account Password <span class="text-danger">*</span></label>
+                            <label class="form-label">Account Password (min 8 chars) <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="fas fa-lock"></i></span>
-                                <input type="password" name="password" id="docPassword" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
+                                <input type="password" name="password" id="docPassword" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" minlength="8" required>
                                 <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('docPassword', this)"><i class="fas fa-eye"></i></button>
                             </div>
                             @error('password') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
@@ -318,7 +318,7 @@
                             <label class="form-label">Medical Registration Number <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="fas fa-id-card"></i></span>
-                                <input type="text" name="medical_registration_no" class="form-control @error('medical_registration_no') is-invalid @enderror" placeholder="e.g. KMC/12345/2020" value="{{ old('medical_registration_no') }}" required>
+                                <input type="text" name="medical_registration_no" class="form-control @error('medical_registration_no') is-invalid @enderror" placeholder="e.g. KMC/12345/2020" value="{{ old('medical_registration_no') }}" maxlength="25" minlength="5" pattern="[A-Z]{2,10}[-\/][A-Z0-9\/-]*[0-9]+[A-Z0-9\/-]*" title="Format: Council Abbreviation / Number / Year e.g. KMC/12345/2020" required>
                             </div>
                             @error('medical_registration_no') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
@@ -328,7 +328,7 @@
                             <label class="form-label">Qualification <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="fas fa-graduation-cap"></i></span>
-                                <input type="text" name="qualification" class="form-control @error('qualification') is-invalid @enderror" placeholder="MBBS, BAMS, BHMS, MD..." value="{{ old('qualification') }}" required>
+                                <input type="text" name="qualification" class="form-control @error('qualification') is-invalid @enderror" placeholder="MBBS, BAMS, BHMS, MD..." value="{{ old('qualification') }}" minlength="2" required>
                             </div>
                             @error('qualification') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
@@ -509,6 +509,219 @@ document.getElementById('specialization_category').addEventListener('change', fu
             });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+
+    forms.forEach(form => {
+        /* ── helpers ── */
+        function getFeedback(input) {
+            let c = input.closest('.input-group') || input.closest('.form-floating') || input.parentNode;
+            let fb = (c.parentNode || c).querySelector('.live-feedback');
+            if (!fb) {
+                fb = document.createElement('div');
+                fb.className = 'live-feedback small mt-1 fw-semibold ps-1';
+                (c.parentNode || c).appendChild(fb);
+            }
+            return fb;
+        }
+        function ok(input) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            const fb = getFeedback(input);
+            fb.textContent = '';
+            fb.className = 'live-feedback small mt-1 fw-semibold ps-1';
+        }
+        function err(input, msg) {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            const fb = getFeedback(input);
+            fb.textContent = '⚠ ' + msg;
+            fb.className = 'live-feedback text-danger small mt-1 fw-semibold ps-1';
+        }
+        function hint(input, msg) {
+            input.classList.remove('is-invalid', 'is-valid');
+            const fb = getFeedback(input);
+            fb.textContent = '💡 ' + msg;
+            fb.className = 'live-feedback text-muted small mt-1 ps-1';
+        }
+        function clear(input) {
+            input.classList.remove('is-invalid', 'is-valid');
+            const fb = getFeedback(input);
+            fb.textContent = '';
+        }
+
+        /* ══════════════════════════════════════════════════
+           EMAIL – allow free typing, validate on blur only
+           ══════════════════════════════════════════════════ */
+        form.querySelectorAll('input[type="email"], input[name="email"]').forEach(inp => {
+            inp.addEventListener('blur', () => {
+                const v = inp.value.trim();
+                if (!v && inp.required) { err(inp, 'Email address is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
+                    err(inp, 'Enter a valid email — e.g. doctor@domain.com');
+                } else { ok(inp); }
+            });
+        });
+
+        /* ══════════════════════════════════════════════════
+           PHONE – digits only, first digit 6-9, max 10
+           Typing invalid chars: blocked in-place
+           ══════════════════════════════════════════════════ */
+        form.querySelectorAll('input[name="phone"]').forEach(inp => {
+            inp.setAttribute('maxlength', '10');
+            inp.setAttribute('inputmode', 'numeric');
+
+            inp.addEventListener('input', function() {
+                let cur = this.value.replace(/\D/g, '');
+                // First digit must be 6-9
+                if (cur.length > 0 && !/^[6-9]/.test(cur)) {
+                    cur = cur.slice(1); // strip the bad first digit
+                }
+                this.value = cur.slice(0, 10);
+                const len = this.value.length;
+                if (len === 0) { clear(inp); return; }
+                if (len < 10) {
+                    hint(inp, `${len}/10 digits entered — need ${10 - len} more`);
+                } else {
+                    ok(inp);
+                }
+            });
+
+            inp.addEventListener('blur', () => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, '10-digit mobile number is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[6-9]\d{9}$/.test(v)) {
+                    err(inp, 'Must be exactly 10 digits starting with 6, 7, 8, or 9.');
+                } else { ok(inp); }
+            });
+        });
+
+        /* ══════════════════════════════════════════════════
+           MEDICAL REGISTRATION NUMBER
+           Format: 2-10 UPPERCASE letters → separator (/ or -)
+                   → digits + optional year segment
+           e.g.  KMC/12345/2020   MCI-98765-2022
+           Live: strip invalid chars, guide user position by position
+           ══════════════════════════════════════════════════ */
+        form.querySelectorAll('input[name="medical_registration_no"]').forEach(inp => {
+            inp.setAttribute('maxlength', '18');
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('spellcheck', 'false');
+            inp.setAttribute('placeholder', 'e.g. KMC/12345/2020');
+
+            /* Positional mask — GST-style:
+               Segment A: 2-6 LETTERS  (council code e.g. KMC, TNMC)  → auto '/'
+               Segment B: 1-6 DIGITS   (registration number)           → auto '/'
+               Segment C: 4  DIGITS    (year)
+            */
+            function maskMedReg(raw) {
+                let out = ''; let ri = 0;
+
+                // Segment A: council letters (max 6)
+                let aLen = 0;
+                while (ri < raw.length && aLen < 6) {
+                    if (/[A-Z]/.test(raw[ri])) { out += raw[ri++]; aLen++; }
+                    else break;
+                }
+                if (aLen < 2) return out;
+
+                out += '/';  // auto-separator
+
+                // Segment B: reg number digits (max 6)
+                let bLen = 0;
+                while (ri < raw.length && bLen < 6) {
+                    if (/[0-9]/.test(raw[ri])) { out += raw[ri++]; bLen++; }
+                    else break;
+                }
+                if (bLen === 0) return out;
+                if (ri >= raw.length) return out;
+
+                out += '/';  // auto-separator
+
+                // Segment C: year digits (max 4)
+                let cLen = 0;
+                while (ri < raw.length && cLen < 4) {
+                    if (/[0-9]/.test(raw[ri])) { out += raw[ri++]; cLen++; }
+                    else break;
+                }
+                return out;
+            }
+
+            inp.addEventListener('input', function() {
+                const raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                const result = maskMedReg(raw);
+                this.value = result;
+                if (raw.length === 0) { clear(inp); return; }
+
+                const full = /^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/;
+                if (full.test(result)) { ok(inp); return; }
+
+                const parts = result.split('/');
+                if (parts.length === 1) {
+                    hint(inp, parts[0].length < 2
+                        ? `Council code: type 2-6 letters (KMC, TNMC, MCI)`
+                        : `Council "${parts[0]}" — type registration number digits next`);
+                } else if (parts.length === 2) {
+                    hint(inp, `${parts[1].length}/6 reg digits entered — type / then 4-digit year`);
+                } else {
+                    hint(inp, `Year: ${parts[2]} (${parts[2].length}/4 digits)`);
+                }
+            });
+
+            inp.addEventListener('blur', () => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, 'Medical Registration Number is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/.test(v)) {
+                    err(inp, 'Invalid format — e.g. KMC/12345/2020  TNMC/98765/2022  MCI/4321/2019');
+                } else { ok(inp); }
+            });
+        });
+
+
+        /* ══════════════════════════════════════════════════
+           FORM SUBMIT GUARD
+           ══════════════════════════════════════════════════ */
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+
+            form.querySelectorAll('input[type="email"], input[name="email"]').forEach(inp => {
+                const v = inp.value.trim();
+                if (!v && inp.required) { err(inp, 'Email address is required.'); valid = false; }
+                else if (v && !/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
+                    err(inp, 'Enter a valid email — e.g. doctor@domain.com'); valid = false;
+                }
+            });
+
+            form.querySelectorAll('input[name="phone"]').forEach(inp => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, '10-digit mobile number is required.'); valid = false; }
+                else if (v && !/^[6-9]\d{9}$/.test(v)) {
+                    err(inp, 'Must be exactly 10 digits starting with 6, 7, 8, or 9.'); valid = false;
+                }
+            });
+
+            form.querySelectorAll('input[name="medical_registration_no"]').forEach(inp => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, 'Medical Registration Number is required.'); valid = false; }
+                else if (v && !/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/.test(v)) {
+                    err(inp, 'Invalid — e.g. KMC/12345/2020  TNMC/98765/2022  MCI/4321/2019'); valid = false;
+                }
+            });
+
+
+            if (!valid) {
+                e.preventDefault();
+                const first = form.querySelector('.is-invalid');
+                if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>
+

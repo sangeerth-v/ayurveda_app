@@ -194,34 +194,38 @@ class HospitalController extends Controller
     protected function validateHospital(Request $request, $id = null, $requirePassword = true)
     {
         return $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:hospitals,email' . ($id ? ',' . $id : ''),
-            'password' => ($requirePassword ? 'required' : 'nullable') . '|string|min:6',
-            'phone' => 'required|digits:10',
-            'address' => 'nullable|string',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:hospitals,email' . ($id ? ',' . $id : ''),
+            'password' => ($requirePassword ? 'required' : 'nullable') . '|string|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'address' => 'nullable|string|min:10|max:1000',
             'district_id' => 'nullable|exists:districts,id',
             'specialties' => 'nullable|string',
             'treatments' => 'nullable|string',
             'facilities' => 'nullable|string',
             'description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.min' => 'Password must be at least 8 characters long.',
         ]);
     }
 
     protected function validateDoctor(Request $request, $id = null)
     {
         return $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:doctors,email' . ($id ? ',' . $id : ''),
-            'password' => ($id ? 'nullable' : 'required') . '|string|min:6',
-            'phone' => 'required|digits:10',
-            'medical_registration_no' => 'nullable|string|max:100',
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:doctors,email' . ($id ? ',' . $id : ''),
+            'password' => ($id ? 'nullable' : 'required') . '|string|min:8',
+            'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
+            'medical_registration_no' => ['nullable', 'string', 'min:5', 'max:25', 'regex:/^[A-Za-z]{2,10}[-\/][A-Za-z0-9\/-]*[0-9]+[A-Za-z0-9\/-]*$/'],
             'specialization_category' => 'required|string|max:255',
             'specialization_subcategory' => 'nullable|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'address' => 'nullable|string',
             'qualification' => 'nullable|string',
-            'experience' => 'nullable|integer',
+            'experience' => 'nullable|integer|min:0|max:70',
             'consultation_fee' => 'nullable|integer|min:0',
             'available_from' => 'nullable|string',
             'available_to' => 'nullable|string',
@@ -232,6 +236,9 @@ class HospitalController extends Controller
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
             'google_meet_link' => 'nullable|url|max:500',
+        ], [
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
+            'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020).',
         ]);
     }
 

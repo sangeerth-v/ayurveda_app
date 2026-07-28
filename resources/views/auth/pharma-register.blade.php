@@ -208,28 +208,28 @@
                         <!-- Company Name -->
                         <div class="col-md-6">
                             <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                            <input type="text" name="company_name" class="form-control @error('company_name') is-invalid @enderror" placeholder="Herbal Pharma Pvt Ltd" value="{{ old('company_name') }}" required>
+                            <input type="text" name="company_name" class="form-control @error('company_name') is-invalid @enderror" placeholder="Herbal Pharma Pvt Ltd" value="{{ old('company_name') }}" minlength="3" required>
                             @error('company_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Drug License Number -->
                         <div class="col-md-6">
                             <label class="form-label">Drug License Number <span class="text-danger">*</span></label>
-                            <input type="text" name="drug_license_no" class="form-control @error('drug_license_no') is-invalid @enderror" placeholder="e.g. DL-20B/1234/2026" value="{{ old('drug_license_no') }}" required>
+                            <input type="text" name="drug_license_no" class="form-control @error('drug_license_no') is-invalid @enderror" placeholder="e.g. DL-20B/1234/2026" value="{{ old('drug_license_no') }}" maxlength="25" minlength="5" pattern="[A-Z0-9]{2,10}[-\/][A-Z0-9\/-]*[0-9]+[A-Z0-9\/-]*" title="Format: DL-20B/1234/2026" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9\/-]/g, '');" required>
                             @error('drug_license_no') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- GST Number -->
                         <div class="col-md-6">
-                            <label class="form-label">GST Number <span class="text-danger">*</span></label>
-                            <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" placeholder="29AAAAA0000A1Z5" value="{{ old('gst_number') }}" required>
+                            <label class="form-label">GST Number (15 Chars) <span class="text-danger">*</span></label>
+                            <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" placeholder="29AAAAA0000A1Z5" value="{{ old('gst_number') }}" pattern="[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}[Zz][0-9A-Za-z]{1}" maxlength="15" minlength="15" title="15-character GSTIN format e.g. 29AAAAA0000A1Z5" oninput="this.value = this.value.toUpperCase();" required>
                             @error('gst_number') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Contact Person -->
                         <div class="col-md-6">
                             <label class="form-label">Contact Person <span class="text-danger">*</span></label>
-                            <input type="text" name="contact_person" class="form-control @error('contact_person') is-invalid @enderror" placeholder="Representative Name" value="{{ old('contact_person') }}" required>
+                            <input type="text" name="contact_person" class="form-control @error('contact_person') is-invalid @enderror" placeholder="Representative Name" value="{{ old('contact_person') }}" minlength="3" required>
                             @error('contact_person') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
@@ -242,16 +242,16 @@
 
                         <!-- Phone Number -->
                         <div class="col-md-6">
-                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="9876543210" value="{{ old('phone') }}" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                            <label class="form-label">Phone Number (10 Digits) <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="9876543210" value="{{ old('phone') }}" pattern="[6-9][0-9]{9}" maxlength="10" minlength="10" title="Valid 10-digit mobile number starting with 6-9" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             @error('phone') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Password -->
                         <div class="col-12">
-                            <label class="form-label">Portal Password <span class="text-danger">*</span></label>
+                            <label class="form-label">Portal Password (min 8 chars) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="password" name="password" id="pharmaPassword" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
+                                <input type="password" name="password" id="pharmaPassword" class="form-control @error('password') is-invalid @enderror" placeholder="••••••••" minlength="8" required>
                                 <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('pharmaPassword', this)"><i class="fas fa-eye"></i></button>
                             </div>
                             @error('password') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
@@ -260,7 +260,7 @@
                         <!-- Address -->
                         <div class="col-12">
                             <label class="form-label">Registered Office Address <span class="text-danger">*</span></label>
-                            <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2" placeholder="Full registered company address" required>{{ old('address') }}</textarea>
+                            <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="2" placeholder="Full registered company address" minlength="10" required>{{ old('address') }}</textarea>
                             @error('address') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
@@ -300,6 +300,263 @@ function togglePassword(inputId, button) {
         icon.classList.add('fa-eye');
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+
+    forms.forEach(form => {
+        /* ── helpers ── */
+        function getFeedback(input) {
+            let c = input.closest('.input-group') || input.closest('.form-floating') || input.parentNode;
+            let fb = (c.parentNode || c).querySelector('.live-feedback');
+            if (!fb) {
+                fb = document.createElement('div');
+                fb.className = 'live-feedback small mt-1 fw-semibold ps-1';
+                (c.parentNode || c).appendChild(fb);
+            }
+            return fb;
+        }
+        function ok(input) {
+            input.classList.remove('is-invalid'); input.classList.add('is-valid');
+            const fb = getFeedback(input); fb.textContent = '';
+            fb.className = 'live-feedback small mt-1 fw-semibold ps-1';
+        }
+        function err(input, msg) {
+            input.classList.remove('is-valid'); input.classList.add('is-invalid');
+            const fb = getFeedback(input); fb.textContent = '⚠ ' + msg;
+            fb.className = 'live-feedback text-danger small mt-1 fw-semibold ps-1';
+        }
+        function hint(input, msg) {
+            input.classList.remove('is-invalid', 'is-valid');
+            const fb = getFeedback(input); fb.textContent = '💡 ' + msg;
+            fb.className = 'live-feedback text-muted small mt-1 ps-1';
+        }
+        function clear(input) {
+            input.classList.remove('is-invalid', 'is-valid');
+            getFeedback(input).textContent = '';
+        }
+
+        /* ══ EMAIL ══ */
+        form.querySelectorAll('input[type="email"], input[name="email"]').forEach(inp => {
+            inp.addEventListener('blur', () => {
+                const v = inp.value.trim();
+                if (!v && inp.required) { err(inp, 'Email address is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
+                    err(inp, 'Enter a valid email — e.g. company@domain.com');
+                } else { ok(inp); }
+            });
+        });
+
+        /* ══ PHONE — digits only, first digit 6-9, max 10 ══ */
+        form.querySelectorAll('input[name="phone"]').forEach(inp => {
+            inp.setAttribute('maxlength', '10');
+            inp.setAttribute('inputmode', 'numeric');
+            inp.addEventListener('input', function() {
+                let cur = this.value.replace(/\D/g, '');
+                if (cur.length > 0 && !/^[6-9]/.test(cur)) cur = cur.slice(1);
+                this.value = cur.slice(0, 10);
+                const len = this.value.length;
+                if (len === 0) { clear(inp); return; }
+                if (len < 10) { hint(inp, `${len}/10 digits — need ${10 - len} more`); }
+                else { ok(inp); }
+            });
+            inp.addEventListener('blur', () => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, '10-digit mobile number is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[6-9]\d{9}$/.test(v)) { err(inp, 'Must be 10 digits starting with 6, 7, 8, or 9.'); }
+                else { ok(inp); }
+            });
+        });
+
+        /* ══ GSTIN — strict positional masking ══
+           Format: 2-digits | 5-letters | 4-digits | 1-letter | 1-alphanum | Z | 1-alphanum = 15 chars
+           e.g. 29AAAAA0000A1Z5  32ABCDE1234F1Z9 */
+        form.querySelectorAll('input[name="gst_number"]').forEach(inp => {
+            inp.setAttribute('maxlength', '15');
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('spellcheck', 'false');
+
+            inp.addEventListener('input', function() {
+                let raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                // Positional enforcement
+                let out = '';
+                for (let i = 0; i < raw.length && i < 15; i++) {
+                    const ch = raw[i];
+                    if (i < 2) {
+                        // positions 1-2: digits only
+                        if (/[0-9]/.test(ch)) out += ch; else break;
+                    } else if (i < 7) {
+                        // positions 3-7: letters only
+                        if (/[A-Z]/.test(ch)) out += ch; else break;
+                    } else if (i < 11) {
+                        // positions 8-11: digits only
+                        if (/[0-9]/.test(ch)) out += ch; else break;
+                    } else if (i === 11) {
+                        // position 12: letter only
+                        if (/[A-Z]/.test(ch)) out += ch; else break;
+                    } else if (i === 12) {
+                        // position 13: alphanumeric
+                        if (/[A-Z0-9]/.test(ch)) out += ch; else break;
+                    } else if (i === 13) {
+                        // position 14: must be Z
+                        if (ch === 'Z') out += ch; else break;
+                    } else if (i === 14) {
+                        // position 15: alphanumeric
+                        if (/[A-Z0-9]/.test(ch)) out += ch;
+                    }
+                }
+                this.value = out;
+                const len = out.length;
+                if (len === 0) { clear(inp); return; }
+
+                const gstFull = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+                if (len === 15 && gstFull.test(out)) { ok(inp); }
+                else {
+                    const segments = [
+                        `Pos 1-2: State code (${out.slice(0,2)||'??'})`,
+                        `3-7: PAN letters (${out.slice(2,7)||'??'})`,
+                        `8-11: PAN digits (${out.slice(7,11)||'??'})`,
+                        `12: Entity (${out[11]||'?'})`,
+                        `13: Reg (${out[12]||'?'})`,
+                        `14: Z (${out[13]||'?'})`,
+                        `15: Check (${out[14]||'?'})`
+                    ];
+                    hint(inp, `${len}/15 — ${segments[Math.min(Math.floor(len/2), 6)]}`);
+                }
+            });
+
+            inp.addEventListener('blur', () => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, 'GST number is required (15 characters).'); return; }
+                if (!v) { clear(inp); return; }
+                const gstFull = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+                if (v.length !== 15 || !gstFull.test(v)) {
+                    err(inp, `Invalid GSTIN. Must be 15 chars: e.g. 29AAAAA0000A1Z5 (got ${v.length}/15)`);
+                } else { ok(inp); }
+            });
+        });
+
+        /* ══ DRUG LICENSE NUMBER — strict positional masking ══
+           Indian Retail: DL-20B/12345/2025  (Form 20-B retail)
+           Pos 0-1: state letters (DL/KL/MH)  auto '-'
+           Pos 2-3: category digits (20/21)
+           Pos 4:   category letter (B/G)     auto '/'
+           Pos 5-9: license digits (5 digits) auto '/'
+           Pos 10-13: year digits (4 digits)  */
+        form.querySelectorAll('input[name="drug_license_no"]').forEach(inp => {
+            inp.setAttribute('maxlength', '18');
+            inp.setAttribute('autocomplete', 'off');
+            inp.setAttribute('spellcheck', 'false');
+            inp.setAttribute('placeholder', 'e.g. DL-20B/12345/2025');
+
+            function maskDrugLic(raw) {
+                let out = ''; let ri = 0;
+                // [0-1] State: 2 letters
+                let stLen = 0;
+                while (ri < raw.length && stLen < 2) {
+                    if (/[A-Z]/.test(raw[ri])) { out += raw[ri++]; stLen++; } else break;
+                }
+                if (stLen < 2) return out;
+                out += '-';
+                // [2-3] Category digits: 2 digits (20 or 21)
+                let cdLen = 0;
+                while (ri < raw.length && cdLen < 2) {
+                    if (/[0-9]/.test(raw[ri])) { out += raw[ri++]; cdLen++; } else break;
+                }
+                if (cdLen < 2) return out;
+                // [4] Category letter: B or G
+                if (ri >= raw.length) return out;
+                if (/[A-Z]/.test(raw[ri])) { out += raw[ri++]; } else return out;
+                out += '/';
+                // [5-9] License number digits: up to 5
+                let licLen = 0;
+                while (ri < raw.length && licLen < 5) {
+                    if (/[0-9]/.test(raw[ri])) { out += raw[ri++]; licLen++; } else break;
+                }
+                if (licLen === 0 || ri >= raw.length) return out;
+                out += '/';
+                // [10-13] Year: 4 digits
+                let yrLen = 0;
+                while (ri < raw.length && yrLen < 4) {
+                    if (/[0-9]/.test(raw[ri])) { out += raw[ri++]; yrLen++; } else break;
+                }
+                return out;
+            }
+
+            inp.addEventListener('input', function() {
+                const raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                const result = maskDrugLic(raw);
+                this.value = result;
+                if (raw.length === 0) { clear(inp); return; }
+                const full = /^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/;
+                if (full.test(result)) { ok(inp); return; }
+                const sl = raw.length;
+                if (sl < 2)       hint(inp, `State: type 2-letter state code (DL, KL, MH, TN)`);
+                else if (sl < 4)  hint(inp, `Category: type 20 (retail) or 21 (wholesale)`);
+                else if (sl < 5)  hint(inp, `Form type: B = retail (20-B), G = wholesale (21-G)`);
+                else if (sl < 10) hint(inp, `License number: ${sl-5}/5 digits`);
+                else              hint(inp, `Year: ${raw.slice(10)} (${raw.length-10}/4 digits)`);
+            });
+
+            inp.addEventListener('blur', () => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, 'Drug License Number is required.'); return; }
+                if (!v) { clear(inp); return; }
+                if (!/^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/.test(v)) {
+                    err(inp, 'Invalid — e.g. DL-20B/12345/2025  KL-21G/98765/2024  MH-20B/5678/2025');
+                } else { ok(inp); }
+            });
+        });
+
+
+        /* ══ FORM SUBMIT GUARD ══ */
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+
+            form.querySelectorAll('input[type="email"], input[name="email"]').forEach(inp => {
+                const v = inp.value.trim();
+                if (!v && inp.required) { err(inp, 'Email address is required.'); valid = false; }
+                else if (v && !/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
+                    err(inp, 'Enter a valid email — e.g. company@domain.com'); valid = false;
+                }
+            });
+
+            form.querySelectorAll('input[name="phone"]').forEach(inp => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, '10-digit mobile number is required.'); valid = false; }
+                else if (v && !/^[6-9]\d{9}$/.test(v)) {
+                    err(inp, 'Must be 10 digits starting with 6, 7, 8, or 9.'); valid = false;
+                }
+            });
+
+            form.querySelectorAll('input[name="gst_number"]').forEach(inp => {
+                const v = inp.value;
+                const gstFull = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+                if (!v && inp.required) { err(inp, 'GST number is required.'); valid = false; }
+                else if (v && !gstFull.test(v)) {
+                    err(inp, 'Invalid GSTIN — e.g. 29AAAAA0000A1Z5 (must be exactly 15 chars)'); valid = false;
+                }
+            });
+
+            form.querySelectorAll('input[name="drug_license_no"]').forEach(inp => {
+                const v = inp.value;
+                if (!v && inp.required) { err(inp, 'Drug License Number is required.'); valid = false; }
+                else if (v && !/^[A-Z]{2}-[0-9]{2}[A-Z]\/[0-9]{1,5}\/[0-9]{4}$/.test(v)) {
+                    err(inp, 'Invalid — e.g. DL-20B/12345/2025  KL-21G/98765/2024'); valid = false;
+                }
+            });
+
+
+            if (!valid) {
+                e.preventDefault();
+                const first = form.querySelector('.is-invalid');
+                if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>
