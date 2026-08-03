@@ -222,7 +222,7 @@
                         <!-- GST Number -->
                         <div class="col-md-6">
                             <label class="form-label">GST Number (15 Chars) <span class="text-danger">*</span></label>
-                            <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" placeholder="29AAAAA0000A1Z5" value="{{ old('gst_number') }}" pattern="[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}[Zz][0-9A-Za-z]{1}" maxlength="15" minlength="15" title="15-character GSTIN format e.g. 29AAAAA0000A1Z5" oninput="this.value = this.value.toUpperCase();" required>
+                            <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" placeholder="29AAAAA0000A1Z5" value="{{ old('gst_number') }}" pattern="[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}[Zz][0-9A-Za-z]{1}" maxlength="15" minlength="15" title="15-character GSTIN format e.g. 29AAAAA0000A1Z5" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);" required>
                             @error('gst_number') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
@@ -382,61 +382,29 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        /* ══ GSTIN — strict positional masking ══
+        /* ══ GSTIN — accept the full 15-character GSTIN format ══
            Format: 2-digits | 5-letters | 4-digits | 1-letter | 1-alphanum | Z | 1-alphanum = 15 chars
            e.g. 29AAAAA0000A1Z5  32ABCDE1234F1Z9 */
         form.querySelectorAll('input[name="gst_number"]').forEach(inp => {
             inp.setAttribute('maxlength', '15');
             inp.setAttribute('autocomplete', 'off');
             inp.setAttribute('spellcheck', 'false');
+            inp.setAttribute('inputmode', 'text');
 
             inp.addEventListener('input', function() {
-                let raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                // Positional enforcement
-                let out = '';
-                for (let i = 0; i < raw.length && i < 15; i++) {
-                    const ch = raw[i];
-                    if (i < 2) {
-                        // positions 1-2: digits only
-                        if (/[0-9]/.test(ch)) out += ch; else break;
-                    } else if (i < 7) {
-                        // positions 3-7: letters only
-                        if (/[A-Z]/.test(ch)) out += ch; else break;
-                    } else if (i < 11) {
-                        // positions 8-11: digits only
-                        if (/[0-9]/.test(ch)) out += ch; else break;
-                    } else if (i === 11) {
-                        // position 12: letter only
-                        if (/[A-Z]/.test(ch)) out += ch; else break;
-                    } else if (i === 12) {
-                        // position 13: alphanumeric
-                        if (/[A-Z0-9]/.test(ch)) out += ch; else break;
-                    } else if (i === 13) {
-                        // position 14: must be Z
-                        if (ch === 'Z') out += ch; else break;
-                    } else if (i === 14) {
-                        // position 15: alphanumeric
-                        if (/[A-Z0-9]/.test(ch)) out += ch;
-                    }
-                }
-                this.value = out;
-                const len = out.length;
+                const raw = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+                this.value = raw;
+                const len = raw.length;
+
                 if (len === 0) { clear(inp); return; }
+                if (len < 15) {
+                    hint(inp, `${len}/15 chars — continue typing your GSTIN`);
+                    return;
+                }
 
                 const gstFull = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-                if (len === 15 && gstFull.test(out)) { ok(inp); }
-                else {
-                    const segments = [
-                        `Pos 1-2: State code (${out.slice(0,2)||'??'})`,
-                        `3-7: PAN letters (${out.slice(2,7)||'??'})`,
-                        `8-11: PAN digits (${out.slice(7,11)||'??'})`,
-                        `12: Entity (${out[11]||'?'})`,
-                        `13: Reg (${out[12]||'?'})`,
-                        `14: Z (${out[13]||'?'})`,
-                        `15: Check (${out[14]||'?'})`
-                    ];
-                    hint(inp, `${len}/15 — ${segments[Math.min(Math.floor(len/2), 6)]}`);
-                }
+                if (gstFull.test(raw)) { ok(inp); }
+                else { hint(inp, 'Type a valid GSTIN like 29AAAAA0000A1Z5'); }
             });
 
             inp.addEventListener('blur', () => {
