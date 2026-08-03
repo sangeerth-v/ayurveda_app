@@ -25,6 +25,16 @@
             --shadow-lg: 0 20px 40px rgba(26, 77, 46, 0.12);
         }
 
+        /* Hide browser-native password reveal eye icons */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--beige-bg);
@@ -385,8 +395,8 @@
                         <!-- Consultation Mode -->
                         <div class="col-md-6">
                             <label class="form-label">Consultation Mode <span class="text-danger">*</span></label>
-                            <select name="consultation_type" id="consultation_type" class="form-select @error('consultation_type') is-invalid @enderror" required>
-                                <option value="Both" {{ old('consultation_type') == 'Both' ? 'selected' : '' }}>Both (In-Person & Online Video)</option>
+                            <select name="consultation_type" id="consultation_type" class="form-select @error('consultation_type') is-invalid @enderror" onchange="toggleConsultationTimes()" required>
+                                <option value="Both" {{ old('consultation_type', 'Both') == 'Both' ? 'selected' : '' }}>Both (In-Person & Online Video)</option>
                                 <option value="Offline" {{ old('consultation_type') == 'Offline' ? 'selected' : '' }}>In-Person Clinic Only</option>
                                 <option value="Online" {{ old('consultation_type') == 'Online' ? 'selected' : '' }}>Online Video Consultation Only</option>
                             </select>
@@ -394,30 +404,30 @@
                         </div>
 
                         <!-- In-Person Working Hours (15-min Slot Generation) -->
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="offline_time_wrapper">
                             <label class="form-label">In-Person Working Hours (15-Min Slots) <span class="text-danger">*</span></label>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <input type="time" name="available_from" class="form-control" value="{{ old('available_from', '09:00') }}" required>
+                                    <input type="time" name="available_from" id="available_from" class="form-control" value="{{ old('available_from', '09:00') }}">
                                     <div class="form-text small">Start Time</div>
                                 </div>
                                 <div class="col-6">
-                                    <input type="time" name="available_to" class="form-control" value="{{ old('available_to', '13:00') }}" required>
+                                    <input type="time" name="available_to" id="available_to" class="form-control" value="{{ old('available_to', '13:00') }}">
                                     <div class="form-text small">End Time</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Online Working Hours (15-min Slot Generation) -->
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="online_time_wrapper">
                             <label class="form-label">Online Video Working Hours (15-Min Slots)</label>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <input type="time" name="online_available_from" class="form-control" value="{{ old('online_available_from', '16:00') }}">
+                                    <input type="time" name="online_available_from" id="online_available_from" class="form-control" value="{{ old('online_available_from', '16:00') }}">
                                     <div class="form-text small">Start Time</div>
                                 </div>
                                 <div class="col-6">
-                                    <input type="time" name="online_available_to" class="form-control" value="{{ old('online_available_to', '20:00') }}">
+                                    <input type="time" name="online_available_to" id="online_available_to" class="form-control" value="{{ old('online_available_to', '20:00') }}">
                                     <div class="form-text small">End Time</div>
                                 </div>
                             </div>
@@ -510,7 +520,29 @@ document.getElementById('specialization_category').addEventListener('change', fu
     }
 });
 
+function toggleConsultationTimes() {
+    const typeSelect = document.getElementById('consultation_type');
+    const offlineWrap = document.getElementById('offline_time_wrapper');
+    const onlineWrap = document.getElementById('online_time_wrapper');
+    
+    if (!typeSelect || !offlineWrap || !onlineWrap) return;
+    
+    const val = typeSelect.value;
+    
+    if (val === 'Offline') {
+        offlineWrap.style.display = 'block';
+        onlineWrap.style.display = 'none';
+    } else if (val === 'Online') {
+        offlineWrap.style.display = 'none';
+        onlineWrap.style.display = 'block';
+    } else { // 'Both'
+        offlineWrap.style.display = 'block';
+        onlineWrap.style.display = 'block';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    toggleConsultationTimes();
     const forms = document.querySelectorAll('form');
 
     forms.forEach(form => {

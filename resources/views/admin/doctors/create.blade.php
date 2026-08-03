@@ -173,23 +173,26 @@
                                     <div class="form-text">State/National council registration certificate (PDF or Image, max 5MB).</div>
                                     @error('council_certificate') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
+                                <div id="offlineFields" class="col-12">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Offline Available From</label>
+                                            <select name="available_from" class="form-select @error('available_from') is-invalid @enderror">
+                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
+                                                    <option value="{{ $time }}">{{ date('h:i A', strtotime($time)) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Available From</label>
-                                    <select name="available_from" class="form-select @error('available_from') is-invalid @enderror">
-                                        @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                            <option value="{{ $time }}">{{ date('h:i A', strtotime($time)) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Available To</label>
-                                    <select name="available_to" class="form-select @error('available_to') is-invalid @enderror">
-                                        @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                            <option value="{{ $time }}" {{ $time == '17:00' ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                        @endforeach
-                                    </select>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Offline Available To</label>
+                                            <select name="available_to" class="form-select @error('available_to') is-invalid @enderror">
+                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
+                                                    <option value="{{ $time }}" {{ $time == '17:00' ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {{-- Consultation Type --}}
@@ -239,6 +242,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
@@ -269,15 +274,25 @@ function previewImage(input, previewId) {
 
 function toggleOnlineFields() {
     const selected = document.querySelector('input[name="consultation_type"]:checked');
+    const offlineFields = document.getElementById('offlineFields');
     const onlineFields = document.getElementById('onlineFields');
-    if (selected && (selected.value === 'Online' || selected.value === 'Both')) {
-        onlineFields.style.display = 'block';
-    } else {
+    
+    if (!selected || !offlineFields || !onlineFields) return;
+    
+    const val = selected.value;
+    if (val === 'Offline') {
+        offlineFields.style.display = 'block';
         onlineFields.style.display = 'none';
+    } else if (val === 'Online') {
+        offlineFields.style.display = 'none';
+        onlineFields.style.display = 'block';
+    } else { // 'Both'
+        offlineFields.style.display = 'block';
+        onlineFields.style.display = 'block';
     }
 }
 // Initialize on load
-toggleOnlineFields();
+document.addEventListener('DOMContentLoaded', toggleOnlineFields);
 
 document.getElementById('specialization_category').addEventListener('change', function() {
     const categoryId = this.value;
