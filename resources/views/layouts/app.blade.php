@@ -30,6 +30,16 @@
             --radius-lg: 24px;
         }
 
+        /* Hide browser-native password reveal eye icons (Edge / IE / Safari / Chrome) */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--light-bg);

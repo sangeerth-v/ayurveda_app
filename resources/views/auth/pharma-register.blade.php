@@ -25,6 +25,16 @@
             --shadow-lg: 0 20px 40px rgba(26, 77, 46, 0.12);
         }
 
+        /* Hide browser-native password reveal eye icons */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--beige-bg);

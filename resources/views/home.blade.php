@@ -185,60 +185,100 @@
         </div>
     </section>
 
-    <!-- STATS OVERVIEW SECTION -->
-    <section class="bg-white py-5 border-top border-bottom">
-        <div class="container">
-            <div class="row align-items-center gx-5">
-                <div class="col-lg-5 mb-4 mb-lg-0">
-                    <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-2 mb-2 fw-semibold">Our Impact</span>
-                    <h2 class="fw-bold mb-3" style="color: var(--primary-green);">Trusted Network for Ayurvedic Health</h2>
-                    <p class="text-muted mb-4">Connecting patients, certified doctors, accredited hospitals, and pharmaceutical partners across India.</p>
+    <!-- PILLARS OF AUTHENTIC CARE & TRUST SECTION -->
+    <section class="py-5 my-4" style="background: linear-gradient(135deg, #f4f9f5 0%, #eef6f0 100%); position: relative; overflow: hidden;">
+        <div class="container py-4 position-relative" style="z-index: 2;">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-8">
+                    <span class="badge rounded-pill px-3 py-2 mb-3 fw-bold text-uppercase" style="background: rgba(26, 77, 46, 0.1); color: var(--primary-green); letter-spacing: 1px; font-size: 0.78rem;">
+                        <i class="fas fa-shield-alt me-1"></i> Trust & Authenticity
+                    </span>
+                    <h2 class="display-6 fw-bold mb-3" style="color: var(--primary-dark); font-family: 'Playfair Display', serif;">
+                        Why Millions Trust Our Ayurvedic Ecosystem
+                    </h2>
+                    <p class="text-muted lead mb-0" style="font-size: 1.05rem;">
+                        A unified healthcare platform bringing together verified doctors, accredited Panchakarma centers, and government-approved pharmacies across Kerala.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <a href="{{ route('doctors.index') }}" class="btn btn-success px-4 py-3 rounded-pill fw-bold shadow-sm" style="background-color: var(--primary-green); border: none;">
+                        <i class="fas fa-calendar-check me-2"></i> Book Consultation Now
+                    </a>
+                </div>
+            </div>
 
-                    <div class="d-flex flex-column gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fas fa-check-circle text-success fa-lg"></i>
-                            <span class="fw-medium text-dark">SMS & Mobile Notifications on Appointments</span>
+            <!-- 4 Modern Feature Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white hover-lift transition-all position-relative overflow-hidden">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 mb-3 shadow-sm" style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%); color: #ffffff;">
+                            <i class="fas fa-user-md fa-xl"></i>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fas fa-check-circle text-success fa-lg"></i>
-                            <span class="fw-medium text-dark">Google Meet Online Video Consultations</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fas fa-check-circle text-success fa-lg"></i>
-                            <span class="fw-medium text-dark">Admin Verified Drug Licenses & Certificates</span>
-                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">Verified Practitioners</h5>
+                        <p class="text-muted small mb-0 line-height-base">
+                            BAMS & MD practitioners verified with official Medical Council registration numbers (KMC/TNMC).
+                        </p>
                     </div>
                 </div>
 
-                <div class="col-lg-7">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="p-4 rounded-4 bg-light text-center border">
-                                <h2 class="display-6 fw-bold text-success mb-1">150+</h2>
-                                <p class="text-muted small mb-0 fw-medium">Verified Doctors</p>
-                            </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white hover-lift transition-all position-relative overflow-hidden">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 mb-3 shadow-sm" style="width: 56px; height: 56px; background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); color: #ffffff;">
+                            <i class="fas fa-video fa-xl"></i>
                         </div>
-                        <div class="col-6">
-                            <div class="p-4 rounded-4 bg-light text-center border">
-                                <h2 class="display-6 fw-bold text-success mb-1">145+</h2>
-                                <p class="text-muted small mb-0 fw-medium">Herbal Products</p>
-                            </div>
+                        <h5 class="fw-bold mb-2 text-dark">Google Meet Video Care</h5>
+                        <p class="text-muted small mb-0 line-height-base">
+                            Seamless online video consultations with instant Google Meet link generation & SMS notifications.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white hover-lift transition-all position-relative overflow-hidden">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 mb-3 shadow-sm" style="width: 56px; height: 56px; background: linear-gradient(135deg, #c5a059 0%, #b08942 100%); color: #ffffff;">
+                            <i class="fas fa-file-contract fa-xl"></i>
                         </div>
-                        <div class="col-6">
-                            <div class="p-4 rounded-4 bg-light text-center border">
-                                <h2 class="display-6 fw-bold text-success mb-1">14</h2>
-                                <p class="text-muted small mb-0 fw-medium">Districts Covered</p>
-                            </div>
+                        <h5 class="fw-bold mb-2 text-dark">Licensed Pharmacies</h5>
+                        <p class="text-muted small mb-0 line-height-base">
+                            Authentic herbal medicines sourced from partners with verified Drug Licenses & 15-digit GSTIN.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white hover-lift transition-all position-relative overflow-hidden">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 mb-3 shadow-sm" style="width: 56px; height: 56px; background: linear-gradient(135deg, #40916c 0%, #52b788 100%); color: #ffffff;">
+                            <i class="fas fa-map-marked-alt fa-xl"></i>
                         </div>
-                        <div class="col-6">
-                            <div class="p-4 rounded-4 bg-light text-center border">
-                                <h2 class="display-6 fw-bold text-success mb-1">98%</h2>
-                                <p class="text-muted small mb-0 fw-medium">Positive Feedback</p>
-                            </div>
-                        </div>
+                        <h5 class="fw-bold mb-2 text-dark">14 Kerala Districts</h5>
+                        <p class="text-muted small mb-0 line-height-base">
+                            Complete regional coverage allowing patients to discover doctors & hospitals in their exact district.
+                        </p>
                     </div>
                 </div>
             </div>
+
+            <!-- Integrated Impact Counter Bar -->
+            <!-- <div class="p-4 rounded-4 shadow-sm bg-white border border-light">
+                <div class="row text-center g-3 align-items-center">
+                    <div class="col-6 col-md-3 border-end border-light">
+                        <h3 class="fw-bold text-success mb-0 display-6">150+</h3>
+                        <div class="text-muted small fw-medium">Certified Doctors</div>
+                    </div>
+                    <div class="col-6 col-md-3 border-end-md border-light">
+                        <h3 class="fw-bold text-success mb-0 display-6">145+</h3>
+                        <div class="text-muted small fw-medium">Authentic Products</div>
+                    </div>
+                    <div class="col-6 col-md-3 border-end border-light">
+                        <h3 class="fw-bold text-success mb-0 display-6">14</h3>
+                        <div class="text-muted small fw-medium">Districts Covered</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <h3 class="fw-bold text-success mb-0 display-6">99%</h3>
+                        <div class="text-muted small fw-medium">Patient Satisfaction</div>
+                    </div>
+                </div>
+            </div> -->
         </div>
     </section>
 

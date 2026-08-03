@@ -148,7 +148,7 @@
                                     @error('district_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
 
-                                <div class="col-md-6">
+                                <div id="offlineProfileFields" class="col-md-6" style="{{ in_array($doctor->consultation_type ?? 'Offline', ['Offline', 'Both']) ? '' : 'display:none;' }}">
                                     {{-- Time parsing --}}
                                     @php 
                                         $times = explode(' to ', $doctor->available_time ?? ''); 
@@ -157,7 +157,7 @@
                                     @endphp
                                     <div class="row">
                                         <div class="col-6">
-                                            <label class="form-label fw-bold">Available From</label>
+                                            <label class="form-label fw-bold">Offline Available From</label>
                                             <select name="available_from" class="form-select">
                                                 @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
                                                     <option value="{{ $time }}" {{ $from == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
@@ -165,7 +165,7 @@
                                             </select>
                                         </div>
                                         <div class="col-6">
-                                            <label class="form-label fw-bold">Available To</label>
+                                            <label class="form-label fw-bold">Offline Available To</label>
                                             <select name="available_to" class="form-select">
                                                 @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
                                                     <option value="{{ $time }}" {{ $to == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
@@ -258,13 +258,24 @@ function previewImage(input, previewId) {
 
 function toggleOnlineProfileFields() {
     const selected = document.querySelector('input[name="consultation_type"]:checked');
-    const fields = document.getElementById('onlineProfileFields');
-    if (selected && (selected.value === 'Online' || selected.value === 'Both')) {
-        fields.style.display = 'block';
-    } else {
-        fields.style.display = 'none';
+    const offlineFields = document.getElementById('offlineProfileFields');
+    const onlineFields = document.getElementById('onlineProfileFields');
+    
+    if (!selected || !offlineFields || !onlineFields) return;
+    
+    const val = selected.value;
+    if (val === 'Offline') {
+        offlineFields.style.display = 'block';
+        onlineFields.style.display = 'none';
+    } else if (val === 'Online') {
+        offlineFields.style.display = 'none';
+        onlineFields.style.display = 'block';
+    } else { // 'Both'
+        offlineFields.style.display = 'block';
+        onlineFields.style.display = 'block';
     }
 }
+document.addEventListener('DOMContentLoaded', toggleOnlineProfileFields);
 </script>
 
 <style>
