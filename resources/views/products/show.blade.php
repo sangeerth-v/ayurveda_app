@@ -31,7 +31,14 @@
 
                     <div class="col-md-6">
                         <div class="card-body p-4 p-md-5">
-                            <span class="text-uppercase small fw-bold text-success tracking-wide">{{ $product->category ?? 'Ayurvedic Product' }}</span>
+                            <div class="mb-2">
+                                <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-3 py-2 rounded-pill text-uppercase font-monospace" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-tag me-1"></i> {{ $product->category ?? 'Ayurvedic Product' }}
+                                    @if(!empty($product->subcategory))
+                                        <span class="mx-1">•</span> {{ $product->subcategory }}
+                                    @endif
+                                </span>
+                            </div>
                             <h2 class="fw-bold my-2" style="color: #1a4d2e;">{{ $product->name }}</h2>
                             
                             <div class="d-flex align-items-center gap-2 mb-3">
