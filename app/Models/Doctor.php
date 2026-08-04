@@ -22,6 +22,7 @@ class Doctor extends Authenticatable
         'specialization_category',
         'specialization_subcategory',
         'district_id',
+        'current_location',
         'address',
         'qualification',
         'experience',

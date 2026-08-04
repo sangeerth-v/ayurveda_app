@@ -11,6 +11,7 @@ class Product extends Model
 
     protected $fillable = [
         'pharma_company_id',
+        'doctor_id',
         'name',
         'category',
         'subcategory',
@@ -24,5 +25,10 @@ class Product extends Model
     public function pharmaCompany()
     {
         return $this->belongsTo(PharmaCompany::class);
+    }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
     }
 }

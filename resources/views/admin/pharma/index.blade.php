@@ -123,7 +123,7 @@
                 Showing {{ $pharmas->firstItem() }} to {{ $pharmas->lastItem() }} of {{ $pharmas->total() }} entries
             </div>
             <div>
-                {{ $pharmas->links() }}
+                {{ $pharmas->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

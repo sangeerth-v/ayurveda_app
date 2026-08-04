@@ -17,7 +17,7 @@
             --primary-green-dark: #06231b;  /* Dark Forest Accent */
             --secondary-green: #6d9773;     /* Healing Sage Mint */
             --accent-gold: #ffba08;         /* Warm Honey Amber Accent */
-            --light-bg: #f4f7f4;            /* Refreshing Soft Mint Cream */
+            --light-bg: #e2ebe4;            /* Aesthetic Minimalist Green */
             --card-bg: #ffffff;
             --text-dark: #072a21;
             --text-muted: #577568;

@@ -400,6 +400,20 @@
                                     <a href="{{ route('products.show', $product->id) }}" class="ap-product-title">
                                         {{ $product->name }}
                                     </a>
+
+                                    @if($product->doctor)
+                                        <div class="mb-2">
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1 small" style="font-size: 0.75rem;" title="Formulated by Dr. {{ $product->doctor->name }}">
+                                                <i class="fas fa-user-md me-1"></i> Dr. {{ $product->doctor->name }}
+                                            </span>
+                                        </div>
+                                    @elseif($product->pharmaCompany)
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-secondary border rounded-pill px-2 py-1 small" style="font-size: 0.75rem;">
+                                                <i class="fas fa-building me-1"></i> {{ $product->pharmaCompany->company_name }}
+                                            </span>
+                                        </div>
+                                    @endif
                                     
                                     <!-- Rating -->
                                     <div class="ap-rating d-flex align-items-center gap-1">

@@ -91,7 +91,7 @@
         </div>
     </div>
     @if($hospitals->hasPages())
-    <div class="card-footer bg-white">{{ $hospitals->links() }}</div>
+    <div class="card-footer bg-white py-3">{{ $hospitals->links('pagination::bootstrap-5') }}</div>
     @endif
 </div>
 @endsection

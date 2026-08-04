@@ -35,10 +35,9 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="subcategory" class="form-label fw-bold text-dark">{{ __('Subcategory') }}</label>
-                                <select id="subcategory" name="subcategory" class="form-select form-select-lg border-success-subtle">
-                                    <option value="">Select Subcategory</option>
-                                </select>
+                                <label for="subcategory" class="form-label fw-bold text-dark">{{ __('Subcategory') }} <span class="text-danger">*</span></label>
+                                <input id="subcategory" type="text" class="form-control form-control-lg border-success-subtle @error('subcategory') is-invalid @enderror" name="subcategory" value="{{ old('subcategory', $product->subcategory) }}" placeholder="Subcategory Name" required>
+                                @error('subcategory') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-12">
@@ -89,33 +88,4 @@
         </div>
     </div>
 </div>
-@section('scripts')
-<script>
-const categorySelect = document.getElementById('category');
-const subcategorySelect = document.getElementById('subcategory');
-
-function loadSubcategories(categoryId, selectedSub = null) {
-    subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-    if (categoryId) {
-        fetch(`/api/product-subcategories/${categoryId}`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(sub => {
-                    const isSelected = selectedSub == sub.id || selectedSub == sub.name ? 'selected' : '';
-                    subcategorySelect.innerHTML += `<option value="${sub.id}" ${isSelected}>${sub.name}</option>`;
-                });
-            });
-    }
-}
-
-categorySelect.addEventListener('change', function() {
-    loadSubcategories(this.value);
-});
-
-// Initial load
-if (categorySelect.value) {
-    loadSubcategories(categorySelect.value, "{{ $product->subcategory }}");
-}
-</script>
-@endsection
 @endsection

@@ -12,6 +12,7 @@
                 <li class="nav-item"><a href="{{ route('admin.hospitals.index') }}" class="nav-link">Hospitals</a></li>
                 <li class="nav-item"><a href="{{ route('admin.doctors.index') }}" class="nav-link">Doctors</a></li>
                 <li class="nav-item"><a href="{{ route('admin.categories.doctor') }}" class="nav-link">Doctor Categories</a></li>
+                <li class="nav-item"><a href="{{ route('admin.categories.product') }}" class="nav-link">Product Categories</a></li>
                 <li class="nav-item"><a href="{{ route('admin.pharmas.index') }}" class="nav-link">Pharmacies</a></li>
                 <li class="nav-item"><a href="{{ route('admin.advertisements.index') }}" class="nav-link">Advertisements</a></li>
                 <li class="nav-item">

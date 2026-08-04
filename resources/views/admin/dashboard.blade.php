@@ -100,6 +100,12 @@
                     <a href="{{ route('admin.pharmas.create') }}" class="btn btn-outline-dark d-flex align-items-center gap-2">
                         <i class="fas fa-building"></i> Register Pharma
                     </a>
+                    <a href="{{ route('admin.categories.doctor') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                        <i class="fas fa-user-md"></i> Doctor Categories
+                    </a>
+                    <a href="{{ route('admin.categories.product') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                        <i class="fas fa-tags"></i> Product Categories
+                    </a>
                 </div>
             </div>
         </div>

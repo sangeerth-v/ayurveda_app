@@ -111,7 +111,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-5">
+                        <td colspan="9" class="text-center py-5">
                             <div class="text-muted">
                                 <i class="fas fa-user-md fa-3x mb-3 opacity-25"></i>
                                 <p class="mb-0">No doctors found in the system.</p>
@@ -126,12 +126,12 @@
     </div>
     @if($doctors->hasPages())
     <div class="card-footer bg-white border-top py-3">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="small text-muted">
                 Showing {{ $doctors->firstItem() }} to {{ $doctors->lastItem() }} of {{ $doctors->total() }} entries
             </div>
             <div>
-                {{ $doctors->links() }}
+                {{ $doctors->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
@@ -142,13 +142,13 @@
     .table thead th {
         border-bottom: 2px solid #f8f9fa;
         letter-spacing: 0.5px;
+        white-space: nowrap;
     }
     .table tbody tr {
         transition: all 0.2s ease;
     }
     .table-hover tbody tr:hover {
         background-color: #fcfdfa;
-        transform: scale(1.002);
     }
     .badge {
         font-weight: 500;
@@ -156,6 +156,23 @@
     }
     .pagination {
         margin-bottom: 0;
+        gap: 4px;
+    }
+    .pagination .page-item .page-link {
+        border-radius: 8px !important;
+        color: var(--primary-green);
+        border: 1px solid #dee2e6;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        color: #ffffff;
+    }
+    .pagination .page-link svg {
+        width: 1rem;
+        height: 1rem;
     }
 </style>
 @endsection

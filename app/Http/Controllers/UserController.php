@@ -123,8 +123,10 @@ class UserController extends Controller
             'medical_registration_no' => ['required', 'string', 'min:10', 'max:18', 'regex:/^[A-Z]{2,6}\/[0-9]{1,6}\/[0-9]{4}$/'],
             'qualification' => 'required|string|min:2|max:255',
             'specialization_category' => 'required|exists:doctor_categories,id',
-            'specialization_subcategory' => 'nullable|exists:doctor_subcategories,id',
+            'specialization_subcategory' => 'nullable|string|max:255',
+            'state_name' => 'required|string|min:2|max:100',
             'district_name' => 'required|string|min:2|max:100',
+            'current_location' => 'nullable|string|max:255',
             'experience' => 'required|integer|min:0|max:70',
             'consultation_fee' => 'required|numeric|min:0|max:100000',
             'consultation_type' => 'required|in:Both,Offline,Online',
@@ -135,7 +137,6 @@ class UserController extends Controller
             'address' => 'required|string|min:10|max:1000',
             'hospital_id' => 'nullable|exists:hospitals,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'council_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
@@ -143,7 +144,9 @@ class UserController extends Controller
             'email.email' => 'Please enter a valid email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete clinic address (at least 10 characters).',
-            'district_name.required' => 'Please enter your district name.',
+            'state_name.required' => 'Please select your state.',
+            'district_name.required' => 'Please select your district.',
+            'specialization_subcategory.required' => 'Please enter your specialization subcategory.',
         ]);
 
         // Find or create the district by name (case-insensitive)
@@ -189,8 +192,9 @@ class UserController extends Controller
             'phone' => $request->phone,
             'medical_registration_no' => strtoupper($request->medical_registration_no),
             'specialization_category' => $category ? $category->name : $request->specialization_category,
-            'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
+            'specialization_subcategory' => $request->specialization_subcategory,
             'district_id' => $district->id,
+            'current_location' => $request->current_location,
             'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
@@ -284,6 +288,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:pharma_companies,email',
             'phone' => ['required', 'regex:/^[6-9]\d{9}$/'],
             'password' => 'required|string|min:8',
+            'state_name' => 'required|string|min:2|max:100',
             'district_name' => 'required|string|min:2|max:100',
             'address' => 'required|string|min:10|max:1000',
             'license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -295,7 +300,8 @@ class UserController extends Controller
             'email.email' => 'Please enter a valid company email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete registered office address (at least 10 characters).',
-            'district_name.required' => 'Please enter the company district name.',
+            'state_name.required' => 'Please select your state.',
+            'district_name.required' => 'Please select your district.',
         ]);
 
         // Find or create the district by name (case-insensitive)
@@ -469,7 +475,7 @@ class UserController extends Controller
 
     public function products(Request $request)
     {
-        $query = Product::where('stock', '>', 0);
+        $query = Product::where('stock', '>', 0)->with(['pharmaCompany', 'doctor']);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -535,7 +541,7 @@ class UserController extends Controller
 
     public function showProduct($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with(['pharmaCompany', 'doctor'])->findOrFail($id);
         return view('products.show', compact('product'));
     }
 

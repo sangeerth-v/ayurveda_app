@@ -20,7 +20,13 @@
                     <p class="text-muted mb-0 small"><i class="far fa-calendar-alt me-1"></i> {{ now()->format('l, d M Y') }}</p>
                 </div>
             </div>
-            <div class="text-end">
+            <div class="text-end d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                <a href="{{ route('doctor.products.create') }}" class="btn btn-outline-success px-3 py-2 fw-semibold small rounded-3 text-decoration-none shadow-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Add Product
+                </a>
+                <a href="{{ route('doctor.products.index') }}" class="btn btn-outline-dark px-3 py-2 fw-semibold small rounded-3 text-decoration-none shadow-sm">
+                    <i class="fas fa-boxes me-1"></i> My Products
+                </a>
                 <div class="btn-group shadow-sm bg-white p-1" style="border-radius: 12px;">
                     <button class="btn btn-success border-0 px-3 py-2 fw-semibold small rounded-3 me-1" data-bs-toggle="modal" data-bs-target="#calendarModal">
                         <i class="fas fa-calendar-check me-1"></i> Full Calendar

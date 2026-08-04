@@ -129,6 +129,14 @@ Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(funct
     Route::get('/profile', [DoctorController::class, 'profile'])->name('profile');
     Route::put('/profile', [DoctorController::class, 'updateProfile'])->name('profile.update');
     Route::put('/bookings/{id}/status', [DoctorController::class, 'updateBookingStatus'])->name('bookings.status.update');
+
+    // Doctor Product Management
+    Route::get('/products', [DoctorController::class, 'productsIndex'])->name('products.index');
+    Route::get('/products/create', [DoctorController::class, 'createProduct'])->name('products.create');
+    Route::post('/products', [DoctorController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/{id}/edit', [DoctorController::class, 'editProduct'])->name('products.edit');
+    Route::put('/products/{id}', [DoctorController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products/{id}', [DoctorController::class, 'destroyProduct'])->name('products.destroy');
 });
 
 // --- Pharma Role Routes (PharmaController) ---

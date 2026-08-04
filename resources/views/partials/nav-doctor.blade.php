@@ -9,6 +9,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item"><a href="{{ route('doctor.dashboard') }}" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="{{ route('doctor.products.index') }}" class="nav-link"><i class="fas fa-boxes me-1"></i> My Products</a></li>
                 <li class="nav-item"><a href="{{ route('doctor.profile') }}" class="nav-link">My Profile</a></li>
                 <!-- <li class="nav-item"><a href="{{ route('home') }}" class="nav-link"><i class="fas fa-external-link-alt me-1"></i> Visit Website</a></li> -->
                 <li class="nav-item">

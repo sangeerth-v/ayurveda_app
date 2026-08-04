@@ -450,4 +450,108 @@ class DoctorController extends Controller
 
         return back()->with('success', 'Appointment status updated and in-app/mobile notification sent to patient!');
     }
+
+    // --- Doctor Products Management ---
+    public function productsIndex()
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+        $products = \App\Models\Product::where('doctor_id', $doctorId)->latest()->paginate(10);
+        return view('doctor.products.index', compact('products'));
+    }
+
+    public function createProduct()
+    {
+        $categories = \App\Models\ProductCategory::all();
+        return view('doctor.products.create', compact('categories'));
+    }
+
+    public function storeProduct(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required',
+            'subcategory' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date',
+            'image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        $cat = \App\Models\ProductCategory::find($request->category);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
+
+        \App\Models\Product::create([
+            'doctor_id' => \Illuminate\Support\Facades\Auth::guard('doctor')->id(),
+            'pharma_company_id' => null,
+            'name' => $request->name,
+            'category' => $cat ? $cat->name : $request->category,
+            'subcategory' => $request->subcategory,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'image' => $imagePath,
+            'expiry_date' => $request->expiry_date,
+        ]);
+
+        return redirect()->route('doctor.products.index')->with('success', 'Product added successfully! It is now live on the store page.');
+    }
+
+    public function editProduct($id)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+        $product = \App\Models\Product::where('doctor_id', $doctorId)->findOrFail($id);
+        $categories = \App\Models\ProductCategory::all();
+        return view('doctor.products.edit', compact('product', 'categories'));
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+        $product = \App\Models\Product::where('doctor_id', $doctorId)->findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required',
+            'subcategory' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date',
+            'image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        $cat = \App\Models\ProductCategory::find($request->category);
+
+        $data = $request->only(['name', 'description', 'price', 'stock', 'expiry_date']);
+        $data['category'] = $cat ? $cat->name : $request->category;
+        $data['subcategory'] = $request->subcategory;
+
+        if ($request->hasFile('image')) {
+            if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('doctor.products.index')->with('success', 'Product updated successfully!');
+    }
+
+    public function destroyProduct($id)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+        $product = \App\Models\Product::where('doctor_id', $doctorId)->findOrFail($id);
+        if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+        }
+        $product->delete();
+
+        return redirect()->route('doctor.products.index')->with('success', 'Product deleted successfully!');
+    }
 }

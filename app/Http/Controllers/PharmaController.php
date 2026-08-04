@@ -196,7 +196,7 @@ class PharmaController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required',
-            'subcategory' => 'nullable',
+            'subcategory' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
@@ -205,7 +205,6 @@ class PharmaController extends Controller
 
         // Resolve Category Names
         $cat = ProductCategory::find($request->category);
-        $sub = ProductSubcategory::find($request->subcategory);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -216,7 +215,7 @@ class PharmaController extends Controller
             'pharma_company_id' => \Illuminate\Support\Facades\Auth::guard('pharma')->id(),
             'name' => $request->name,
             'category' => $cat ? $cat->name : $request->category,
-            'subcategory' => $sub ? $sub->name : $request->subcategory,
+            'subcategory' => $request->subcategory,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -243,7 +242,7 @@ class PharmaController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required',
-            'subcategory' => 'nullable',
+            'subcategory' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'expiry_date' => 'nullable|date',
@@ -252,11 +251,10 @@ class PharmaController extends Controller
 
         // Resolve Category Names
         $cat = ProductCategory::find($request->category);
-        $sub = ProductSubcategory::find($request->subcategory);
 
         $data = $request->only(['name', 'description', 'price', 'stock', 'expiry_date']);
         $data['category'] = $cat ? $cat->name : $request->category;
-        $data['subcategory'] = $sub ? $sub->name : $request->subcategory;
+        $data['subcategory'] = $request->subcategory;
 
         if ($request->hasFile('image')) {
             // Delete old image

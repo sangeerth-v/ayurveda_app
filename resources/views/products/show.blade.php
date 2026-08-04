@@ -41,6 +41,28 @@
                             </div>
                             <h2 class="fw-bold my-2" style="color: #1a4d2e;">{{ $product->name }}</h2>
                             
+                            @if($product->doctor)
+                                <div class="alert alert-success border-0 shadow-sm rounded-3 py-2 px-3 my-3 d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                                        <i class="fas fa-user-md fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Formulated by Certified Practitioner</div>
+                                        <div class="text-success fw-semibold">Dr. {{ $product->doctor->name }} <span class="small text-muted">({{ $product->doctor->specialization_category ?? 'Ayurveda Specialist' }})</span></div>
+                                    </div>
+                                </div>
+                            @elseif($product->pharmaCompany)
+                                <div class="alert alert-light border rounded-3 py-2 px-3 my-3 d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Manufactured By</div>
+                                        <div class="text-secondary fw-semibold">{{ $product->pharmaCompany->company_name }}</div>
+                                    </div>
+                                </div>
+                            @endif
+                            
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <div class="text-warning small">
                                     <i class="fas fa-star"></i>
