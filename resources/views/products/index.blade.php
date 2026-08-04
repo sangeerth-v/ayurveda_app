@@ -196,8 +196,8 @@
         margin-bottom: 4px;
     }
     .ap-product-title {
-        font-size: 0.95rem;
-        font-weight: 600;
+        font-size: 1rem;
+        font-weight: 700;
         color: #1a4d2e;
         line-height: 1.35;
         height: 2.7em;
@@ -397,7 +397,6 @@
 
                                 <!-- Card Content -->
                                 <div class="ap-card-body">
-                                    <div class="ap-cat-title">{{ $product->category ?? 'Ayurvedic Care' }}</div>
                                     <a href="{{ route('products.show', $product->id) }}" class="ap-product-title">
                                         {{ $product->name }}
                                     </a>
