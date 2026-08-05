@@ -51,6 +51,7 @@ class DoctorController extends Controller
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
             'google_meet_link' => 'nullable|url|max:500',
+            'current_location' => 'nullable|string|max:255',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.',
             'medical_registration_no.regex' => 'Please enter a valid Medical Registration Number format (e.g. KMC/12345/2020).',
@@ -95,6 +96,7 @@ class DoctorController extends Controller
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
+            'current_location' => $request->current_location,
             'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience ?? 0,
@@ -177,6 +179,7 @@ class DoctorController extends Controller
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $subcategory ? $subcategory->name : $request->specialization_subcategory,
             'district_id' => $request->district_id,
+            'current_location' => $request->current_location,
             'address' => $request->address,
             'qualification' => $request->qualification,
             'experience' => $request->experience,
@@ -319,6 +322,7 @@ class DoctorController extends Controller
             'online_available_from' => 'nullable|string',
             'online_available_to' => 'nullable|string',
             'google_meet_link' => 'nullable|url|max:500',
+            'current_location' => 'nullable|string|max:255',
         ]);
 
         $data = $request->except(['photo', 'password', 'available_from', 'available_to', 'online_available_from', 'online_available_to']);
@@ -336,6 +340,9 @@ class DoctorController extends Controller
         }
         if ($request->has('google_meet_link')) {
             $data['google_meet_link'] = $request->google_meet_link;
+        }
+        if ($request->has('current_location')) {
+            $data['current_location'] = $request->current_location;
         }
 
         if ($request->hasFile('photo')) {
@@ -358,19 +365,26 @@ class DoctorController extends Controller
     public function updateBookingStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Booked,Cancelled,Completed'
+            'status'           => 'required|in:Booked,Cancelled,Completed',
+            'google_meet_link' => 'nullable|string|max:500',
         ]);
 
         $booking = \App\Models\DoctorToken::where('doctor_id', \Illuminate\Support\Facades\Auth::guard('doctor')->id())
             ->with(['user', 'doctor'])
             ->findOrFail($id);
 
-        $booking->update(['status' => $request->status]);
+        $updateData = ['status' => $request->status];
+        if ($request->has('google_meet_link')) {
+            $updateData['google_meet_link'] = $request->google_meet_link;
+        }
+
+        $booking->update($updateData);
 
         $user = $booking->user;
         $doctor = $booking->doctor;
         $date = \Carbon\Carbon::parse($booking->booking_date)->format('d M Y');
         $time = \Carbon\Carbon::parse($booking->booking_time)->format('h:i A');
+        $meetLink = $booking->google_meet_link ?: ($doctor->google_meet_link ?? null);
 
         // Send appointment status update email to User
         if ($user && $user->email) {
@@ -398,7 +412,11 @@ class DoctorController extends Controller
             }
 
             // 2. Mobile SMS Notification
-            $smsMessage = "✅ APPOINTMENT APPROVED: Dear {$user->name}, your appointment with Dr. {$doctor->name} on {$date} at {$time} ({$consultationType}) has been APPROVED by the doctor. Ref: #BK-{$booking->id}. - Ayurveda App";
+            $smsMessage = "✅ APPOINTMENT APPROVED: Dear {$user->name}, your appointment with Dr. {$doctor->name} on {$date} at {$time} ({$consultationType}) has been APPROVED by the doctor.";
+            if ($booking->consultation_type === 'Online' && $meetLink) {
+                $smsMessage .= " Meet Link: {$meetLink}";
+            }
+            $smsMessage .= " Ref: #BK-{$booking->id}. - Ayurveda App";
 
             if ($user && $user->phone) {
                 \App\Services\SmsService::sendSms($user->phone, $smsMessage);
@@ -406,13 +424,13 @@ class DoctorController extends Controller
 
             // 3. Additional WhatsApp Meet Link if Online
             if ($booking->consultation_type === 'Online') {
-                $meetLink = $doctor->google_meet_link ?? 'Link will be shared shortly';
+                $waMeetLink = $meetLink ?? 'Link will be shared shortly';
                 $waMessage = "✅ *Appointment Confirmed!*\n\n";
                 $waMessage .= "Dear {$user->name},\n";
                 $waMessage .= "Your online consultation with *Dr. {$doctor->name}* has been confirmed.\n\n";
                 $waMessage .= "📅 *Date:* {$date}\n";
                 $waMessage .= "⏰ *Time:* {$time}\n\n";
-                $waMessage .= "🎥 *Google Meet Link:* {$meetLink}\n\n";
+                $waMessage .= "🎥 *Google Meet Link:* {$waMeetLink}\n\n";
                 $waMessage .= "Please join on time. - Ayurveda App";
 
                 if ($user && $user->phone) {

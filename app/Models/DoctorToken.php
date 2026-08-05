@@ -16,6 +16,7 @@ class DoctorToken extends Model
         'booking_time',
         'status',
         'consultation_type',
+        'google_meet_link',
     ];
 
     public function user()

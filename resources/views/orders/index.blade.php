@@ -19,7 +19,8 @@
                                     <th>Order ID</th>
                                     <th>Date</th>
                                     <th>Total Amount</th>
-                                    <th>Status</th>
+                                    <th>Order Status</th>
+                                    <th>Payment Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -33,6 +34,13 @@
                                             <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }}">
                                                 {{ $order->order_status }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Completed</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pending</span>
+                                            @endif
                                         </td>
                                         <td>
                                             <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Details</a>

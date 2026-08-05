@@ -19,7 +19,15 @@
                             <p class="mb-1"><strong>Order Date:</strong> {{ $order->created_at->format('d M Y, h:i A') }}</p>
                             <p class="mb-1"><strong>Status:</strong> <span class="badge bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }}">{{ $order->order_status }}</span></p>
                             <p class="mb-1"><strong>Payment Method:</strong> {{ $order->payment_method }}</p>
-                            <p class="mb-1"><strong>Payment Status:</strong> <span class="badge bg-info">{{ $order->payment_status }}</span></p>
+                            <p class="mb-1"><strong>Payment Status:</strong> 
+                                @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Completed</span>
+                                @elseif($order->payment_status == 'Pending')
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pending</span>
+                                @else
+                                    <span class="badge bg-secondary">{{ $order->payment_status }}</span>
+                                @endif
+                            </p>
                         </div>
                         <div class="col-md-6 ps-md-4">
                             <h6 class="text-muted text-uppercase small fw-bold mb-3">Shipping Address</h6>

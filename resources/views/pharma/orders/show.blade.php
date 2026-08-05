@@ -24,9 +24,19 @@
                         </div>
                         <div class="col-md-6 text-md-end">
                             <h5>Order Summary</h5>
-                            <p>
+                            <p class="mb-2">
                                 <strong>Date:</strong> {{ $order->created_at->format('d M Y, h:i A') }}<br>
-                            <div class="order-status-control mt-2">
+                                <strong>Payment Method:</strong> {{ $order->payment_method ?? 'N/A' }}<br>
+                                <strong>Payment Status:</strong> 
+                                @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                    <span class="badge bg-success px-2 py-1"><i class="fas fa-check-circle me-1"></i> Completed</span>
+                                @else
+                                    <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-clock me-1"></i> Pending</span>
+                                @endif
+                            </p>
+
+                            <!-- Update Order Status -->
+                            <div class="order-status-control mt-3">
                                 <label class="small text-muted mb-1 d-block font-weight-bold">Update Order Status:</label>
                                 <form action="{{ route('pharma.orders.status.update', $order->id) }}" method="POST" class="d-inline-block">
                                     @csrf
@@ -41,7 +51,29 @@
                                     </div>
                                 </form>
                             </div>
-                            </p>
+
+                            <!-- Update Payment Status (Payment Received Button) -->
+                            <div class="payment-status-control mt-3">
+                                <label class="small text-muted mb-1 d-block font-weight-bold">Payment Status:</label>
+                                <form action="{{ route('pharma.orders.status.update', $order->id) }}" method="POST" class="d-inline-block">
+                                    @csrf
+                                    @method('PUT')
+                                    @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill small fw-bold">
+                                                <i class="fas fa-check-circle me-1"></i> Payment Received
+                                            </span>
+                                            <button type="submit" name="payment_status" value="Pending" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 small" title="Revert to Pending">
+                                                <i class="fas fa-undo me-1"></i> Undo
+                                            </button>
+                                        </div>
+                                    @else
+                                        <button type="submit" name="payment_status" value="Completed" class="btn btn-sm btn-success rounded-pill px-3 py-2 shadow-sm fw-bold">
+                                            <i class="fas fa-hand-holding-usd me-1"></i> Payment Received
+                                        </button>
+                                    @endif
+                                </form>
+                            </div>
                         </div>
                     </div>
 

@@ -121,7 +121,18 @@
                                         <div class="avatar-sm bg-success bg-opacity-10 text-success fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 35px; height: 35px;">
                                             {{ substr($booking->user->name ?? 'P', 0, 1) }}
                                         </div>
-                                        <div class="fw-semibold">{{ $booking->user->name ?? 'Patient' }}</div>
+                                        <div>
+                                            <div class="fw-semibold">{{ $booking->user->name ?? 'Patient' }}</div>
+                                            @if($booking->consultation_type === 'Online')
+                                                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill small" style="font-size: 10px;">
+                                                    <i class="fas fa-video me-1"></i> Online
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill small" style="font-size: 10px;">
+                                                    <i class="fas fa-user me-1"></i> Offline
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </td>
                                 <td>
@@ -133,6 +144,19 @@
                                         <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 px-3 py-1 rounded-pill">Pending</span>
                                     @elseif($booking->status == 'Booked')
                                         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 px-3 py-1 rounded-pill">Scheduled</span>
+                                        @if($booking->consultation_type == 'Online')
+                                            @php $meetLink = $booking->google_meet_link ?: ($booking->doctor->google_meet_link ?? null); @endphp
+                                            <div class="mt-1 small">
+                                                @if($meetLink)
+                                                    <a href="{{ $meetLink }}" target="_blank" class="text-primary text-decoration-none small"><i class="fas fa-video me-1"></i> Meet Link</a>
+                                                @else
+                                                    <span class="text-danger small"><i class="fas fa-exclamation-circle me-1"></i> No link</span>
+                                                @endif
+                                                <button type="button" class="btn btn-link btn-sm p-0 text-muted ms-1" data-bs-toggle="modal" data-bs-target="#acceptOnlineModal-{{ $booking->id }}" title="Edit Google Meet Link">
+                                                    <i class="fas fa-pencil-alt small"></i>
+                                                </button>
+                                            </div>
+                                        @endif
                                     @elseif($booking->status == 'Completed')
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 px-3 py-1 rounded-pill">Completed</span>
                                     @else
@@ -141,12 +165,18 @@
                                 </td>
                                 <td>
                                     @if($booking->status == 'Pending')
-                                        <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="Booked">
-                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 me-1"><i class="fas fa-check me-1 small"></i> Accept</button>
-                                        </form>
+                                        @if($booking->consultation_type === 'Online')
+                                            <button type="button" class="btn btn-sm btn-success rounded-pill px-3 py-1 me-1" data-bs-toggle="modal" data-bs-target="#acceptOnlineModal-{{ $booking->id }}">
+                                                <i class="fas fa-check me-1 small"></i> Accept
+                                            </button>
+                                        @else
+                                            <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="Booked">
+                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 me-1"><i class="fas fa-check me-1 small"></i> Accept</button>
+                                            </form>
+                                        @endif
                                         <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PUT')
@@ -168,6 +198,65 @@
                                         </form>
                                     @else
                                         <span class="text-muted small">-</span>
+                                    @endif
+
+                                    @if($booking->consultation_type === 'Online')
+                                        <!-- Accept / Update Meet Link Modal for Booking #{{ $booking->id }} -->
+                                        <div class="modal fade" id="acceptOnlineModal-{{ $booking->id }}" tabindex="-1" aria-labelledby="acceptOnlineModalLabel-{{ $booking->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                                                    <form action="{{ route('doctor.bookings.status.update', $booking->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="status" value="Booked">
+                                                        <div class="modal-header border-0 pb-0 pt-4 px-4">
+                                                            <h5 class="modal-title fw-bold" id="acceptOnlineModalLabel-{{ $booking->id }}">
+                                                                <i class="fas fa-video text-success me-2"></i>
+                                                                {{ $booking->status == 'Booked' ? 'Update Google Meet Link' : 'Approve Online Consultation' }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body p-4 text-start">
+                                                            <div class="p-3 bg-light rounded-3 mb-3">
+                                                                <div class="d-flex justify-content-between mb-1">
+                                                                    <span class="text-muted small">Patient:</span>
+                                                                    <span class="fw-bold small">{{ $booking->user->name ?? 'N/A' }}</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <span class="text-muted small">Date & Time:</span>
+                                                                    <span class="fw-bold small">{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }} at {{ \Carbon\Carbon::parse($booking->booking_time)->format('h:i A') }}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="meet_link_{{ $booking->id }}" class="form-label fw-semibold small">
+                                                                    Google Meet Link <span class="text-danger">*</span>
+                                                                </label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text bg-white text-muted"><i class="fas fa-link"></i></span>
+                                                                    <input type="url" 
+                                                                           name="google_meet_link" 
+                                                                           id="meet_link_{{ $booking->id }}" 
+                                                                           class="form-control" 
+                                                                           placeholder="https://meet.google.com/xxx-xxxx-xxx" 
+                                                                           value="{{ old('google_meet_link', $booking->google_meet_link ?: ($booking->doctor->google_meet_link ?? '')) }}" 
+                                                                           required>
+                                                                </div>
+                                                                <div class="form-text small text-muted">
+                                                                    Paste the Google Meet link for this consultation. The patient will see this link after approval.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                                                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-success rounded-pill px-4">
+                                                                <i class="fas fa-check-circle me-1"></i> {{ $booking->status == 'Booked' ? 'Save Link' : 'Approve & Save Link' }}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>

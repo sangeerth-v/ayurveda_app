@@ -44,6 +44,7 @@
                 <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="{{ route('products.index') }}" class="nav-link">Products</a></li>
                 <li class="nav-item"><a href="{{ route('doctors.index') }}" class="nav-link">Doctors</a></li>
+                <li class="nav-item"><a href="{{ route('medical_astrology') }}" class="nav-link"><i class="fas fa-magic me-1 text-warning"></i> Medical Astrology</a></li>
                 
                 @if(Auth::guard('web')->check())
                     <li class="nav-item"><a href="{{ route('cart.index') }}" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>

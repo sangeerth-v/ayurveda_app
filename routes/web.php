@@ -18,6 +18,7 @@ Route::get('/', [UserController::class, 'index'])->name('home');
 Route::get('/products', [UserController::class, 'products'])->name('products.index');
 Route::get('/doctors', [UserController::class, 'doctors'])->name('doctors.index');
 Route::get('/hospitals', [UserController::class, 'hospitals'])->name('hospitals.index');
+Route::get('/medical-astrology', [UserController::class, 'medicalAstrology'])->name('medical_astrology');
 Route::get('/product/{id}', [UserController::class, 'showProduct'])->name('products.show');
 
 // --- Auth Routes (UserController) ---

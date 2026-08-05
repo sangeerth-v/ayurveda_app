@@ -45,15 +45,16 @@
                         <i class="fas fa-map-marker-alt text-success"></i>
                     </span>
                     <select id="districtFilter" class="form-select border-start-0 ps-0" style="border-color:#c8dfc8;">
-                        <option value="all">All Districts (Kerala)</option>
+                        <option value="all">All Locations / Districts</option>
+                        <option value="abroad">✈️ Other / Abroad Locations</option>
                         @foreach($districts as $dist)
                             <option value="{{ $dist->id }}">{{ $dist->name }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="d-flex gap-2 h-100">
+            <div class="col-md-4">
+                <div class="d-flex gap-1 h-100 flex-wrap">
                     <a href="{{ route('doctors.index') }}"
                        class="btn {{ ($activeType ?? 'all') === 'all' ? 'btn-success' : 'btn-outline-success' }} fw-semibold flex-fill">
                         All
@@ -65,6 +66,10 @@
                     <a href="{{ route('doctors.index', ['type' => 'Offline']) }}"
                        class="btn {{ ($activeType ?? 'all') === 'Offline' ? 'btn-secondary' : 'btn-outline-secondary' }} fw-semibold flex-fill">
                         <i class="fas fa-hospital me-1"></i>Offline
+                    </a>
+                    <a href="{{ route('doctors.index', ['type' => 'Other']) }}"
+                       class="btn {{ ($activeType ?? 'all') === 'Other' ? 'btn-info text-white' : 'btn-outline-info' }} fw-semibold flex-fill">
+                        <i class="fas fa-globe-asia me-1"></i>Other / Abroad
                     </a>
                 </div>
             </div>
@@ -89,10 +94,17 @@
                      data-name="{{ strtolower($doctor->name) }}"
                      data-category="{{ strtolower($doctor->specialization_category ?? '') }}"
                      data-district="{{ $doctor->district_id }}"
-                     data-constype="{{ strtolower($doctor->consultation_type ?? 'offline') }}">
+                     data-constype="{{ strtolower($doctor->consultation_type ?? 'offline') }}"
+                     data-haslocation="{{ !empty($doctor->current_location) ? 'yes' : 'no' }}"
+                     data-location="{{ strtolower($doctor->current_location ?? '') }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.2s, box-shadow 0.2s;">
                         {{-- Header band --}}
                         <div class="py-4 text-center position-relative" style="background: linear-gradient(135deg, #0c3b2e, #1d5c42);">
+                            @if($doctor->current_location)
+                                <span class="position-absolute top-0 start-0 mt-2 ms-2 badge bg-warning text-dark border border-warning border-opacity-25 shadow-sm" style="font-size:0.65rem;">
+                                    <i class="fas fa-globe-asia me-1"></i>{{ $doctor->current_location }}
+                                </span>
+                            @endif
                             {{-- Consultation Badge --}}
                             @if($doctor->consultation_type === 'Online')
                                 <span class="position-absolute top-0 end-0 mt-2 me-2 badge" style="background:#0d6efd; font-size:0.7rem;">🎥 Online</span>
@@ -101,9 +113,13 @@
                             @else
                                 <span class="position-absolute top-0 end-0 mt-2 me-2 badge bg-secondary" style="font-size:0.7rem;">🏥 Offline</span>
                             @endif
-                            <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2"
-                                 style="width:70px;height:70px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);">
-                                <i class="fas fa-user-md fa-2x text-white"></i>
+                            <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2 overflow-hidden shadow-sm"
+                                 style="width:75px;height:75px;background:rgba(255,255,255,0.15);border:3px solid rgba(255,255,255,0.4);">
+                                @if($doctor->photo)
+                                    <img src="{{ asset('storage/' . $doctor->photo) }}" alt="Dr. {{ $doctor->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                @else
+                                    <i class="fas fa-user-md fa-2x text-white"></i>
+                                @endif
                             </div>
                             <h5 class="text-white fw-bold mb-0">Dr. {{ $doctor->name }}</h5>
                             <small class="text-white opacity-75">{{ $doctor->specialization_category ?? 'General Practice' }}</small>
@@ -121,6 +137,9 @@
                                 @endif
                                 @if($doctor->district)
                                     <p class="mb-1 small text-muted"><i class="fas fa-map-marker-alt me-2 text-success"></i>{{ $doctor->district->name }}</p>
+                                @endif
+                                @if($doctor->current_location)
+                                    <p class="mb-1 small fw-semibold text-primary"><i class="fas fa-globe-asia me-2"></i><strong>Location:</strong> {{ $doctor->current_location }}</p>
                                 @endif
                                 @if($doctor->available_time)
                                     <p class="mb-1 small text-muted"><i class="fas fa-clock me-2 text-success"></i><strong>In-person:</strong> {{ $doctor->available_time }}</p>
@@ -192,13 +211,19 @@
         let visible = 0;
 
         cards.forEach(function (card) {
-            const name           = card.dataset.name     || '';
-            const category       = card.dataset.category || '';
-            const cardDistrictId = card.dataset.district || '';
+            const name           = card.dataset.name         || '';
+            const category       = card.dataset.category     || '';
+            const cardDistrictId = card.dataset.district     || '';
+            const hasLocation    = card.dataset.haslocation  || 'no';
+            const locationText   = card.dataset.location     || '';
 
-            const matchesSearch   = !query || name.includes(query) || category.includes(query);
+            const matchesSearch   = !query || name.includes(query) || category.includes(query) || locationText.includes(query);
             const matchesCategory = activeCategory === 'all' || category === activeCategory;
-            const matchesDistrict = selectedDistrict === 'all' || cardDistrictId === selectedDistrict;
+            
+            let matchesDistrict  = selectedDistrict === 'all' || cardDistrictId === selectedDistrict;
+            if (selectedDistrict === 'abroad') {
+                matchesDistrict = hasLocation === 'yes' || !cardDistrictId;
+            }
 
             if (matchesSearch && matchesCategory && matchesDistrict) {
                 card.style.display = '';

@@ -519,12 +519,19 @@ class UserController extends Controller
     {
         $query = Doctor::with(['district']);
 
-        // Filter by consultation type if requested
-        if ($request->filled('type') && in_array($request->type, ['Online', 'Offline'])) {
-            $query->where(function ($q) use ($request) {
-                $q->where('consultation_type', $request->type)
-                  ->orWhere('consultation_type', 'Both');
-            });
+        // Filter by consultation type or location if requested
+        if ($request->filled('type')) {
+            if (in_array($request->type, ['Online', 'Offline'])) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('consultation_type', $request->type)
+                      ->orWhere('consultation_type', 'Both');
+                });
+            } elseif (in_array($request->type, ['Other', 'Abroad'])) {
+                $query->where(function ($q) {
+                    $q->whereNotNull('current_location')
+                      ->where('current_location', '!=', '');
+                });
+            }
         }
 
         $doctors = $query->get();
@@ -537,6 +544,12 @@ class UserController extends Controller
     {
         $hospitals = \App\Models\Hospital::where('is_active', true)->with('district')->latest()->get();
         return view('hospitals.index', compact('hospitals'));
+    }
+
+    public function medicalAstrology()
+    {
+        $doctors = Doctor::with(['district'])->get();
+        return view('medical-astrology', compact('doctors'));
     }
 
     public function showProduct($id)

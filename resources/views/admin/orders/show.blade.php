@@ -44,7 +44,11 @@
                             </div>
                             <div class="mb-2 d-flex justify-content-between pe-md-4">
                                 <span class="text-secondary">Payment Status:</span>
-                                <span class="badge bg-info bg-opacity-10 text-info px-3">{{ $order->payment_status }}</span>
+                                @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1">Completed</span>
+                                @else
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-1">Pending</span>
+                                @endif
                             </div>
                             <div class="mt-4 pt-3 border-top pe-md-4">
                                 <h6 class="text-muted text-uppercase small fw-bold mb-3"><i class="fas fa-user-tag me-2"></i>Customer Information</h6>

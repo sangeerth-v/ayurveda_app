@@ -225,6 +225,14 @@
                                             <div class="form-text">Your personal Google Meet room link shared with patients after you approve their online appointment.</div>
                                             @error('google_meet_link') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
+                                        <div class="col-12 mt-3">
+                                            <label class="form-label fw-bold"><i class="fas fa-globe-asia text-success me-1"></i> Current Location (If Abroad or Outside Native Place)</label>
+                                            <input type="text" name="current_location" class="form-control @error('current_location') is-invalid @enderror"
+                                                placeholder="e.g. Dubai, UAE / Riyadh, Saudi Arabia / London, UK"
+                                                value="{{ old('current_location', $doctor->current_location) }}">
+                                            <div class="form-text">Specify your current operating location or country if you practice abroad/outside native district.</div>
+                                            @error('current_location') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>

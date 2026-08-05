@@ -37,20 +37,43 @@
                                     </small>
                                 </div>
                                 <div class="col-md-6 ps-4">
-                                    <h5 class="mb-1 fw-bold" style="color:#1a4d2e;">
-                                        Dr. {{ $booking->doctor->name ?? 'N/A' }}
-                                    </h5>
-                                    <p class="mb-0 text-muted small">
-                                        {{ $booking->doctor->specialization_category ?? 'General' }}
-                                        @if($booking->consultation_type)
-                                            <span class="badge bg-light text-dark border ms-1">{{ $booking->consultation_type }}</span>
-                                        @endif
-                                    </p>
-                                    @if($booking->status == 'Booked' && $booking->consultation_type == 'Online' && !empty($booking->doctor->google_meet_link))
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width:45px;height:45px;background:#1a4d2e;">
+                                            @if($booking->doctor && $booking->doctor->photo)
+                                                <img src="{{ asset('storage/' . $booking->doctor->photo) }}" alt="Dr. {{ $booking->doctor->name }}" style="width:100%;height:100%;object-fit:cover;">
+                                            @else
+                                                <i class="fas fa-user-md text-white"></i>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0 fw-bold" style="color:#1a4d2e;">
+                                                Dr. {{ $booking->doctor->name ?? 'N/A' }}
+                                            </h5>
+                                            <p class="mb-0 text-muted small">
+                                                {{ $booking->doctor->specialization_category ?? 'General' }}
+                                                @if($booking->consultation_type)
+                                                    <span class="badge bg-light text-dark border ms-1">{{ $booking->consultation_type }}</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    @if($booking->status == 'Booked' && $booking->consultation_type == 'Online')
+                                        @php
+                                            $meetLink = $booking->google_meet_link ?: ($booking->doctor->google_meet_link ?? null);
+                                        @endphp
                                         <div class="mt-2">
-                                            <a href="{{ $booking->doctor->google_meet_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill">
-                                                <i class="fas fa-video me-1"></i> Join Meeting
-                                            </a>
+                                            @if(!empty($meetLink))
+                                                <a href="{{ $meetLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
+                                                    <i class="fas fa-video me-1"></i> Join Google Meet
+                                                </a>
+                                                <div class="mt-1 small text-muted">
+                                                    <i class="fas fa-link me-1"></i> {{ $meetLink }}
+                                                </div>
+                                            @else
+                                                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25 px-2 py-1 rounded">
+                                                    <i class="fas fa-clock me-1"></i> Google Meet link will be provided by doctor
+                                                </span>
+                                            @endif
                                         </div>
                                     @endif
                                 </div>

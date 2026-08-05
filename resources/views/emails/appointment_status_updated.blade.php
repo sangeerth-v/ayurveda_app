@@ -62,10 +62,13 @@
                     <span class="details-value">{{ $booking->consultation_type }}</span>
                 </div>
                 @endif
-                @if($booking->status == 'Booked' && $booking->consultation_type == 'Online' && !empty($booking->doctor->google_meet_link))
+                @php
+                    $meetLink = $booking->google_meet_link ?: ($booking->doctor->google_meet_link ?? null);
+                @endphp
+                @if($booking->status == 'Booked' && $booking->consultation_type == 'Online' && !empty($meetLink))
                 <div class="details-row">
                     <span class="details-label">Meeting:</span>
-                    <span class="details-value"><a href="{{ $booking->doctor->google_meet_link }}" style="color: #1a4d2e; font-weight: bold;">{{ $booking->doctor->google_meet_link }}</a></span>
+                    <span class="details-value"><a href="{{ $meetLink }}" style="color: #1a4d2e; font-weight: bold;">{{ $meetLink }}</a></span>
                 </div>
                 @endif
             </div>

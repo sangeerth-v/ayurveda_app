@@ -372,19 +372,45 @@ class PharmaController extends Controller
     public function updateOrderStatus(Request $request, $id)
     {
         $request->validate([
-            'order_status' => 'required|in:Placed,Delivered'
+            'order_status'   => 'nullable|in:Placed,Delivered',
+            'payment_status' => 'nullable|in:Pending,Received,Completed,Paid',
         ]);
 
         $order = \App\Models\Order::findOrFail($id);
-        $order->update(['order_status' => $request->order_status]);
+        $updateData = [];
 
-        // Send order status updated email to User
-        try {
-            \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderStatusUpdatedMail($order));
-        } catch (\Exception $e) {
-            \Log::error("Failed to send order status updated email to {$order->user->email}: " . $e->getMessage());
+        if ($request->has('order_status')) {
+            $updateData['order_status'] = $request->order_status;
         }
 
-        return back()->with('success', 'Order status updated to ' . $request->order_status);
+        if ($request->has('payment_status')) {
+            $statusVal = $request->payment_status;
+            if ($statusVal === 'Received' || $statusVal === 'Paid') {
+                $statusVal = 'Completed';
+            }
+            $updateData['payment_status'] = $statusVal;
+        }
+
+        if (!empty($updateData)) {
+            $order->update($updateData);
+        }
+
+        // Send order status updated email to User if order_status updated
+        if ($request->has('order_status') && $order->user && $order->user->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderStatusUpdatedMail($order));
+            } catch (\Exception $e) {
+                \Log::error("Failed to send order status updated email to {$order->user->email}: " . $e->getMessage());
+            }
+        }
+
+        $msg = 'Order updated successfully!';
+        if ($request->has('payment_status')) {
+            $msg = 'Payment status updated to ' . $order->payment_status;
+        } elseif ($request->has('order_status')) {
+            $msg = 'Order status updated to ' . $request->order_status;
+        }
+
+        return back()->with('success', $msg);
     }
 }

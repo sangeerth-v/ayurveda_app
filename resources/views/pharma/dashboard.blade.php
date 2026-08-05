@@ -70,9 +70,22 @@
                             </td>
                             <td class="fw-bold text-success">₹{{ number_format($order->total_price, 2) }}</td>
                             <td>
-                                <span class="badge rounded-pill bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} bg-opacity-10 text-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border border-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border-opacity-10 px-3">
-                                    {{ $order->order_status }}
-                                </span>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill bg-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} bg-opacity-10 text-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border border-{{ $order->order_status == 'Delivered' ? 'success' : 'primary' }} border-opacity-10 px-3">
+                                        {{ $order->order_status }}
+                                    </span>
+                                </div>
+                                <div>
+                                    @if(in_array($order->payment_status, ['Completed', 'Received', 'Paid']))
+                                        <span class="badge rounded-pill bg-success text-white px-2 py-1 small">
+                                            <i class="fas fa-check-circle me-1"></i> Paid
+                                        </span>
+                                    @else
+                                        <span class="badge rounded-pill bg-warning text-dark px-2 py-1 small">
+                                            <i class="fas fa-clock me-1"></i> Unpaid
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="text-center">
                                 <a href="{{ route('pharma.orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">Details</a>

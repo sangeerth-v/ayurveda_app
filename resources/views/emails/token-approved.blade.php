@@ -27,6 +27,21 @@
                 <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Status:</td>
                 <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; color: #40916c; font-weight: bold;">Confirmed (Booked)</td>
             </tr>
+            @if($booking->consultation_type)
+            <tr>
+                <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Consultation Type:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{{ $booking->consultation_type }}</td>
+            </tr>
+            @endif
+            @php
+                $meetLink = $booking->google_meet_link ?: ($booking->doctor->google_meet_link ?? null);
+            @endphp
+            @if($booking->consultation_type === 'Online' && !empty($meetLink))
+            <tr>
+                <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Google Meet Link:</td>
+                <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;"><a href="{{ $meetLink }}" style="color: #40916c; font-weight: bold;">{{ $meetLink }}</a></td>
+            </tr>
+            @endif
         </table>
 
         <p>You can view all your appointments under the "My Appointments" section of your profile.</p>

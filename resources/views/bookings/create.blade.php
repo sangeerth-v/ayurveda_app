@@ -18,8 +18,12 @@
             <div class="card-body p-4">
                 {{-- Doctor Summary --}}
                 <div class="d-flex align-items-center gap-3 p-3 rounded-3 mb-4" style="background: #f0f7f4;">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:60px;height:60px;background:#1a4d2e;">
-                        <i class="fas fa-user-md fa-lg text-white"></i>
+                    <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width:65px;height:65px;background:#1a4d2e;border:2px solid #fff;">
+                        @if($doctor->photo)
+                            <img src="{{ asset('storage/' . $doctor->photo) }}" alt="Dr. {{ $doctor->name }}" style="width:100%;height:100%;object-fit:cover;">
+                        @else
+                            <i class="fas fa-user-md fa-lg text-white"></i>
+                        @endif
                     </div>
                     <div>
                         <h5 class="mb-1 fw-bold" style="color:#1a4d2e;">Dr. {{ $doctor->name }}</h5>
