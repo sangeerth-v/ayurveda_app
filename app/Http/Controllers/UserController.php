@@ -548,7 +548,7 @@ class UserController extends Controller
 
     public function medicalAstrology()
     {
-        $doctors = Doctor::with(['district'])->get();
+        $doctors = Doctor::with(['district', 'hospital'])->get();
         return view('medical-astrology', compact('doctors'));
     }
 
@@ -811,6 +811,21 @@ class UserController extends Controller
             'consultation_type' => $request->consultation_type,
         ]);
 
+        $formattedDate = \Carbon\Carbon::parse($request->booking_date)->format('d M Y');
+        $formattedTime = \Carbon\Carbon::parse($request->booking_time)->format('h:i A');
+
+        // Create In-App Notification for Patient
+        if (Auth::check()) {
+            \App\Models\UserNotification::create([
+                'user_id' => Auth::id(),
+                'title'   => 'Appointment Request Sent 📅',
+                'message' => "Your appointment booking request for {$formattedDate} at {$formattedTime} ({$request->consultation_type}) with Dr. {$doctor->name} was submitted.",
+                'type'    => 'appointment_pending',
+                'link'    => route('bookings.my'),
+                'is_read' => false,
+            ]);
+        }
+
         // Send appointment request email to Doctor
         try {
             Mail::to($booking->doctor->email)->send(new AppointmentRequestMail($booking));
@@ -818,7 +833,7 @@ class UserController extends Controller
             \Log::error("Failed to send appointment request email: " . $e->getMessage());
         }
 
-        return redirect()->route('bookings.my')->with('success', 'Appointment booking request submitted! Awaiting doctor approval.');
+        return redirect()->route('bookings.my')->with('success', "Appointment request submitted for {$formattedDate} at {$formattedTime}! Awaiting doctor approval.");
     }
 
     public function myBookings()

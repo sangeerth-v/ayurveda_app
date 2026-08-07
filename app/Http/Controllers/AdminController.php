@@ -143,15 +143,15 @@ class AdminController extends Controller
 
     public function advertisementsSetPopup($id)
     {
-        \App\Models\Advertisement::where('is_popup', true)->update(['is_popup' => false]);
-        
         if ($id != 0) {
             $advertisement = \App\Models\Advertisement::findOrFail($id);
-            $advertisement->is_popup = true;
+            $advertisement->is_popup = !$advertisement->is_popup;
             $advertisement->save();
-            return back()->with('success', 'Popup advertisement set successfully.');
+            $status = $advertisement->is_popup ? 'added to' : 'removed from';
+            return back()->with('success', "Advertisement {$status} popup list.");
         }
 
-        return back()->with('success', 'Popup advertisement removed successfully.');
+        \App\Models\Advertisement::where('is_popup', true)->update(['is_popup' => false]);
+        return back()->with('success', 'All popup advertisements removed successfully.');
     }
 }

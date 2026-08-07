@@ -7,22 +7,6 @@
 @section('title', 'Ayurveda Management System | Traditional Healing & Clinical Care')
 
 @section('content')
-<!-- Single Popup Ad Overlay -->
-@if(isset($popupAd))
-<div id="singleAdPopup" class="adware-overlay" style="display: none;">
-    <div class="adware-content d-flex justify-content-center align-items-center">
-        <button class="adware-close" onclick="closePopupAd()">&times;</button>
-        @if($popupAd->link)
-            <a href="{{ $popupAd->link }}" target="_blank">
-                <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded-4" alt="{{ $popupAd->title }}">
-            </a>
-        @else
-            <img src="{{ asset('storage/' . $popupAd->image_path) }}" class="img-fluid adware-img shadow-lg rounded-4" alt="{{ $popupAd->title }}">
-        @endif
-    </div>
-</div>
-@endif
-
 <div class="container-fluid p-0">
 
     <!-- HERO SECTION: ROYAL FOREST & SAGE MINT -->
@@ -393,50 +377,6 @@ Dinacharya Routine Modal -->
 .max-w-600 { max-width: 600px; }
 .max-w-700 { max-width: 700px; }
 
-/* Single Adware Modal CSS */
-.adware-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0,0,0,0.85);
-    z-index: 999999;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(5px);
-}
-
-.adware-content {
-    position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-}
-
-.adware-img {
-    max-height: 85vh;
-    object-fit: contain;
-}
-
-.adware-close {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    background: #ef3b2d;
-    border: none;
-    color: white;
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 1000000;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
-}
 </style>
 
 <script>

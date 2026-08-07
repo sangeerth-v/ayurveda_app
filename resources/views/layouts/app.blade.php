@@ -283,5 +283,9 @@
     @endif
 
     @yield('scripts')
+
+    @unless(request()->is('admin*') || request()->is('doctor*') || request()->is('hospital*') || request()->is('pharma*'))
+        @include('partials.popup-ad')
+    @endunless
 </body>
 </html>

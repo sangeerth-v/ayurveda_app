@@ -267,11 +267,22 @@ class DoctorController extends Controller
                             ->pluck('booking_date')
                             ->toArray();
 
+        // Get detailed booking info per date (total bookings and pending count)
+        $bookedDatesSummary = \App\Models\DoctorToken::where('doctor_id', $doctorId)
+            ->selectRaw('booking_date, COUNT(*) as total_count, SUM(CASE WHEN status = "Pending" THEN 1 ELSE 0 END) as pending_count')
+            ->groupBy('booking_date')
+            ->get()
+            ->keyBy('booking_date');
+
+        $pendingTotal = \App\Models\DoctorToken::where('doctor_id', $doctorId)
+            ->where('status', 'Pending')
+            ->count();
+
         $unavailabilities = \App\Models\DoctorUnavailability::where('doctor_id', $doctorId)
                             ->pluck('unavailable_date')
                             ->toArray();
 
-        return view('doctor.dashboard', compact('bookings', 'allBookingDates', 'unavailabilities', 'filter'));
+        return view('doctor.dashboard', compact('bookings', 'allBookingDates', 'bookedDatesSummary', 'pendingTotal', 'unavailabilities', 'filter'));
     }
 
     public function toggleAvailability(Request $request)

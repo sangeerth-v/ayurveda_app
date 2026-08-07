@@ -4,218 +4,419 @@
     @include('partials.nav-public')
 @endsection
 
-@section('title', 'Medical Astrology & Doctor Timings | Ayurveda App')
+@section('title', 'Doctor Timings & Online/Offline Schedules | Ayurveda App')
 
 @section('content')
 <!-- Hero Header -->
-<div class="position-relative overflow-hidden p-4 p-md-5 text-center text-white mb-5 rounded-4 shadow-lg" 
+<div class="position-relative overflow-hidden p-4 p-md-5 text-center text-white mb-4 rounded-4 shadow-lg" 
      style="background: linear-gradient(135deg, #0c3b2e 0%, #1d5c42 50%, #2d7a58 100%);">
     <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(#ffba08 1px, transparent 1px); background-size: 20px 20px;"></div>
     
-    <div class="col-md-9 p-lg-4 mx-auto my-3 position-relative" style="z-index: 2;">
+    <div class="col-md-10 p-lg-3 mx-auto position-relative" style="z-index: 2;">
         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm" style="letter-spacing: 1px;">
-            ✨ JYOTISHYA CHIKITSA & AYURVEDA
+            ✨ AYURVEDIC DOCTOR SCHEDULES
         </span>
-        <h1 class="display-4 fw-bold font-serif text-warning mb-3" style="font-family: 'Playfair Display', serif;">
-            Medical Astrology & Doctor Schedule
+        <h1 class="display-5 fw-bold text-white mb-3" style="font-family: 'Playfair Display', serif;">
+            Doctor Consultation Timings & Availability
         </h1>
-        <p class="lead font-weight-normal text-light mb-4" style="font-size: 1.15rem; line-height: 1.8;">
-            Discover how cosmic alignments, planetary energies, and Ayurvedic <strong>Tridoshas (Vata, Pitta, Kapha)</strong> unite to guide holistic healing. Check doctor consultation timings and book your personalized health session.
+        <p class="lead text-light opacity-90 mb-4 mx-auto" style="max-width: 750px; font-size: 1.1rem; line-height: 1.7;">
+            Explore verified Ayurvedic specialists available for <strong>In-Clinic (Offline)</strong> visits and <strong>Online Video Consultations</strong>. Check daily timings and book your slot seamlessly.
         </p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="#doctorScheduleSection" class="btn btn-warning text-dark fw-bold px-4 py-3 rounded-pill shadow-sm">
-                <i class="fas fa-calendar-alt me-2"></i> View Doctor Timings
-            </a>
-            <a href="#aboutAstrologySection" class="btn btn-outline-light fw-bold px-4 py-3 rounded-pill">
-                <i class="fas fa-compass me-2"></i> Learn About Medical Astrology
-            </a>
+
+        <!-- Doctor Stat Counters -->
+        <div class="row g-3 justify-content-center text-dark">
+            <div class="col-6 col-md-3">
+                <div class="bg-white bg-opacity-95 p-3 rounded-4 shadow-sm backdrop-blur">
+                    <div class="h3 fw-bold text-success mb-0">{{ $doctors->count() }}</div>
+                    <small class="text-muted fw-semibold">Total Doctors</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="bg-white bg-opacity-95 p-3 rounded-4 shadow-sm backdrop-blur">
+                    <div class="h3 fw-bold text-primary mb-0">
+                        {{ $doctors->filter(fn($d) => strtolower($d->consultation_type ?? '') === 'online' || strtolower($d->consultation_type ?? '') === 'both' || !empty($d->online_available_time))->count() }}
+                    </div>
+                    <small class="text-muted fw-semibold">Online Doctors</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="bg-white bg-opacity-95 p-3 rounded-4 shadow-sm backdrop-blur">
+                    <div class="h3 fw-bold text-warning mb-0">
+                        {{ $doctors->filter(fn($d) => strtolower($d->consultation_type ?? '') === 'offline' || strtolower($d->consultation_type ?? '') === 'both' || !empty($d->available_time))->count() }}
+                    </div>
+                    <small class="text-muted fw-semibold">Offline Doctors</small>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container my-5">
-    <!-- What is Medical Astrology Section -->
-    <div class="row align-items-center mb-5" id="aboutAstrologySection">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <span class="text-uppercase text-success fw-bold small tracking-wider"><i class="fas fa-star me-2"></i>Ancient Healing Science</span>
-            <h2 class="fw-bold mb-3 mt-1" style="color: #0c3b2e; font-family: 'Playfair Display', serif;">
-                What is Medical Astrology (*Jyotishya Chikitsa*)?
-            </h2>
-            <p class="text-muted leading-relaxed">
-                In classical Ayurveda and Vedic sciences, <strong>Medical Astrology</strong> (or <em>Jyotishya Chikitsa</em>) is the study of how planetary cycles, solar-lunar rhythms, and zodiac alignments influence the human bio-energies (<strong>Vata, Pitta, and Kapha</strong>).
-            </p>
-            <p class="text-muted leading-relaxed">
-                By evaluating birth charts alongside Ayurvedic diagnostic methods (such as <em>Nadi Pariksha</em>), practitioners gain deeper insights into physical vulnerability, immunity patterns, and the most auspicious times (<em>Muhurta</em>) for treatments and wellness regimens.
-            </p>
-
-            <div class="row g-3 mt-2">
-                <div class="col-sm-6">
-                    <div class="p-3 bg-light rounded-3 border-start border-4 border-warning shadow-sm h-100">
-                        <h6 class="fw-bold text-dark mb-1"><i class="fas fa-sun text-warning me-2"></i>Solar Energy & Pitta</h6>
-                        <small class="text-muted">Governs metabolism, digestion, vital energy, and circulation.</small>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="p-3 bg-light rounded-3 border-start border-4 border-info shadow-sm h-100">
-                        <h6 class="fw-bold text-dark mb-1"><i class="fas fa-moon text-info me-2"></i>Lunar Rhythms & Kapha</h6>
-                        <small class="text-muted">Controls bodily fluids, emotional calm, cellular regeneration, and immunity.</small>
-                    </div>
+<div class="container my-4">
+    <!-- Filter & Search Controls Bar -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-light">
+        <div class="row g-3 align-items-center">
+            <!-- Search Box -->
+            <div class="col-md-5">
+                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden bg-white">
+                    <span class="input-group-text bg-white border-0 ps-3 text-success">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="doctorSearchInput" class="form-control border-0 ps-2" placeholder="Search doctor by name, category, or location..." style="font-size: 0.95rem; box-shadow: none;">
+                    <button class="btn btn-link text-muted border-0 me-2" id="clearSearchBtn" type="button" style="display:none;" title="Clear Search">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: linear-gradient(145deg, #ffffff 0%, #f4f8f5 100%);">
-                <div class="card-body p-4 p-md-5">
-                    <h4 class="fw-bold mb-4 text-center" style="color: #0c3b2e;">
-                        <i class="fas fa-atom text-warning me-2"></i>Planetary & Tridosha Correspondences
-                    </h4>
-                    <ul class="list-group list-group-flush border-0">
-                        <li class="list-group-item bg-transparent d-flex align-items-center py-3 border-bottom">
-                            <span class="badge bg-danger bg-opacity-10 text-danger p-3 rounded-circle me-3"><i class="fas fa-fire fa-lg"></i></span>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Sun & Mars &mdash; Pitta (Fire Element)</h6>
-                                <small class="text-muted">Blood pressure, digestive fire (Agni), liver health & inflammation.</small>
-                            </div>
-                        </li>
-                        <li class="list-group-item bg-transparent d-flex align-items-center py-3 border-bottom">
-                            <span class="badge bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3"><i class="fas fa-wind fa-lg"></i></span>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Saturn & Mercury &mdash; Vata (Air Element)</h6>
-                                <small class="text-muted">Nervous system, joint mobility, respiratory flow & mental activity.</small>
-                            </div>
-                        </li>
-                        <li class="list-group-item bg-transparent d-flex align-items-center py-3 border-bottom">
-                            <span class="badge bg-info bg-opacity-10 text-info p-3 rounded-circle me-3"><i class="fas fa-water fa-lg"></i></span>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Moon & Jupiter &mdash; Kapha (Earth/Water Element)</h6>
-                                <small class="text-muted">Lymphatic system, body weight, tissue strength & psychological calm.</small>
-                            </div>
-                        </li>
-                    </ul>
+            <!-- Consultation Type Filter Pills -->
+            <div class="col-md-7">
+                <div class="d-flex gap-2 flex-wrap justify-content-md-end" id="typeFilterGroup">
+                    <button type="button" class="btn btn-success rounded-pill px-3 py-2 fw-semibold filter-type-btn active" data-filter="all">
+                        <i class="fas fa-user-md me-1"></i> All Doctors
+                    </button>
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold filter-type-btn" data-filter="online">
+                        <i class="fas fa-video me-1"></i> Online Doctors
+                    </button>
+                    <button type="button" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold filter-type-btn" data-filter="offline">
+                        <i class="fas fa-hospital-user me-1"></i> Offline Doctors
+                    </button>
+                    <button type="button" class="btn btn-outline-warning text-dark rounded-pill px-3 py-2 fw-semibold filter-type-btn" data-filter="both">
+                        <i class="fas fa-star me-1"></i> Online & Offline
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <hr class="my-5 opacity-25">
-
-    <!-- About Our App Section -->
-    <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mb-5 border">
-        <div class="row align-items-center">
-            <div class="col-md-3 text-center mb-4 mb-md-0">
-                <div class="p-4 bg-success bg-opacity-10 text-success rounded-circle d-inline-block shadow-sm">
-                    <i class="fas fa-heartbeat fa-4x"></i>
-                </div>
-            </div>
-            <div class="col-md-9">
-                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold mb-2">ABOUT THIS APP</span>
-                <h3 class="fw-bold mb-3" style="color: #0c3b2e;">Integrative Ayurvedic Healthcare & Tele-Consultations</h3>
-                <p class="text-muted">
-                    Our platform connects patients directly with verified Ayurvedic doctors, hospital specialists, and authentic pharmaceutical remedies. Whether you seek online video consultations or in-person visits, our system simplifies token bookings, doctor availability schedules, and prescription fulfillment.
-                </p>
-                <div class="row g-3">
-                    <div class="col-sm-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-user-md text-success fs-4 me-2"></i>
-                            <span class="fw-bold small text-dark">Verified Doctors</span>
-                        </div>
+    <!-- Doctor Grid -->
+    <div class="row g-4" id="doctorsContainer">
+        @forelse($doctors as $doctor)
+            @php
+                $constype = strtolower($doctor->consultation_type ?? 'both');
+                $hasOnline = ($constype === 'online' || $constype === 'both' || !empty($doctor->online_available_time));
+                $hasOffline = ($constype === 'offline' || $constype === 'both' || !empty($doctor->available_time));
+                
+                $filterTag = 'both';
+                if ($hasOnline && !$hasOffline) {
+                    $filterTag = 'online';
+                } elseif ($hasOffline && !$hasOnline) {
+                    $filterTag = 'offline';
+                } elseif ($hasOnline && $hasOffline) {
+                    $filterTag = 'both';
+                }
+            @endphp
+            <div class="col-md-6 col-lg-4 doctor-card-wrapper" 
+                 data-name="{{ strtolower($doctor->name) }}"
+                 data-category="{{ strtolower($doctor->specialization_category ?? '') }}"
+                 data-district="{{ strtolower($doctor->district->name ?? '') }}"
+                 data-hospital="{{ strtolower($doctor->hospital->name ?? '') }}"
+                 data-type="{{ $filterTag }}"
+                 data-has-online="{{ $hasOnline ? 'true' : 'false' }}"
+                 data-has-offline="{{ $hasOffline ? 'true' : 'false' }}">
+                
+                <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden bg-white">
+                    <!-- Top Status Bar -->
+                    <div class="px-4 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                        <span class="badge bg-light text-muted border rounded-pill px-3 py-1 fw-normal small">
+                            <i class="fas fa-award text-warning me-1"></i> {{ $doctor->experience ?? 5 }}+ Yrs Exp
+                        </span>
+                        
+                        @if($hasOnline && $hasOffline)
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 fw-bold small">
+                                <i class="fas fa-check-circle me-1"></i> Online & Offline
+                            </span>
+                        @elseif($hasOnline)
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1 fw-bold small">
+                                <i class="fas fa-video me-1"></i> Online Only
+                            </span>
+                        @else
+                            <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50 rounded-pill px-3 py-1 fw-bold small">
+                                <i class="fas fa-clinic-medical me-1"></i> Offline Only
+                            </span>
+                        @endif
                     </div>
-                    <div class="col-sm-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-video text-primary fs-4 me-2"></i>
-                            <span class="fw-bold small text-dark">Online Google Meet</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-pills text-warning fs-4 me-2"></i>
-                            <span class="fw-bold small text-dark">Genuine Medicines</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Doctor Timings & Consultation Schedule Section -->
-    <div class="mb-5" id="doctorScheduleSection">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-            <div>
-                <h3 class="fw-bold mb-1" style="color: #0c3b2e; font-family: 'Playfair Display', serif;">
-                    <i class="fas fa-user-clock me-2 text-warning"></i> Doctor Timings & Available Slots
-                </h3>
-                <p class="text-muted mb-0">Select a doctor to view their consultation schedules and book an appointment.</p>
-            </div>
-            <a href="{{ route('doctors.index') }}" class="btn btn-outline-success rounded-pill px-4">
-                View All Doctors <i class="fas fa-arrow-right ms-1"></i>
-            </a>
-        </div>
-
-        <div class="row g-4">
-            @forelse($doctors as $doctor)
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center me-3 flex-shrink-0 shadow-sm" style="width: 60px; height: 60px; background: #e8f5e9; border: 2px solid #1a4d2e;">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <!-- Doctor Info Header -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="position-relative me-3 flex-shrink-0">
+                                <div class="rounded-circle overflow-hidden shadow-sm d-flex align-items-center justify-content-center" 
+                                     style="width: 68px; height: 68px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 3px solid #1d5c42;">
                                     @if($doctor->photo)
                                         <img src="{{ asset('storage/' . $doctor->photo) }}" alt="Dr. {{ $doctor->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                                     @else
-                                        <span class="fw-bold text-success" style="font-size: 1.1rem;">Dr.</span>
+                                        <i class="fas fa-user-md fa-2x text-success"></i>
                                     @endif
                                 </div>
-                                <div>
-                                    <h5 class="fw-bold mb-1 text-dark">Dr. {{ $doctor->name }}</h5>
-                                    <span class="badge bg-light text-success border border-success border-opacity-25 rounded-pill px-3">
+                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle" title="Active Practitioner">
+                                    <span class="visually-hidden">Active</span>
+                                </span>
+                            </div>
+
+                            <div>
+                                <h5 class="fw-bold mb-1 text-dark">Dr. {{ $doctor->name }}</h5>
+                                <div class="mb-1">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-2 py-1 rounded">
                                         {{ $doctor->specialization_category ?? 'Ayurveda Specialist' }}
                                     </span>
                                 </div>
+                                @if($doctor->qualification)
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="{{ $doctor->qualification }}">
+                                        <i class="fas fa-graduation-cap me-1 text-secondary"></i> {{ $doctor->qualification }}
+                                    </small>
+                                @endif
                             </div>
+                        </div>
 
-                            <div class="small text-muted mb-3">
-                                <div class="mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i><strong>District:</strong> {{ $doctor->district->name ?? 'Kerala' }}</div>
-                                <div class="mb-1"><i class="fas fa-briefcase me-2 text-info"></i><strong>Experience:</strong> {{ $doctor->experience_years ?? 5 }} Years</div>
+                        <!-- Location & Hospital -->
+                        <div class="p-2 px-3 bg-light rounded-3 small mb-3">
+                            <div class="d-flex align-items-center mb-1 text-muted">
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                <span class="fw-semibold text-dark">{{ $doctor->district->name ?? 'Kerala' }}</span>
+                                @if($doctor->current_location)
+                                    <span class="ms-1">({{ $doctor->current_location }})</span>
+                                @endif
                             </div>
-
-                            <div class="bg-light p-3 rounded-3 mb-4 mt-auto">
-                                <h6 class="fw-bold small text-dark mb-2"><i class="far fa-clock me-1 text-warning"></i> Consultation Timings:</h6>
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span class="text-muted"><i class="fas fa-clinic-medical me-1 text-secondary"></i> Offline Hours:</span>
-                                    <span class="fw-semibold text-dark">{{ $doctor->available_time ?? '09:00 AM - 01:00 PM' }}</span>
+                            @if($doctor->hospital)
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="fas fa-hospital-alt text-info me-2"></i>
+                                    <span class="text-truncate" title="{{ $doctor->hospital->name }}">{{ $doctor->hospital->name }}</span>
                                 </div>
-                                <div class="d-flex justify-content-between small">
-                                    <span class="text-muted"><i class="fas fa-video me-1 text-primary"></i> Online Hours:</span>
-                                    <span class="fw-semibold text-dark">{{ $doctor->online_available_time ?? '04:00 PM - 07:00 PM' }}</span>
+                            @endif
+                        </div>
+
+                        <!-- Consultation Timings Section -->
+                        <div class="rounded-3 border p-3 mb-3 bg-body mt-auto">
+                            <h6 class="fw-bold small text-uppercase text-muted mb-2 tracking-wider">
+                                <i class="far fa-clock me-1 text-warning"></i> Consultation Timings
+                            </h6>
+
+                            <!-- Offline Timings -->
+                            <div class="p-2 rounded mb-2 {{ $hasOffline ? 'bg-success bg-opacity-10 border border-success border-opacity-25' : 'bg-light text-muted' }}">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold small {{ $hasOffline ? 'text-success' : 'text-muted' }}">
+                                        <i class="fas fa-clinic-medical me-1"></i> In-Clinic (Offline)
+                                    </span>
+                                    @if($hasOffline)
+                                        <span class="badge bg-success text-white small" style="font-size: 0.7rem;">Available</span>
+                                    @else
+                                        <span class="badge bg-secondary text-white small" style="font-size: 0.7rem;">N/A</span>
+                                    @endif
+                                </div>
+                                <div class="small fw-semibold text-dark">
+                                    {{ $doctor->available_time ?? ($hasOffline ? '09:00 AM - 01:00 PM' : 'Not Available') }}
                                 </div>
                             </div>
 
-                            <a href="{{ route('bookings.create', $doctor->id) }}" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm">
-                                <i class="fas fa-calendar-check me-2"></i> Book Appointment
-                            </a>
+                            <!-- Online Timings -->
+                            <div class="p-2 rounded {{ $hasOnline ? 'bg-primary bg-opacity-10 border border-primary border-opacity-25' : 'bg-light text-muted' }}">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold small {{ $hasOnline ? 'text-primary' : 'text-muted' }}">
+                                        <i class="fas fa-video me-1"></i> Video Call (Online)
+                                    </span>
+                                    @if($hasOnline)
+                                        <span class="badge bg-primary text-white small" style="font-size: 0.7rem;">Google Meet</span>
+                                    @else
+                                        <span class="badge bg-secondary text-white small" style="font-size: 0.7rem;">N/A</span>
+                                    @endif
+                                </div>
+                                <div class="small fw-semibold text-dark">
+                                    {{ $doctor->online_available_time ?? ($hasOnline ? '04:00 PM - 07:00 PM' : 'Not Available') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fee & Booking Action -->
+                        <div class="d-flex align-items-center justify-content-between pt-2">
+                            <div>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">Consultation Fee</small>
+                                <span class="fw-bold text-success fs-5">₹{{ number_format($doctor->consultation_fee ?? 300) }}</span>
+                            </div>
+                            @auth
+                                <a href="{{ route('bookings.create', $doctor->id) }}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                                    <i class="fas fa-calendar-check me-1"></i> Book Slot
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}?redirect={{ urlencode(route('bookings.create', $doctor->id)) }}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                                    <i class="fas fa-calendar-check me-1"></i> Book Slot
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>
-            @empty
-                <div class="col-12 text-center py-5 text-muted">
-                    <i class="fas fa-user-md fa-3x mb-3 opacity-25"></i>
-                    <p class="mb-0">No doctor schedules available at the moment.</p>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-light rounded-4 shadow-sm d-inline-block text-center" style="max-width: 450px;">
+                    <i class="fas fa-user-md fa-4x text-muted mb-3 opacity-50"></i>
+                    <h5 class="fw-bold text-dark">No Doctors Available</h5>
+                    <p class="text-muted small mb-0">There are currently no doctors registered in the system.</p>
                 </div>
-            @endforelse
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Empty State for JS Search -->
+    <div id="noResultsState" class="text-center py-5" style="display: none;">
+        <div class="p-4 bg-light rounded-4 d-inline-block text-center shadow-sm" style="max-width: 420px;">
+            <i class="fas fa-search fa-3x text-success mb-3 opacity-50"></i>
+            <h5 class="fw-bold text-dark mb-2">No Matching Doctors Found</h5>
+            <p class="text-muted small mb-3">Try adjusting your search criteria or switching the filter category.</p>
+            <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-4" id="resetFiltersBtn">
+                Reset Search Filters
+            </button>
         </div>
     </div>
 </div>
 
 <style>
     .hover-lift {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
     .hover-lift:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(12, 59, 46, 0.15) !important;
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(12, 59, 46, 0.12) !important;
     }
-    .leading-relaxed {
-        line-height: 1.7;
+    .backdrop-blur {
+        backdrop-filter: blur(10px);
+    }
+    .tracking-wider {
+        letter-spacing: 0.5px;
+    }
+    .filter-type-btn {
+        transition: all 0.2s ease-in-out;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('doctorSearchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const filterBtns = document.querySelectorAll('.filter-type-btn');
+    const doctorCards = document.querySelectorAll('.doctor-card-wrapper');
+    const noResultsState = document.getElementById('noResultsState');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    function filterDoctors() {
+        let visibleCount = 0;
+
+        doctorCards.forEach(card => {
+            const name = card.getAttribute('data-name') || '';
+            const category = card.getAttribute('data-category') || '';
+            const district = card.getAttribute('data-district') || '';
+            const hospital = card.getAttribute('data-hospital') || '';
+            const hasOnline = card.getAttribute('data-has-online') === 'true';
+            const hasOffline = card.getAttribute('data-has-offline') === 'true';
+
+            // Match search text
+            const matchesSearch = !searchQuery || 
+                name.includes(searchQuery) || 
+                category.includes(searchQuery) || 
+                district.includes(searchQuery) || 
+                hospital.includes(searchQuery);
+
+            // Match consultation type filter
+            let matchesType = true;
+            if (currentFilter === 'online') {
+                matchesType = hasOnline;
+            } else if (currentFilter === 'offline') {
+                matchesType = hasOffline;
+            } else if (currentFilter === 'both') {
+                matchesType = hasOnline && hasOffline;
+            }
+
+            if (matchesSearch && matchesType) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0 && doctorCards.length > 0) {
+            noResultsState.style.display = 'block';
+        } else {
+            noResultsState.style.display = 'none';
+        }
+    }
+
+    // Search Input listener
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            searchQuery = e.target.value.toLowerCase().trim();
+            if (searchQuery.length > 0) {
+                clearSearchBtn.style.display = 'inline-block';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+            filterDoctors();
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            filterDoctors();
+        });
+    }
+
+    // Filter Buttons listener
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            filterBtns.forEach(b => {
+                b.classList.remove('active');
+                if (b.classList.contains('btn-success')) {
+                    b.classList.replace('btn-success', 'btn-outline-success');
+                }
+                if (b.classList.contains('btn-primary')) {
+                    b.classList.replace('btn-primary', 'btn-outline-primary');
+                }
+                if (b.classList.contains('btn-warning')) {
+                    b.classList.replace('btn-warning', 'btn-outline-warning');
+                }
+            });
+
+            this.classList.add('active');
+            const filter = this.getAttribute('data-filter');
+            currentFilter = filter;
+
+            if (filter === 'all') {
+                this.classList.replace('btn-outline-success', 'btn-success');
+            } else if (filter === 'online') {
+                this.classList.replace('btn-outline-primary', 'btn-primary');
+            } else if (filter === 'offline') {
+                this.classList.replace('btn-outline-success', 'btn-success');
+            } else if (filter === 'both') {
+                this.classList.replace('btn-outline-warning', 'btn-warning');
+            }
+
+            filterDoctors();
+        });
+    });
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            currentFilter = 'all';
+
+            filterBtns.forEach(b => {
+                b.classList.remove('active');
+                if (b.getAttribute('data-filter') === 'all') {
+                    b.classList.add('active');
+                    b.classList.replace('btn-outline-success', 'btn-success');
+                }
+            });
+
+            filterDoctors();
+        });
+    }
+});
+</script>
 @endsection

@@ -43,6 +43,24 @@
             </div>
         </div>
 
+        <!-- Pending Booking Notification Alert Banner -->
+        @if(isset($pendingTotal) && $pendingTotal > 0)
+            <div class="alert alert-warning border-warning border-opacity-50 rounded-4 shadow-sm p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-2.5 bg-warning bg-opacity-25 text-dark rounded-circle">
+                        <i class="fas fa-bell fa-lg text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">Patient Booking Request Alert!</h6>
+                        <small class="text-muted">You have <strong>{{ $pendingTotal }} new patient appointment request(s)</strong> waiting for approval across your schedule.</small>
+                    </div>
+                </div>
+                <a href="{{ route('doctor.dashboard', ['filter' => 'all']) }}" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-1.5 small shadow-sm text-decoration-none">
+                    <i class="fas fa-tasks me-1"></i> Review Requests
+                </a>
+            </div>
+        @endif
+
         <!-- Date Strip (Only relevant for Today/Upcoming) -->
         <div class="row mb-4 align-items-center">
             <div class="col-md-9">
@@ -58,14 +76,26 @@
                                 $dateStr = $date->format('Y-m-d');
                                 $isActive = ($selectedDate == $dateStr);
                                 $isUnavailable = in_array($dateStr, $unavailabilities);
+                                $dateSummary = isset($bookedDatesSummary) ? ($bookedDatesSummary[$dateStr] ?? null) : null;
                             @endphp
                             <div class="date-pill {{ $isActive ? 'active' : '' }} {{ $isUnavailable ? 'unavailable' : '' }} flex-shrink-0 d-flex flex-column align-items-center justify-content-center" 
                                  onclick="window.location.href='{{ route('doctor.dashboard', ['filter' => 'upcoming', 'date' => $dateStr]) }}'"
-                                 style="cursor: pointer; position: relative;">
+                                 style="cursor: pointer; position: relative; {{ $dateSummary ? 'border-color: #15803d;' : '' }}">
                                 <span class="day">{{ $date->format('D') }}</span>
                                 <span class="num">{{ $date->format('d') }}</span>
+                                
                                 @if($isUnavailable)
                                     <span class="unavailable-marker px-1 rounded-pill bg-danger text-white position-absolute top-0 end-0" style="font-size: 8px; transform: translate(30%, -30%);">Leave</span>
+                                @elseif($dateSummary)
+                                    @if($dateSummary->pending_count > 0)
+                                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 rounded-circle p-1 shadow-sm" style="font-size: 9px; min-width: 18px; height: 18px; line-height: 12px; transform: translate(30%, -30%);" title="{{ $dateSummary->pending_count }} Pending Request(s)">
+                                            {{ $dateSummary->pending_count }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-success text-white position-absolute top-0 end-0 rounded-circle p-1 shadow-sm" style="font-size: 8px; width: 16px; height: 16px; transform: translate(30%, -30%);" title="{{ $dateSummary->total_count }} Booked Appointment(s)">
+                                            <i class="fas fa-check" style="font-size: 7px;"></i>
+                                        </span>
+                                    @endif
                                 @endif
                             </div>
                         @endfor
