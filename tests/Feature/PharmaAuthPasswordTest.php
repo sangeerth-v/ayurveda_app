@@ -26,6 +26,7 @@ class PharmaAuthPasswordTest extends TestCase
             'email' => $email,
             'phone' => '9876543210',
             'password' => $plainPassword,
+            'state_name' => 'Kerala',
             'district_name' => 'Ernakulam',
             'address' => 'Test registered office address for pharma company',
             'license_document' => null,

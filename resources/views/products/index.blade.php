@@ -8,582 +8,396 @@
 
 @section('content')
 <style>
-/* ─── PRODUCTS PAGE DESIGN ────────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   PRODUCTS PAGE — UNIQUE DESIGN
+   Palette: deep bottle-green, parchment cream, gold
+════════════════════════════════════════════════════ */
 :root {
-    --forest:   #0c3b2e;
-    --sage:     #1d5c42;
-    --herb:     #4f772d;
-    --gold:     #c5a059;
-    --amber:    #ffba08;
-    --parchment:#f9f5ef;
-    --cream:    #faf8f4;
+    --pg:  #0c3b2e;
+    --sg:  #1d5c42;
+    --hg:  #4f772d;
+    --gld: #c5a059;
+    --amb: #ffba08;
+    --par: #f5f0e8;
+    --wht: #ffffff;
 }
 
-/* ─ HERO ─ */
-.pharmacy-hero {
-        background: #0c3b2e;
-        color: #ffffff;
-        padding: 0;
-        position: relative;
-        overflow: hidden;
-        min-height: 52vh;
-        display: flex;
-        align-items: center;
-    }
-    .pharmacy-hero-bg {
-        position: absolute; inset: 0;
-        background: url('/images/mortar_pestle.png') center center / cover no-repeat;
-        filter: brightness(0.28) saturate(1.3);
-        z-index: 0;
-    }
-    .pharmacy-hero-overlay {
-        position: absolute; inset: 0;
-        background: linear-gradient(120deg, rgba(12,59,46,0.88) 45%, rgba(12,59,46,0.5) 100%);
-        z-index: 1;
-    }
-    .pharmacy-hero-content { position: relative; z-index: 2; padding: 3.5rem 0; width: 100%; }
-    .pharmacy-hero-quote {
-        font-family: 'Playfair Display', Georgia, serif;
-        font-size: clamp(1.6rem, 4vw, 2.6rem);
-        color: #fff;
-        font-style: italic;
-        font-weight: 700;
-        line-height: 1.3;
-        margin-bottom: 0.75rem;
-    }
-    .pharmacy-hero-quote .accent { color: #ffba08; }
-    }
-    .pharmacy-hero::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        right: -20px;
-        width: 250px;
-        height: 250px;
-        background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-    .search-box-wrap {
-        max-width: 650px;
-        margin: 0 auto;
-        position: relative;
-    }
-    .search-box-input {
-        height: 52px;
-        border-radius: 30px;
-        padding-left: 25px;
-        padding-right: 120px;
-        border: none;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        font-size: 0.98rem;
-    }
-    .search-box-btn {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        height: 42px;
-        border-radius: 25px;
-        padding: 0 24px;
-        background: var(--accent-gold, #c5a059);
-        border: none;
-        color: #1a4d2e;
-        font-weight: 700;
-        transition: all 0.2s ease;
-    }
-    .search-box-btn:hover {
-        background: #d4af66;
-        transform: translateY(-1px);
-    }
-    
-    /* Category Quick Pills */
-    .category-pills-slider {
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 8px;
-        scrollbar-width: thin;
-    }
-    .category-pills-slider::-webkit-scrollbar {
-        height: 4px;
-    }
-    .category-pills-slider::-webkit-scrollbar-thumb {
-        background: #c5a059;
-        border-radius: 4px;
-    }
-    .category-pill {
-        white-space: nowrap;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(5px);
-        color: #ffffff;
-        padding: 8px 18px;
-        border-radius: 25px;
-        font-size: 0.88rem;
-        font-weight: 500;
-        text-decoration: none;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        transition: all 0.2s;
-    }
-    .category-pill:hover, .category-pill.active {
-        background: #ffffff;
-        color: #1a4d2e;
-        font-weight: 600;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+/* ── FLATLAY HERO BANNER ───────────────────────────── */
+.ph-hero {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.ph-hero-img {
+    position: absolute; inset: 0;
+    background: url('/images/herb_flatlay.png') center/cover no-repeat;
+    filter: brightness(0.45) saturate(1.1);
+}
+.ph-hero-content {
+    position: relative; z-index: 2;
+    color: #fff;
+}
+.ph-hero-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 0.6rem;
+}
+.ph-hero-title em { color: var(--amb); font-style: normal; }
+.ph-hero-sub { color: rgba(255,255,255,0.7); font-size: 1rem; margin-bottom: 1.8rem; }
 
-    /* Trust Feature Bar */
-    .trust-bar {
-        background: #f4f8f4;
-        border-bottom: 1px solid #e0e9e1;
-        padding: 0.85rem 0;
-        font-size: 0.88rem;
-        color: #2d6a4f;
-    }
-    .trust-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 500;
-    }
-    .trust-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #e1efe3;
-        color: #1a4d2e;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
+/* Search pill inside hero */
+.hero-search-wrap { position: relative; max-width: 560px; margin: 0 auto; }
+.hero-search-wrap input {
+    width: 100%; height: 54px; border-radius: 50px;
+    padding: 0 130px 0 24px;
+    border: none; font-size: 0.96rem;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    outline: none;
+}
+.hero-search-wrap button {
+    position: absolute; right: 5px; top: 5px; height: 44px;
+    background: linear-gradient(135deg, var(--amb), #d4900c);
+    border: none; border-radius: 40px; padding: 0 24px;
+    color: #072a21; font-weight: 800; font-size: 0.9rem;
+    cursor: pointer; transition: all 0.2s;
+}
+.hero-search-wrap button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,186,8,0.4); }
 
-    /* Product Card Styling */
-    .ap-product-card {
-        background: #ffffff;
-        border-radius: 14px;
-        border: 1px solid #e8eee9;
-        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        position: relative;
-    }
-    .ap-product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 28px rgba(26, 77, 46, 0.12) !important;
-        border-color: #c5a059;
-    }
-    .ap-img-wrap {
-        height: 200px;
-        background: #f9fbf9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .ap-img-wrap img {
-        max-height: 160px;
-        max-width: 100%;
-        object-fit: contain;
-        transition: transform 0.4s ease;
-    }
-    .ap-product-card:hover .ap-img-wrap img {
-        transform: scale(1.06);
-    }
-    .badge-rx {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        background: #fff3cd;
-        color: #856404;
-        font-size: 0.72rem;
-        font-weight: 700;
-        padding: 4px 8px;
-        border-radius: 6px;
-        border: 1px solid #ffeeba;
-        z-index: 2;
-    }
-    .badge-herbal {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: #d4edda;
-        color: #155724;
-        font-size: 0.72rem;
-        font-weight: 600;
-        padding: 4px 8px;
-        border-radius: 6px;
-        z-index: 2;
-    }
-    .ap-card-body {
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-    }
-    .ap-cat-title {
-        font-size: 0.75rem;
-        color: #4f772d;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-    }
-    .ap-product-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #1a4d2e;
-        line-height: 1.35;
-        height: 2.7em;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        margin-bottom: 8px;
-        text-decoration: none;
-    }
-    .ap-product-title:hover {
-        color: #4f772d;
-    }
-    .ap-rating {
-        font-size: 0.78rem;
-        color: #ffc107;
-        margin-bottom: 10px;
-    }
-    .ap-price {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #1a4d2e;
-    }
-    .btn-add-cart {
-        background: #1a4d2e;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.88rem;
-        padding: 8px;
-        transition: all 0.2s ease;
-    }
-    .btn-add-cart:hover {
-        background: #4f772d;
-        color: #ffffff;
-    }
-    .qty-picker {
-        width: 85px;
-    }
-    .qty-picker input {
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-    .qty-btn {
-        padding: 2px 8px;
-        font-size: 0.8rem;
-    }
+/* Category pills on hero */
+.hero-cat-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 1.5rem; }
+.hero-cat-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; padding: 7px 18px; border-radius: 50px;
+    font-size: 0.83rem; font-weight: 500;
+    text-decoration: none; transition: all 0.2s;
+}
+.hero-cat-pill:hover, .hero-cat-pill.active {
+    background: #fff; color: var(--pg);
+    font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
 
-    /* Filter Sidebar Styling */
-    .filter-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e0e9e1;
-    }
-    .filter-header {
-        border-bottom: 1px solid #edf2ee;
-        padding: 1rem 1.25rem;
-    }
+/* ── SPLIT FEATURE STRIP ───────────────────────────── */
+.feat-strip {
+    display: flex;
+    background: var(--pg);
+}
+.feat-strip-img {
+    width: 42%;
+    min-height: 280px;
+    background: url('/images/product_bottle.png') center/cover no-repeat;
+    flex-shrink: 0;
+}
+.feat-strip-content {
+    flex: 1;
+    padding: 3.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.feat-strip-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,186,8,0.15); border: 1px solid rgba(255,186,8,0.35);
+    color: var(--amb); font-size: 0.73rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 4px 14px; border-radius: 50px; margin-bottom: 1.2rem;
+    width: fit-content;
+}
+.feat-strip-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    color: #fff; font-weight: 800; line-height: 1.2;
+    margin-bottom: 1rem;
+}
+.feat-strip-title span { color: var(--amb); }
+.feat-strip-desc { color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.5rem; }
+.feat-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.feat-pill {
+    padding: 6px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.07);
+}
+
+/* ── CATALOG TOOLBAR ───────────────────────────────── */
+.catalog-bar {
+    background: var(--par);
+    border-bottom: 1px solid #e0d9cc;
+    padding: 1.2rem 0;
+}
+.catalog-bar .toolbar-inner {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+}
+
+/* ── PRODUCT CARDS ─────────────────────────────────── */
+.catalog-section { background: var(--par); padding: 3rem 0 5rem; }
+
+.prod-card {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #e8e1d6;
+    overflow: hidden;
+    height: 100%;
+    display: flex; flex-direction: column;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 12px rgba(12,59,46,0.05);
+}
+.prod-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gld);
+    box-shadow: 0 18px 40px rgba(12,59,46,0.12);
+}
+.prod-img-wrap {
+    height: 195px;
+    background: linear-gradient(145deg, #f0ede5, #e8e4da);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.2rem; position: relative; overflow: hidden;
+}
+.prod-img-wrap img { max-height: 160px; max-width: 100%; object-fit: contain; transition: transform 0.4s ease; }
+.prod-card:hover .prod-img-wrap img { transform: scale(1.07); }
+
+.prod-badge-rx {
+    position: absolute; top: 10px; left: 10px;
+    background: #fffbeb; color: #92400e; border: 1px solid #fde68a;
+    font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+}
+.prod-badge-herb {
+    position: absolute; top: 10px; right: 10px;
+    background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
+    font-size: 0.65rem; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+}
+.prod-body { padding: 1rem 1.1rem; display: flex; flex-direction: column; flex-grow: 1; }
+.prod-cat { font-size: 0.7rem; color: var(--hg); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.prod-name {
+    font-size: 0.98rem; font-weight: 700; color: var(--pg);
+    line-height: 1.35; height: 2.7em; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    margin-bottom: 8px; text-decoration: none;
+}
+.prod-name:hover { color: var(--hg); }
+.prod-by { font-size: 0.74rem; margin-bottom: 8px; }
+.prod-stars { color: #f59e0b; font-size: 0.75rem; margin-bottom: 10px; }
+.prod-footer { margin-top: auto; padding-top: 10px; border-top: 1px solid #f0ece4; }
+.prod-price { font-size: 1.2rem; font-weight: 800; color: var(--pg); }
+.prod-stock { font-size: 0.72rem; color: #16a34a; font-weight: 600; }
+.btn-addcart {
+    background: var(--pg);
+    color: #fff; border: none; border-radius: 10px;
+    font-weight: 700; font-size: 0.85rem; padding: 9px;
+    width: 100%; transition: all 0.2s;
+    cursor: pointer;
+}
+.btn-addcart:hover { background: var(--sg); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(12,59,46,0.2); }
+.qty-grp { display: flex; gap: 8px; align-items: center; }
+.qty-btn { width: 30px; height: 30px; border: 1px solid #d0cab8; border-radius: 8px; background: #f8f5ef; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--pg); }
+.qty-input { width: 45px; height: 30px; text-align: center; border: 1px solid #d0cab8; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: var(--pg); }
+
+/* ── EMPTY / NO RESULTS ────────────────────────────── */
+.empty-state { text-align: center; padding: 5rem 1rem; }
+.empty-state i { color: #c8bfaf; font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+/* ── SORT DROPDOWN ─────────────────────────────────── */
+.sort-btn {
+    background: #fff; border: 1px solid #d0cab8;
+    border-radius: 50px; padding: 8px 18px;
+    font-size: 0.85rem; font-weight: 600; color: var(--pg);
+    cursor: pointer;
+}
 </style>
 
-<!-- ═══ HERO: Photo Backed ═══════════════════════════ -->
-<div class="pharmacy-hero">
-    <div class="pharmacy-hero-bg"></div>
-    <div class="pharmacy-hero-overlay"></div>
-    <div class="pharmacy-hero-content">
-        <div class="container text-center">
-            <div class="mb-3" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,186,8,0.15);border:1px solid rgba(255,186,8,0.35);color:#ffba08;font-size:0.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 16px;border-radius:50px;">
-                <i class="fas fa-mortar-pestle me-1"></i> Herbal Pharmacy & Wellness
-            </div>
-            <h1 class="pharmacy-hero-quote">
-                "Your body knows how to heal.<br>
-                <span class="accent">Herbs just guide the way.</span>"
-            </h1>
-            <p style="color:rgba(255,255,255,0.55);font-size:0.95rem;margin-bottom:2rem;">
-                Genuine herbal medicines, oils, supplements & certified Ayurvedic formulations
-            </p>
+{{-- ═══ FLATLAY HERO ═══════════════════════════════ --}}
+<div class="ph-hero">
+    <div class="ph-hero-img"></div>
+    <div class="ph-hero-content px-3">
+        <h1 class="ph-hero-title">
+            Ayurveda Pharmacy<br>
+            <em>&amp; Wellness Store</em>
+        </h1>
+        <p class="ph-hero-sub">Genuine herbal medicines, oils &amp; certified Ayurvedic formulations</p>
 
-            <!-- Live Search Bar -->
-            <div class="search-box-wrap mb-4">
-                <form action="{{ route('products.index') }}" method="GET">
-                    @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
-                    <input type="text" name="search" class="form-control search-box-input" placeholder="Search for medicines, churnas, oils, hair care..." value="{{ $search ?? '' }}">
-                    <button type="submit" class="search-box-btn">
-                        <i class="fas fa-search me-1"></i> Search
-                    </button>
-                </form>
-            </div>
+        <div class="hero-search-wrap">
+            <form action="{{ route('products.index') }}" method="GET">
+                @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
+                <input type="text" name="search" placeholder="Search medicines, churnas, oils, hair care…" value="{{ $search ?? '' }}">
+                <button type="submit"><i class="fas fa-search me-1"></i>Search</button>
+            </form>
+        </div>
 
-            <!-- Quick Category Pills -->
-            <div class="category-pills-slider justify-content-center">
-                <a href="{{ route('products.index') }}" class="category-pill {{ !request('categories') ? 'active' : '' }}">
-                    ✨ All Products
+        <div class="hero-cat-pills">
+            <a href="{{ route('products.index') }}" class="hero-cat-pill {{ !request('categories') ? 'active' : '' }}">✨ All</a>
+            @foreach($categoryData as $catName => $subCats)
+                <a href="{{ route('products.index', ['categories' => [$catName]]) }}"
+                   class="hero-cat-pill {{ is_array(request('categories')) && in_array($catName, request('categories')) ? 'active' : '' }}">
+                    @if(Str::contains($catName, ['Medicine','Rx'])) 💊
+                    @elseif(Str::contains($catName, ['Oil','Hair','Care'])) 💆
+                    @elseif(Str::contains($catName, ['Wellness','Health'])) 🛡️
+                    @else 🌿 @endif
+                    {{ $catName }}
                 </a>
-                @foreach($categoryData as $catName => $subCats)
-                    <a href="{{ route('products.index', ['categories' => [$catName]]) }}"
-                       class="category-pill {{ is_array(request('categories')) && in_array($catName, request('categories')) ? 'active' : '' }}">
-                        @if(Str::contains($catName, ['Medicine', 'Rx'])) 💊
-                        @elseif(Str::contains($catName, ['Oil', 'Hair', 'Care'])) 💆
-                        @elseif(Str::contains($catName, ['Wellness', 'Health'])) 🛡️
-                        @else 🌿 @endif
-                        {{ $catName }}
+            @endforeach
+        </div>
+    </div>
+</div>
+
+{{-- ═══ PRODUCT BOTTLE SPLIT STRIP ════════════════ --}}
+<div class="feat-strip d-none d-md-flex">
+    <div class="feat-strip-img"></div>
+    <div class="feat-strip-content">
+        <div class="feat-strip-badge"><i class="fas fa-seedling"></i> From Nature's Lab</div>
+        <h2 class="feat-strip-title">Pure. Potent.<br><span>Proven by Tradition.</span></h2>
+        <p class="feat-strip-desc">
+            Every product is sourced from GMP-licensed pharmacies and formulated by BAMS &amp; MD 
+            Ayurvedic practitioners. Ancient healing science — delivered directly to you.
+        </p>
+        <div class="feat-pill-row">
+            <span class="feat-pill"><i class="fas fa-leaf me-1"></i>100% Natural</span>
+            <span class="feat-pill"><i class="fas fa-certificate me-1"></i>GMP Certified</span>
+            <span class="feat-pill"><i class="fas fa-flask me-1"></i>Lab Tested</span>
+            <span class="feat-pill"><i class="fas fa-user-md me-1"></i>Doctor Formulated</span>
+        </div>
+    </div>
+</div>
+
+{{-- ═══ CATALOG TOOLBAR ════════════════════════════ --}}
+<div class="catalog-bar">
+    <div class="container">
+        <div class="toolbar-inner">
+            <div>
+                <span style="font-weight:700;color:var(--pg);font-size:1rem;">
+                    @if($search)
+                        Results for "<span style="color:var(--hg);">{{ $search }}</span>"
+                    @else
+                        All Ayurvedic Products
+                    @endif
+                </span>
+                <span style="background:#e8f5e9;color:#2d6a4f;padding:3px 10px;border-radius:50px;font-size:0.78rem;font-weight:700;margin-left:8px;">
+                    {{ $products->count() }} items
+                </span>
+                @if($search)
+                    <a href="{{ route('products.index') }}" style="color:#e74c3c;margin-left:10px;font-size:0.83rem;text-decoration:none;">
+                        <i class="fas fa-times-circle"></i> Clear
                     </a>
-                @endforeach
+                @endif
+            </div>
+            <div class="dropdown">
+                <button class="sort-btn dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort-amount-down me-1"></i>
+                    Sort: {{ str_replace('_',' ', ucwords($sort ?? 'price_asc','_')) }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                    <li><a class="dropdown-item {{ (!request('sort')||request('sort')=='price_asc') ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort'=>'price_asc']) }}">Price: Low → High</a></li>
+                    <li><a class="dropdown-item {{ request('sort')=='price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort'=>'price_desc']) }}">Price: High → Low</a></li>
+                    <li><a class="dropdown-item {{ request('sort')=='newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort'=>'newest']) }}">Newest Arrivals</a></li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ═══ NATURE EDITORIAL PHOTO BLOCK ════════════════════ -->
-<div style="background:#f9f5ef;padding:3.5rem 0;">
+{{-- ═══ PRODUCT GRID ════════════════════════════════ --}}
+<section class="catalog-section">
     <div class="container">
-        <div class="row g-4 align-items-center">
-            <!-- Left: Photo Grid -->
-            <div class="col-lg-5">
-                <div class="row g-3">
-                    <div class="col-12">
-                        <img src="/images/herb_hands.png" alt="Hands holding Ayurvedic herbs"
-                            style="width:100%;height:240px;object-fit:cover;border-radius:20px;box-shadow:0 16px 40px rgba(12,59,46,0.15);">
+        @if($products->count() > 0)
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach($products as $product)
+            <div class="col">
+                <div class="prod-card">
+                    {{-- Badge --}}
+                    @if($product->category == 'Medicine')
+                        <span class="prod-badge-rx"><i class="fas fa-file-prescription me-1"></i>Rx</span>
+                    @else
+                        <span class="prod-badge-herb"><i class="fas fa-seedling me-1"></i>Herbal</span>
+                    @endif
+
+                    {{-- Image --}}
+                    <div class="prod-img-wrap">
+                        <a href="{{ route('products.show', $product->id) }}">
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                            @else
+                                <img src="/images/herb_flatlay.png" alt="{{ $product->name }}" style="border-radius:10px;">
+                            @endif
+                        </a>
                     </div>
-                    <div class="col-6">
-                        <img src="/images/mortar_pestle.png" alt="Traditional herb grinding"
-                            style="width:100%;height:138px;object-fit:cover;border-radius:16px;box-shadow:0 8px 22px rgba(12,59,46,0.1);">
-                    </div>
-                    <div class="col-6">
-                        <div style="width:100%;height:138px;border-radius:16px;background:linear-gradient(135deg,#0c3b2e,#1d5c42);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(12,59,46,0.2);">
-                            <div style="color:#ffba08;font-size:2.2rem;font-weight:800;font-family:'Playfair Display',serif;line-height:1;">5000+</div>
-                            <div style="color:rgba(255,255,255,0.65);font-size:0.78rem;margin-top:4px;text-align:center;">Years of<br>Ayurvedic Wisdom</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Right: Philosophy Content -->
-            <div class="col-lg-7 ps-lg-5">
-                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,119,45,0.1);color:#4f772d;font-size:0.76rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:50px;margin-bottom:1.2rem;">
-                    <i class="fas fa-seedling"></i> From Nature's Pharmacy
-                </div>
-                <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.6rem,3vw,2.2rem);color:#0c3b2e;font-weight:800;line-height:1.25;margin-bottom:1.2rem;">
-                    Pure. Potent.<br>Proven by Tradition.
-                </h2>
-                <p style="color:#6b7c6b;line-height:1.9;font-size:1rem;margin-bottom:1.5rem;">
-                    Every product on our shelf is sourced from GMP-licensed, government-approved pharmacies.
-                    Formulated by BAMS and MD Ayurvedic practitioners, each herb carries thousands of years of 
-                    healing science — delivered directly to your doorstep.
-                </p>
-
-                <!-- Feature Pills Row -->
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    <span style="background:#e8f5e9;color:#1d5c42;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #c3e6cb;">
-                        <i class="fas fa-leaf me-1"></i> 100% Natural
-                    </span>
-                    <span style="background:#fff8e1;color:#8b6914;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #ffe082;">
-                        <i class="fas fa-certificate me-1"></i> GMP Certified
-                    </span>
-                    <span style="background:#e3f2fd;color:#1565c0;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #bbdefb;">
-                        <i class="fas fa-shield-alt me-1"></i> Lab Tested
-                    </span>
-                    <span style="background:#fce4ec;color:#c62828;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #f8bbd0;">
-                        <i class="fas fa-user-md me-1"></i> Doctor Formulated
-                    </span>
-                </div>
-
-                <!-- Mini Quote -->
-                <blockquote style="border-left:3px solid #c5a059;padding:0.8rem 1.2rem;margin:1.5rem 0;background:rgba(197,160,89,0.06);border-radius:0 12px 12px 0;">
-                    <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#0c3b2e;margin:0;font-size:1rem;line-height:1.6;">
-                        "The secret to perfect health lies in harmony between body, mind, and nature."
-                    </p>
-                    <footer style="color:#8a9a8b;font-size:0.78rem;margin-top:6px;">— Charaka Samhita</footer>
-                </blockquote>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="trust-bar d-none d-md-block">
-    <div class="container">
-        <div class="row align-items-center text-center">
-            <div class="col-md-3">
-                <div class="trust-item justify-content-center">
-                    <div class="trust-icon"><i class="fas fa-bolt"></i></div>
-                    <span>Fast Express Delivery</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="trust-item justify-content-center">
-                    <div class="trust-icon"><i class="fas fa-shield-alt"></i></div>
-                    <span>100% Genuine Ayurvedic</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="trust-item justify-content-center">
-                    <div class="trust-icon"><i class="fas fa-leaf"></i></div>
-                    <span>Certified Quality Herbs</span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="trust-item justify-content-center">
-                    <div class="trust-icon"><i class="fas fa-user-md"></i></div>
-                    <span>Doctor Consultations</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- Main Catalog Container -->
-<div class="container my-5">
-    <div class="row">
-        <!-- Product Listing Section (Full Width) -->
-        <div class="col-lg-12">
-            <!-- Header Toolbar -->
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 bg-white p-3 rounded-3 shadow-sm border border-light">
-                <div>
-                    <h5 class="fw-bold text-dark mb-1">
-                        @if($search)
-                            Search Results for "<span class="text-success">{{ $search }}</span>"
-                        @else
-                            All Ayurvedic Products
+                    {{-- Body --}}
+                    <div class="prod-body">
+                        @if($product->category)
+                            <div class="prod-cat">{{ $product->category }}</div>
                         @endif
-                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill ms-2 font-monospace">{{ $products->count() }} items</span>
-                    </h5>
-                    <p class="text-muted small mb-0">Original, lab-tested herbal formulations for holistic health.</p>
-                </div>
+                        <a href="{{ route('products.show', $product->id) }}" class="prod-name">{{ $product->name }}</a>
 
-                <div class="d-flex align-items-center gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-sort-amount-down me-1"></i> Sort: {{ str_replace('_', ' ', ucwords($sort ?? 'price_asc', '_')) }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                            <li><a class="dropdown-item {{ (request('sort') == 'price_asc' || !request('sort')) ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}">Price: Low to High</a></li>
-                            <li><a class="dropdown-item {{ request('sort') == 'price_desc' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}">Price: High to Low</a></li>
-                            <li><a class="dropdown-item {{ request('sort') == 'newest' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Newest Arrivals</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+                        @if($product->doctor)
+                            <div class="prod-by">
+                                <span class="badge" style="background:#e8f5e9;color:#1d5c42;font-size:0.72rem;padding:4px 8px;border-radius:20px;">
+                                    <i class="fas fa-user-md me-1"></i>Dr. {{ $product->doctor->name }}
+                                </span>
+                            </div>
+                        @elseif($product->pharmaCompany)
+                            <div class="prod-by">
+                                <span class="badge" style="background:#f5f5f5;color:#555;font-size:0.72rem;padding:4px 8px;border-radius:20px;">
+                                    <i class="fas fa-building me-1"></i>{{ $product->pharmaCompany->company_name }}
+                                </span>
+                            </div>
+                        @endif
 
-            <!-- Active Search Filter Badge -->
-            @if($search)
-                <div class="mb-3 d-flex align-items-center gap-2">
-                    <span class="small text-muted">Active Search:</span>
-                    <span class="badge bg-success bg-opacity-15 text-success p-2 rounded-pill">
-                        "{{ $search }}" <a href="{{ route('products.index') }}" class="text-success ms-2 text-decoration-none"><i class="fas fa-times-circle"></i></a>
-                    </span>
-                </div>
-            @endif
+                        <div class="prod-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                            <span style="color:#9ca3af;margin-left:4px;">(4.8)</span>
+                        </div>
 
-            <!-- Product Grid -->
-            @if($products->count() > 0)
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
-                    @foreach($products as $product)
-                        <div class="col">
-                            <div class="ap-product-card shadow-sm">
-                                <!-- Prescription / Herbal Badge -->
-                                @if($product->category == 'Medicine')
-                                    <span class="badge-rx"><i class="fas fa-file-prescription me-1"></i> Prescription</span>
-                                @else
-                                    <span class="badge-herbal"><i class="fas fa-seedling me-1"></i> 100% Herbal</span>
-                                @endif
-
-                                <!-- Product Image Wrap -->
-                                <div class="ap-img-wrap">
-                                    <a href="{{ route('products.show', $product->id) }}">
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                                        @else
-                                            <img src="https://via.placeholder.com/200x200?text=Ayurvedic+Product" alt="{{ $product->name }}">
-                                        @endif
-                                    </a>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="ap-card-body">
-                                    <a href="{{ route('products.show', $product->id) }}" class="ap-product-title">
-                                        {{ $product->name }}
-                                    </a>
-
-                                    @if($product->doctor)
-                                        <div class="mb-2">
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1 small" style="font-size: 0.75rem;" title="Formulated by Dr. {{ $product->doctor->name }}">
-                                                <i class="fas fa-user-md me-1"></i> Dr. {{ $product->doctor->name }}
-                                            </span>
-                                        </div>
-                                    @elseif($product->pharmaCompany)
-                                        <div class="mb-2">
-                                            <span class="badge bg-light text-secondary border rounded-pill px-2 py-1 small" style="font-size: 0.75rem;">
-                                                <i class="fas fa-building me-1"></i> {{ $product->pharmaCompany->company_name }}
-                                            </span>
-                                        </div>
+                        <div class="prod-footer">
+                            <div class="d-flex justify-content-between align-items-end mb-3">
+                                <div>
+                                    <div class="prod-price">₹{{ number_format($product->price, 2) }}</div>
+                                    @if($product->stock > 0)
+                                        <div class="prod-stock"><i class="fas fa-check-circle me-1"></i>In Stock</div>
                                     @endif
-                                    
-                                    <!-- Rating -->
-                                    <div class="ap-rating d-flex align-items-center gap-1">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star-half-alt text-warning"></i>
-                                        <span class="text-muted ms-1 small">(4.8)</span>
-                                    </div>
-
-                                    <!-- Pricing & Add to Cart -->
-                                    <div class="mt-auto pt-2 border-top">
-                                        <div class="d-flex justify-content-between align-items-baseline mb-3">
-                                            <div>
-                                                <span class="ap-price">₹{{ number_format($product->price, 2) }}</span>
-                                            </div>
-                                            <span class="badge bg-success bg-opacity-10 text-success small">In Stock</span>
-                                        </div>
-
-                                        @if($product->stock > 0)
-                                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                                @csrf
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="input-group input-group-sm qty-picker">
-                                                        <button class="btn btn-outline-secondary qty-btn" type="button" onclick="const input = this.parentNode.querySelector('input'); if(input.value > 1) input.stepDown();">-</button>
-                                                        <input type="number" name="quantity" class="form-control p-0 text-center" value="1" min="1" max="10">
-                                                        <button class="btn btn-outline-secondary qty-btn" type="button" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-add-cart flex-grow-1">
-                                                        <i class="fas fa-shopping-cart me-1"></i> Add
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        @else
-                                            <button class="btn btn-secondary btn-sm w-100 disabled">Out of Stock</button>
-                                        @endif
-                                    </div>
                                 </div>
                             </div>
+
+                            @if($product->stock > 0)
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                @csrf
+                                <div class="qty-grp mb-2">
+                                    <button type="button" class="qty-btn" onclick="const i=this.parentNode.querySelector('input');if(i.value>1)i.stepDown()">−</button>
+                                    <input type="number" name="quantity" class="qty-input" value="1" min="1" max="10">
+                                    <button type="button" class="qty-btn" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                                </div>
+                                <button type="submit" class="btn-addcart">
+                                    <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                </button>
+                            </form>
+                            @else
+                                <button class="btn-addcart" style="opacity:0.5;cursor:not-allowed;" disabled>Out of Stock</button>
+                            @endif
                         </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="card border-0 shadow-sm p-5 text-center my-4">
-                    <i class="fas fa-box-open fa-3x text-muted mb-3 opacity-50"></i>
-                    <h5 class="fw-bold">No Products Found</h5>
-                    <p class="text-muted small">Try searching with a different term or clearing your category filters.</p>
-                    <div>
-                        <a href="{{ route('products.index') }}" class="btn btn-success btn-sm px-4">Reset Filters</a>
                     </div>
                 </div>
-            @endif
+            </div>
+            @endforeach
         </div>
-    </div>
-</div>
-@endsection
 
+        @else
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h5 style="color:var(--pg);font-weight:700;">No Products Found</h5>
+            <p class="text-muted small">Try a different search or clear your category filter.</p>
+            <a href="{{ route('products.index') }}" style="background:var(--pg);color:#fff;padding:10px 28px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.9rem;display:inline-block;margin-top:10px;">
+                <i class="fas fa-redo me-2"></i>Reset Filters
+            </a>
+        </div>
+        @endif
+    </div>
+</section>
+
+@endsection
