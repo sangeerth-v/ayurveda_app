@@ -9,13 +9,24 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-md-12">
+@extends('layouts.app')
+
+@section('navbar')
+    @include('partials.nav-admin')
+@endsection
+
+@section('title', 'Admin Dashboard | Ayurveda')
+
+@section('content')
+<div class="row mb-4">
+    <div class="col-md-12">
         <h2 class="mb-3">Admin Overview</h2>
         <p class="text-muted">Welcome back, Admin. Here is what's happening today.</p>
     </div>
 </div>
 
 <div class="row g-4 mb-5">
-    <!-- Doctors Stat Card -->
+    {{-- 
     <div class="col-md-3">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid #198754 !important;">
             <div class="card-body">
@@ -31,8 +42,9 @@
             </div>
         </div>
     </div>
+    --}}
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid var(--primary-green) !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -49,7 +61,7 @@
     </div>
 
     <!-- Pharmas Stat Card -->
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid var(--accent-gold) !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -66,7 +78,7 @@
     </div>
 
     <!-- Users Stat Card -->
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm" style="border-left: 5px solid #4a90e2 !important;">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -94,9 +106,11 @@
                     <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle"></i> Add New Doctor
                     </a>
+                    {{-- 
                     <a href="{{ route('admin.hospitals.create') }}" class="btn btn-outline-success d-flex align-items-center gap-2">
                         <i class="fas fa-hospital"></i> Register Hospital
                     </a>
+                    --}}
                     <a href="{{ route('admin.pharmas.create') }}" class="btn btn-outline-dark d-flex align-items-center gap-2">
                         <i class="fas fa-building"></i> Register Pharma
                     </a>

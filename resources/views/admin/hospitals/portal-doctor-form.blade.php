@@ -90,26 +90,19 @@
         @endif
     </div>
     @php
-        $parts = explode(' to ', $doctor->available_time ?? '');
-        $from = old('available_from', $parts[0] ?? '09:00');
-        $to = old('available_to', $parts[1] ?? '17:00');
-        $timeOptions = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'];
+        $parts = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->available_time ?? '');
+        $fromRaw = trim($parts[0] ?? '');
+        $toRaw = trim($parts[1] ?? '');
+        $from = $fromRaw ? date('H:i', strtotime($fromRaw)) : '09:00';
+        $to = $toRaw ? date('H:i', strtotime($toRaw)) : '17:00';
     @endphp
     <div class="col-md-6">
         <label class="form-label fw-bold">Available From</label>
-        <select name="available_from" class="form-select">
-            @foreach($timeOptions as $time)
-                <option value="{{ $time }}" {{ $from == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-            @endforeach
-        </select>
+        <input type="time" name="available_from" class="form-control" value="{{ old('available_from', $from) }}">
     </div>
     <div class="col-md-6">
         <label class="form-label fw-bold">Available To</label>
-        <select name="available_to" class="form-select">
-            @foreach($timeOptions as $time)
-                <option value="{{ $time }}" {{ $to == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-            @endforeach
-        </select>
+        <input type="time" name="available_to" class="form-control" value="{{ old('available_to', $to) }}">
     </div>
 
     {{-- Consultation Type --}}
@@ -130,9 +123,11 @@
 
     {{-- Online Availability Fields --}}
     @php 
-        $onlineTimes = explode(' to ', $doctor->online_available_time ?? ''); 
-        $onlineFrom = old('online_available_from', $onlineTimes[0] ?? '09:00'); 
-        $onlineTo = old('online_available_to', $onlineTimes[1] ?? '17:00'); 
+        $onlineTimes = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->online_available_time ?? ''); 
+        $onlineFromRaw = trim($onlineTimes[0] ?? '');
+        $onlineToRaw = trim($onlineTimes[1] ?? '');
+        $onlineFrom = $onlineFromRaw ? date('H:i', strtotime($onlineFromRaw)) : '16:00'; 
+        $onlineTo = $onlineToRaw ? date('H:i', strtotime($onlineToRaw)) : '20:00'; 
     @endphp
     <div id="portalOnlineFields" class="col-12" style="display:none;">
         <div class="row g-3 p-3 rounded-3" style="background:#e8f4fd; border:1px solid #b8d9f7;">
@@ -141,19 +136,11 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Online Available From</label>
-                <select name="online_available_from" class="form-select">
-                    @foreach($timeOptions as $time)
-                        <option value="{{ $time }}" {{ $onlineFrom == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                    @endforeach
-                </select>
+                <input type="time" name="online_available_from" class="form-control" value="{{ old('online_available_from', $onlineFrom) }}">
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Online Available To</label>
-                <select name="online_available_to" class="form-select">
-                    @foreach($timeOptions as $time)
-                        <option value="{{ $time }}" {{ $onlineTo == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                    @endforeach
-                </select>
+                <input type="time" name="online_available_to" class="form-control" value="{{ old('online_available_to', $onlineTo) }}">
             </div>
             <div class="col-12">
                 <label class="form-label fw-bold">Google Meet Link</label>

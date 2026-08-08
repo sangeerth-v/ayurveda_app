@@ -188,28 +188,22 @@
                                 </div>
 
                                 @php 
-                                    $times = explode(' to ', $doctor->available_time ?? ''); 
-                                    $from = $times[0] ?? '09:00'; 
-                                    $to = $times[1] ?? '17:00'; 
+                                    $times = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->available_time ?? ''); 
+                                    $fromRaw = trim($times[0] ?? ''); 
+                                    $toRaw = trim($times[1] ?? ''); 
+                                    $from = $fromRaw ? date('H:i', strtotime($fromRaw)) : '09:00';
+                                    $to = $toRaw ? date('H:i', strtotime($toRaw)) : '17:00';
                                 @endphp
                                 <div id="offlineFields" class="col-12">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Offline Available From</label>
-                                            <select name="available_from" class="form-select @error('available_from') is-invalid @enderror">
-                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $from == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="available_from" class="form-control @error('available_from') is-invalid @enderror" value="{{ old('available_from', $from) }}">
                                         </div>
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Offline Available To</label>
-                                            <select name="available_to" class="form-select @error('available_to') is-invalid @enderror">
-                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $to == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="available_to" class="form-control @error('available_to') is-invalid @enderror" value="{{ old('available_to', $to) }}">
                                         </div>
                                     </div>
                                 </div>
@@ -232,9 +226,11 @@
 
                                 {{-- Online Availability Fields (shown when Online or Both) --}}
                                 @php 
-                                    $onlineTimes = explode(' to ', $doctor->online_available_time ?? ''); 
-                                    $onlineFrom = $onlineTimes[0] ?? '09:00'; 
-                                    $onlineTo = $onlineTimes[1] ?? '17:00'; 
+                                    $onlineTimes = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->online_available_time ?? ''); 
+                                    $onlineFromRaw = trim($onlineTimes[0] ?? ''); 
+                                    $onlineToRaw = trim($onlineTimes[1] ?? ''); 
+                                    $onlineFrom = $onlineFromRaw ? date('H:i', strtotime($onlineFromRaw)) : '16:00'; 
+                                    $onlineTo = $onlineToRaw ? date('H:i', strtotime($onlineToRaw)) : '20:00'; 
                                 @endphp
                                 <div id="onlineFields" class="col-12" style="display:none;">
                                     <div class="row g-3 p-3 rounded-3" style="background:#e8f4fd; border:1px solid #b8d9f7;">
@@ -243,19 +239,11 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Online Available From</label>
-                                            <select name="online_available_from" class="form-select">
-                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $onlineFrom == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="online_available_from" class="form-control" value="{{ old('online_available_from', $onlineFrom) }}">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Online Available To</label>
-                                            <select name="online_available_to" class="form-select">
-                                                @foreach(['07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $onlineTo == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="online_available_to" class="form-control" value="{{ old('online_available_to', $onlineTo) }}">
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label fw-bold">Google Meet Link</label>

@@ -17,7 +17,9 @@ use App\Http\Controllers\HospitalController;
 Route::get('/', [UserController::class, 'index'])->name('home');
 Route::get('/products', [UserController::class, 'products'])->name('products.index');
 Route::get('/doctors', [UserController::class, 'doctors'])->name('doctors.index');
-Route::get('/hospitals', [UserController::class, 'hospitals'])->name('hospitals.index');
+Route::get('/hospitals', function () {
+    return redirect()->route('home')->with('info', 'Hospital directory is currently unavailable.');
+})->name('hospitals.index');
 Route::get('/medical-astrology', [UserController::class, 'medicalAstrology'])->name('medical_astrology');
 Route::get('/product/{id}', [UserController::class, 'showProduct'])->name('products.show');
 
@@ -30,8 +32,12 @@ Route::get('/register', [UserController::class, 'showRegister'])->name('register
 Route::post('/register', [UserController::class, 'register']);
 Route::get('/doctor/register', [UserController::class, 'showDoctorRegister'])->name('doctor.register');
 Route::post('/doctor/register', [UserController::class, 'processDoctorRegister'])->name('doctor.register.submit');
-Route::get('/hospital/register', [UserController::class, 'showHospitalRegister'])->name('hospital.register');
-Route::post('/hospital/register', [UserController::class, 'processHospitalRegister'])->name('hospital.register.submit');
+Route::get('/hospital/register', function () {
+    return redirect()->route('login')->with('info', 'Hospital registration is currently paused.');
+})->name('hospital.register');
+Route::post('/hospital/register', function () {
+    return redirect()->route('login')->with('info', 'Hospital registration is currently paused.');
+})->name('hospital.register.submit');
 Route::get('/pharma/register', [UserController::class, 'showPharmaRegister'])->name('pharma.register');
 Route::post('/pharma/register', [UserController::class, 'processPharmaRegister'])->name('pharma.register.submit');
 Route::get('/register/verify-otp', [UserController::class, 'showVerifyOtp'])->name('register.verify_otp');
@@ -83,9 +89,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('doctors', DoctorController::class);
         Route::put('/doctors/{id}/toggle-active', [DoctorController::class, 'toggleActive'])->name('doctors.toggle_active');
 
-        // Hospital Management by Admin
-        Route::resource('hospitals', HospitalController::class);
-        Route::put('/hospitals/{id}/toggle-active', [HospitalController::class, 'toggleActive'])->name('hospitals.toggle_active');
+        // Hospital Management by Admin (Disabled temporarily)
+        Route::get('/hospitals', function () {
+            return redirect()->route('admin.dashboard')->with('info', 'Hospital management is currently disabled.');
+        })->name('hospitals.index');
+        Route::get('/hospitals/create', function () {
+            return redirect()->route('admin.dashboard')->with('info', 'Hospital registration is currently disabled.');
+        })->name('hospitals.create');
 
         // Pharma Management by Admin
         Route::resource('pharmas', PharmaController::class);
@@ -119,7 +129,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// AJAX Routes (No prefix to keep URL clean, or inside admin if appropriate)
+// AJAX Routes
 Route::get('/api/doctor-subcategories/{categoryId}', [\App\Http\Controllers\Admin\CategoryController::class, 'getDoctorSubcategories']);
 Route::get('/api/product-subcategories/{categoryId}', [\App\Http\Controllers\Admin\CategoryController::class, 'getProductSubcategories']);
 
@@ -153,7 +163,7 @@ Route::prefix('pharma')->name('pharma.')->middleware('auth:pharma')->group(funct
     Route::get('/profile', [PharmaController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [PharmaController::class, 'updateProfile'])->name('profile.update');
 
-    // Category Management for Pharma (reusing same logic)
+    // Category Management for Pharma
     Route::get('/product-categories', [PharmaController::class, 'productCategories'])->name('categories.product');
     Route::post('/product-categories', [PharmaController::class, 'storeProductCategory'])->name('categories.product.store');
     Route::post('/product-subcategories', [PharmaController::class, 'storeProductSubcategory'])->name('categories.product_subcategory.store');
@@ -161,14 +171,9 @@ Route::prefix('pharma')->name('pharma.')->middleware('auth:pharma')->group(funct
     Route::delete('/product-subcategories/{id}', [PharmaController::class, 'destroyProductSubcategory'])->name('categories.product_subcategory.destroy');
 });
 
-// --- Hospital Role Routes (HospitalController) ---
-Route::prefix('hospital')->name('hospital.')->middleware('auth:hospital')->group(function () {
-    Route::get('/dashboard', [HospitalController::class, 'dashboard'])->name('dashboard');
-    Route::get('/profile', [HospitalController::class, 'profile'])->name('profile');
-    Route::put('/profile', [HospitalController::class, 'updateProfile'])->name('profile.update');
-    Route::get('/doctors/create', [HospitalController::class, 'doctorsCreate'])->name('doctors.create');
-    Route::post('/doctors', [HospitalController::class, 'doctorsStore'])->name('doctors.store');
-    Route::get('/doctors/{id}/edit', [HospitalController::class, 'doctorsEdit'])->name('doctors.edit');
-    Route::put('/doctors/{id}', [HospitalController::class, 'doctorsUpdate'])->name('doctors.update');
-    Route::delete('/doctors/{id}', [HospitalController::class, 'doctorsDestroy'])->name('doctors.destroy');
+// --- Hospital Role Routes (Disabled temporarily) ---
+Route::prefix('hospital')->name('hospital.')->group(function () {
+    Route::any('{any?}', function () {
+        return redirect()->route('login')->with('info', 'Hospital portal is currently disabled.');
+    })->where('any', '.*');
 });

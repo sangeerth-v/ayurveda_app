@@ -8,13 +8,50 @@
 
 @section('content')
 <style>
-    /* Apollo Pharmacy Inspired Ayurvedic Design System */
-    .pharmacy-hero {
-        background: linear-gradient(135deg, #0c3b2e 0%, #1d5c42 60%, #6d9773 100%);
+/* ─── PRODUCTS PAGE DESIGN ────────────────────────────────────── */
+:root {
+    --forest:   #0c3b2e;
+    --sage:     #1d5c42;
+    --herb:     #4f772d;
+    --gold:     #c5a059;
+    --amber:    #ffba08;
+    --parchment:#f9f5ef;
+    --cream:    #faf8f4;
+}
+
+/* ─ HERO ─ */
+.pharmacy-hero {
+        background: #0c3b2e;
         color: #ffffff;
-        padding: 2.5rem 1rem 3rem;
+        padding: 0;
         position: relative;
         overflow: hidden;
+        min-height: 52vh;
+        display: flex;
+        align-items: center;
+    }
+    .pharmacy-hero-bg {
+        position: absolute; inset: 0;
+        background: url('/images/mortar_pestle.png') center center / cover no-repeat;
+        filter: brightness(0.28) saturate(1.3);
+        z-index: 0;
+    }
+    .pharmacy-hero-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(120deg, rgba(12,59,46,0.88) 45%, rgba(12,59,46,0.5) 100%);
+        z-index: 1;
+    }
+    .pharmacy-hero-content { position: relative; z-index: 2; padding: 3.5rem 0; width: 100%; }
+    .pharmacy-hero-quote {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: clamp(1.6rem, 4vw, 2.6rem);
+        color: #fff;
+        font-style: italic;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+    }
+    .pharmacy-hero-quote .accent { color: #ffba08; }
     }
     .pharmacy-hero::after {
         content: '';
@@ -260,43 +297,121 @@
     }
 </style>
 
-<!-- Hero & Search Banner -->
+<!-- ═══ HERO: Photo Backed ═══════════════════════════ -->
 <div class="pharmacy-hero">
-    <div class="container text-center">
-        <h2 class="text-white fw-bold mb-2">🌿 Ayurveda Pharmacy & Wellness</h2>
-        <p class="text-white-50 mb-4 small">Genuine Herbal Medicines, Oils, Supplements & Certified Ayurvedic Formulations</p>
-        
-        <!-- Live Search Bar -->
-        <div class="search-box-wrap mb-4">
-            <form action="{{ route('products.index') }}" method="GET">
-                @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
-                <input type="text" name="search" class="form-control search-box-input" placeholder="Search for medicines, churnas, oils, hair care..." value="{{ $search ?? '' }}">
-                <button type="submit" class="search-box-btn">
-                    <i class="fas fa-search me-1"></i> Search
-                </button>
-            </form>
-        </div>
+    <div class="pharmacy-hero-bg"></div>
+    <div class="pharmacy-hero-overlay"></div>
+    <div class="pharmacy-hero-content">
+        <div class="container text-center">
+            <div class="mb-3" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,186,8,0.15);border:1px solid rgba(255,186,8,0.35);color:#ffba08;font-size:0.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 16px;border-radius:50px;">
+                <i class="fas fa-mortar-pestle me-1"></i> Herbal Pharmacy & Wellness
+            </div>
+            <h1 class="pharmacy-hero-quote">
+                "Your body knows how to heal.<br>
+                <span class="accent">Herbs just guide the way.</span>"
+            </h1>
+            <p style="color:rgba(255,255,255,0.55);font-size:0.95rem;margin-bottom:2rem;">
+                Genuine herbal medicines, oils, supplements & certified Ayurvedic formulations
+            </p>
 
-        <!-- Quick Category Pills -->
-        <div class="category-pills-slider justify-content-center">
-            <a href="{{ route('products.index') }}" class="category-pill {{ !request('categories') ? 'active' : '' }}">
-                ✨ All Products
-            </a>
-            @foreach($categoryData as $catName => $subCats)
-                <a href="{{ route('products.index', ['categories' => [$catName]]) }}" 
-                   class="category-pill {{ is_array(request('categories')) && in_array($catName, request('categories')) ? 'active' : '' }}">
-                    @if(Str::contains($catName, ['Medicine', 'Rx'])) 💊 
-                    @elseif(Str::contains($catName, ['Oil', 'Hair', 'Care'])) 💆 
-                    @elseif(Str::contains($catName, ['Wellness', 'Health'])) 🛡️ 
-                    @else 🌿 @endif
-                    {{ $catName }}
+            <!-- Live Search Bar -->
+            <div class="search-box-wrap mb-4">
+                <form action="{{ route('products.index') }}" method="GET">
+                    @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
+                    <input type="text" name="search" class="form-control search-box-input" placeholder="Search for medicines, churnas, oils, hair care..." value="{{ $search ?? '' }}">
+                    <button type="submit" class="search-box-btn">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick Category Pills -->
+            <div class="category-pills-slider justify-content-center">
+                <a href="{{ route('products.index') }}" class="category-pill {{ !request('categories') ? 'active' : '' }}">
+                    ✨ All Products
                 </a>
-            @endforeach
+                @foreach($categoryData as $catName => $subCats)
+                    <a href="{{ route('products.index', ['categories' => [$catName]]) }}"
+                       class="category-pill {{ is_array(request('categories')) && in_array($catName, request('categories')) ? 'active' : '' }}">
+                        @if(Str::contains($catName, ['Medicine', 'Rx'])) 💊
+                        @elseif(Str::contains($catName, ['Oil', 'Hair', 'Care'])) 💆
+                        @elseif(Str::contains($catName, ['Wellness', 'Health'])) 🛡️
+                        @else 🌿 @endif
+                        {{ $catName }}
+                    </a>
+                @endforeach
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Apollo-Style Assurance Bar
+<!-- ═══ NATURE EDITORIAL PHOTO BLOCK ════════════════════ -->
+<div style="background:#f9f5ef;padding:3.5rem 0;">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <!-- Left: Photo Grid -->
+            <div class="col-lg-5">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <img src="/images/herb_hands.png" alt="Hands holding Ayurvedic herbs"
+                            style="width:100%;height:240px;object-fit:cover;border-radius:20px;box-shadow:0 16px 40px rgba(12,59,46,0.15);">
+                    </div>
+                    <div class="col-6">
+                        <img src="/images/mortar_pestle.png" alt="Traditional herb grinding"
+                            style="width:100%;height:138px;object-fit:cover;border-radius:16px;box-shadow:0 8px 22px rgba(12,59,46,0.1);">
+                    </div>
+                    <div class="col-6">
+                        <div style="width:100%;height:138px;border-radius:16px;background:linear-gradient(135deg,#0c3b2e,#1d5c42);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(12,59,46,0.2);">
+                            <div style="color:#ffba08;font-size:2.2rem;font-weight:800;font-family:'Playfair Display',serif;line-height:1;">5000+</div>
+                            <div style="color:rgba(255,255,255,0.65);font-size:0.78rem;margin-top:4px;text-align:center;">Years of<br>Ayurvedic Wisdom</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Philosophy Content -->
+            <div class="col-lg-7 ps-lg-5">
+                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,119,45,0.1);color:#4f772d;font-size:0.76rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:50px;margin-bottom:1.2rem;">
+                    <i class="fas fa-seedling"></i> From Nature's Pharmacy
+                </div>
+                <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.6rem,3vw,2.2rem);color:#0c3b2e;font-weight:800;line-height:1.25;margin-bottom:1.2rem;">
+                    Pure. Potent.<br>Proven by Tradition.
+                </h2>
+                <p style="color:#6b7c6b;line-height:1.9;font-size:1rem;margin-bottom:1.5rem;">
+                    Every product on our shelf is sourced from GMP-licensed, government-approved pharmacies.
+                    Formulated by BAMS and MD Ayurvedic practitioners, each herb carries thousands of years of 
+                    healing science — delivered directly to your doorstep.
+                </p>
+
+                <!-- Feature Pills Row -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span style="background:#e8f5e9;color:#1d5c42;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #c3e6cb;">
+                        <i class="fas fa-leaf me-1"></i> 100% Natural
+                    </span>
+                    <span style="background:#fff8e1;color:#8b6914;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #ffe082;">
+                        <i class="fas fa-certificate me-1"></i> GMP Certified
+                    </span>
+                    <span style="background:#e3f2fd;color:#1565c0;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #bbdefb;">
+                        <i class="fas fa-shield-alt me-1"></i> Lab Tested
+                    </span>
+                    <span style="background:#fce4ec;color:#c62828;padding:7px 15px;border-radius:50px;font-size:0.83rem;font-weight:600;border:1px solid #f8bbd0;">
+                        <i class="fas fa-user-md me-1"></i> Doctor Formulated
+                    </span>
+                </div>
+
+                <!-- Mini Quote -->
+                <blockquote style="border-left:3px solid #c5a059;padding:0.8rem 1.2rem;margin:1.5rem 0;background:rgba(197,160,89,0.06);border-radius:0 12px 12px 0;">
+                    <p style="font-family:'Playfair Display',Georgia,serif;font-style:italic;color:#0c3b2e;margin:0;font-size:1rem;line-height:1.6;">
+                        "The secret to perfect health lies in harmony between body, mind, and nature."
+                    </p>
+                    <footer style="color:#8a9a8b;font-size:0.78rem;margin-top:6px;">— Charaka Samhita</footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="trust-bar d-none d-md-block">
     <div class="container">
         <div class="row align-items-center text-center">

@@ -249,12 +249,21 @@ class HospitalController extends Controller
 
         $data['specialization_category'] = $category ? $category->name : $request->specialization_category;
         $data['specialization_subcategory'] = $subcategory ? $subcategory->name : $request->specialization_subcategory;
-        $data['password_plain'] = $request->password;
-        $data['available_time'] = trim(($request->available_from ?? '') . ' to ' . ($request->available_to ?? ''));
+        if ($request->filled('available_from') && $request->filled('available_to')) {
+            try {
+                $data['available_time'] = \Carbon\Carbon::parse($request->available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->available_to)->format('h:i A');
+            } catch (\Exception $e) {
+                $data['available_time'] = trim(($request->available_from ?? '') . ' to ' . ($request->available_to ?? ''));
+            }
+        }
         $data['consultation_type'] = $request->consultation_type ?? 'Offline';
 
         if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
-            $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+            try {
+                $data['online_available_time'] = \Carbon\Carbon::parse($request->online_available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->online_available_to)->format('h:i A');
+            } catch (\Exception $e) {
+                $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+            }
         }
 
         $data['google_meet_link'] = $request->google_meet_link;

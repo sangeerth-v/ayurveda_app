@@ -723,15 +723,18 @@ class UserController extends Controller
         $offlineSlots = $this->parseTimeSlots($doctor->available_time);
         $onlineSlots = $this->parseTimeSlots($doctor->online_available_time);
 
-        // Fallback default slots if both are empty
-        if (empty($offlineSlots) && empty($onlineSlots)) {
-            $default = ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00'];
-            $offlineSlots = $default;
-            $onlineSlots = $default;
+        $defaultOffline = ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00'];
+        $defaultOnline  = ['16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00'];
+
+        if (empty($offlineSlots)) {
+            $offlineSlots = $defaultOffline;
         }
 
-        // Backward compatibility
-        $slots = !empty($offlineSlots) ? $offlineSlots : $onlineSlots;
+        if (empty($onlineSlots)) {
+            $onlineSlots = $defaultOnline;
+        }
+
+        $slots = $offlineSlots;
 
         return view('bookings.create', compact('doctor', 'bookedSlots', 'slots', 'offlineSlots', 'onlineSlots', 'unavailabilities'));
     }
@@ -747,12 +750,22 @@ class UserController extends Controller
 
         foreach ($parts as $part) {
             $part = trim($part);
-            if (!str_contains(strtolower($part), ' to ')) continue;
+            if (empty($part)) continue;
 
-            [$startStr, $endStr] = explode(' to ', strtolower($part));
+            // Normalize dashes or hyphens to ' to '
+            $normalizedPart = preg_replace('/\s*[-–—]\s*/u', ' to ', strtolower($part));
+
+            if (!str_contains($normalizedPart, ' to ')) continue;
+
+            [$startStr, $endStr] = explode(' to ', $normalizedPart, 2);
             try {
                 $start = \Carbon\Carbon::parse(trim($startStr));
                 $end = \Carbon\Carbon::parse(trim($endStr));
+
+                // If start >= end (e.g. 09:00 to 09:00 or invalid range), extend by 4 hours
+                if ($start >= $end) {
+                    $end = (clone $start)->addHours(4);
+                }
 
                 while ($start < $end) {
                     $slots[] = $start->format('H:i');

@@ -9,7 +9,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a></li>
-                <li class="nav-item"><a href="{{ route('admin.hospitals.index') }}" class="nav-link">Hospitals</a></li>
+                {{-- <li class="nav-item"><a href="{{ route('admin.hospitals.index') }}" class="nav-link">Hospitals</a></li> --}}
                 <li class="nav-item"><a href="{{ route('admin.doctors.index') }}" class="nav-link">Doctors</a></li>
                 <li class="nav-item"><a href="{{ route('admin.categories.doctor') }}" class="nav-link">Doctor Categories</a></li>
                 <li class="nav-item"><a href="{{ route('admin.categories.product') }}" class="nav-link">Product Categories</a></li>

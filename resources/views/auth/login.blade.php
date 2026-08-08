@@ -294,20 +294,20 @@
 
         /* Partner Registration Section */
         .partner-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            display: flex;
+            gap: 12px;
             margin-top: 1rem;
         }
 
         .partner-btn {
+            flex: 1;
             background: #f4f8f4;
             border: 1px solid #d4e2d6;
-            border-radius: 10px;
-            padding: 0.75rem 0.5rem;
+            border-radius: 12px;
+            padding: 0.85rem 0.6rem;
             text-align: center;
             color: var(--primary-green);
-            font-size: 0.78rem;
+            font-size: 0.82rem;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s ease;
@@ -315,7 +315,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 6px;
         }
 
         .partner-btn i {
@@ -437,10 +438,13 @@
                             <i class="fas fa-user-md"></i>
                             <span>Apply as Doctor</span>
                         </a>
+                        {{-- Hospital registration disabled temporarily --}}
+                        {{-- 
                         <a href="{{ route('hospital.register') }}" class="partner-btn">
                             <i class="fas fa-hospital"></i>
                             <span>Register Hospital</span>
                         </a>
+                        --}}
                         <a href="{{ route('pharma.register') }}" class="partner-btn">
                             <i class="fas fa-capsules"></i>
                             <span>Register Pharma</span>

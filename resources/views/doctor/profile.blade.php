@@ -151,26 +151,20 @@
                                 <div id="offlineProfileFields" class="col-md-6" style="{{ in_array($doctor->consultation_type ?? 'Offline', ['Offline', 'Both']) ? '' : 'display:none;' }}">
                                     {{-- Time parsing --}}
                                     @php 
-                                        $times = explode(' to ', $doctor->available_time ?? ''); 
-                                        $from = $times[0] ?? '09:00'; 
-                                        $to = $times[1] ?? '17:00'; 
+                                        $times = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->available_time ?? ''); 
+                                        $fromRaw = trim($times[0] ?? ''); 
+                                        $toRaw = trim($times[1] ?? ''); 
+                                        $from = $fromRaw ? date('H:i', strtotime($fromRaw)) : '09:00';
+                                        $to = $toRaw ? date('H:i', strtotime($toRaw)) : '17:00';
                                     @endphp
                                     <div class="row">
                                         <div class="col-6">
                                             <label class="form-label fw-bold">Offline Available From</label>
-                                            <select name="available_from" class="form-select">
-                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $from == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="available_from" class="form-control" value="{{ old('available_from', $from) }}">
                                         </div>
                                         <div class="col-6">
                                             <label class="form-label fw-bold">Offline Available To</label>
-                                            <select name="available_to" class="form-select">
-                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $to == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="available_to" class="form-control" value="{{ old('available_to', $to) }}">
                                         </div>
                                     </div>
                                 </div>
@@ -192,9 +186,11 @@
 
                                 {{-- Online Availability and Meet Link --}}
                                 @php
-                                    $onTimes = explode(' to ', $doctor->online_available_time ?? '');
-                                    $onFrom = $onTimes[0] ?? '09:00';
-                                    $onTo = $onTimes[1] ?? '17:00';
+                                    $onTimes = preg_split('/\s*to\s*|\s*[-–—]\s*/i', $doctor->online_available_time ?? '');
+                                    $onFromRaw = trim($onTimes[0] ?? '');
+                                    $onToRaw = trim($onTimes[1] ?? '');
+                                    $onFrom = $onFromRaw ? date('H:i', strtotime($onFromRaw)) : '16:00';
+                                    $onTo = $onToRaw ? date('H:i', strtotime($onToRaw)) : '20:00';
                                 @endphp
                                 <div id="onlineProfileFields" class="col-12" style="{{ in_array($doctor->consultation_type ?? 'Offline', ['Online', 'Both']) ? '' : 'display:none;' }}">
                                     <div class="row g-3 p-3 rounded-3" style="background:#e8f4fd; border:1px solid #b8d9f7;">
@@ -203,19 +199,11 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Online Available From</label>
-                                            <select name="online_available_from" class="form-select">
-                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $onFrom == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="online_available_from" class="form-control" value="{{ old('online_available_from', $onFrom) }}">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Online Available To</label>
-                                            <select name="online_available_to" class="form-select">
-                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'] as $time)
-                                                    <option value="{{ $time }}" {{ $onTo == $time ? 'selected' : '' }}>{{ date('h:i A', strtotime($time)) }}</option>
-                                                @endforeach
-                                            </select>
+                                            <input type="time" name="online_available_to" class="form-control" value="{{ old('online_available_to', $onTo) }}">
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label fw-bold">Google Meet Link</label>

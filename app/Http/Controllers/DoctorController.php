@@ -184,11 +184,13 @@ class DoctorController extends Controller
             'qualification' => $request->qualification,
             'experience' => $request->experience,
             'consultation_fee' => $request->consultation_fee,
-            'available_time' => $request->available_from . ' to ' . $request->available_to,
+            'available_time' => ($request->filled('available_from') && $request->filled('available_to'))
+                ? (\Carbon\Carbon::parse($request->available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->available_to)->format('h:i A'))
+                : null,
             'hospital_id' => $request->hospital_id,
             'consultation_type' => $request->consultation_type ?? 'Offline',
             'online_available_time' => ($request->filled('online_available_from') && $request->filled('online_available_to'))
-                ? $request->online_available_from . ' to ' . $request->online_available_to
+                ? (\Carbon\Carbon::parse($request->online_available_from)->format('h:i A') . ' to ' . \Carbon\Carbon::parse($request->online_available_to)->format('h:i A'))
                 : null,
             'google_meet_link' => $request->google_meet_link,
         ];
@@ -339,11 +341,23 @@ class DoctorController extends Controller
         $data = $request->except(['photo', 'password', 'available_from', 'available_to', 'online_available_from', 'online_available_to']);
         
         if ($request->filled('available_from') && $request->filled('available_to')) {
-            $data['available_time'] = $request->available_from . ' to ' . $request->available_to;
+            try {
+                $fromFmt = \Carbon\Carbon::parse($request->available_from)->format('h:i A');
+                $toFmt   = \Carbon\Carbon::parse($request->available_to)->format('h:i A');
+                $data['available_time'] = $fromFmt . ' to ' . $toFmt;
+            } catch (\Exception $e) {
+                $data['available_time'] = $request->available_from . ' to ' . $request->available_to;
+            }
         }
 
         if ($request->filled('online_available_from') && $request->filled('online_available_to')) {
-            $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+            try {
+                $onFromFmt = \Carbon\Carbon::parse($request->online_available_from)->format('h:i A');
+                $onToFmt   = \Carbon\Carbon::parse($request->online_available_to)->format('h:i A');
+                $data['online_available_time'] = $onFromFmt . ' to ' . $onToFmt;
+            } catch (\Exception $e) {
+                $data['online_available_time'] = $request->online_available_from . ' to ' . $request->online_available_to;
+            }
         }
 
         if ($request->has('consultation_type')) {
