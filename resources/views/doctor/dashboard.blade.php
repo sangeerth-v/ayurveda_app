@@ -27,6 +27,9 @@
                 <a href="{{ route('doctor.products.index') }}" class="btn btn-outline-dark px-3 py-2 fw-semibold small rounded-3 text-decoration-none shadow-sm">
                     <i class="fas fa-boxes me-1"></i> My Products
                 </a>
+                <a href="{{ route('doctor.orders.index') }}" class="btn btn-outline-primary px-3 py-2 fw-semibold small rounded-3 text-decoration-none shadow-sm">
+                    <i class="fas fa-truck me-1"></i> Product Orders
+                </a>
                 <div class="btn-group shadow-sm bg-white p-1" style="border-radius: 12px;">
                     <button class="btn btn-success border-0 px-3 py-2 fw-semibold small rounded-3 me-1" data-bs-toggle="modal" data-bs-target="#calendarModal">
                         <i class="fas fa-calendar-check me-1"></i> Full Calendar

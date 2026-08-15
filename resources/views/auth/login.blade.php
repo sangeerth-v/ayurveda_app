@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Ayurveda Management System</title>
+    <title>Login | Ayurveda Portal</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -13,342 +13,227 @@
 
     <style>
         :root {
-            --primary-dark: #123722;
-            --primary-green: #1a4d2e;
-            --secondary-green: #2d6a4f;
-            --accent-green: #40916c;
-            --accent-gold: #c5a059;
-            --light-bg: #fcfdfa;
-            --beige-bg: #fbf8f3;
-            --text-dark: #1b4332;
-            --shadow-md: 0 12px 32px rgba(26, 77, 46, 0.08);
-            --shadow-lg: 0 20px 40px rgba(26, 77, 46, 0.12);
-        }
-
-        /* Hide browser-native password reveal eye icons */
-        input[type="password"]::-ms-reveal,
-        input[type="password"]::-ms-clear,
-        input[type="password"]::-webkit-contacts-auto-fill-button,
-        input[type="password"]::-webkit-credentials-auto-fill-button {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
+            --forest: #0c3b2e;
+            --sage: #1d5c42;
+            --herb: #4f772d;
+            --gold: #c5a059;
+            --amber: #ffba08;
+            --parchment: #f9f5ef;
+            --cream: #faf8f4;
+            --dark: #1e293b;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--beige-bg);
-            color: var(--text-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--parchment);
+            color: var(--dark);
             min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
-        }
-
-        .split-layout {
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* Left Side Illustration & Branding */
-        .left-panel {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-green) 50%, var(--secondary-green) 100%);
-            color: #ffffff;
-            padding: 4rem 3rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
         }
 
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            left: -100px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(197, 160, 89, 0.18) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .left-panel::after {
-            content: '';
-            position: absolute;
-            bottom: -150px;
-            right: -150px;
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, rgba(64, 145, 108, 0.25) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .illustration-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 2.5rem;
-            margin: 2rem 0;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .illustration-art {
-            position: relative;
-            height: 220px;
+        /* ── MINIMAL CARD CONTAINER ────────────────────────── */
+        .login-section {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .center-circle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px dashed rgba(197, 160, 89, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: var(--accent-gold);
-            animation: pulse-ring 4s infinite ease-in-out;
-        }
-
-        @keyframes pulse-ring {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .floating-badge {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--primary-green);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: float-around 3s infinite ease-in-out alternate;
-        }
-
-        .badge-1 { top: 10px; left: 10px; }
-        .badge-2 { bottom: 10px; right: 10px; animation-delay: 1.5s; }
-        .badge-3 { top: 40px; right: 15px; animation-delay: 0.8s; }
-
-        @keyframes float-around {
-            from { transform: translateY(0px); }
-            to { transform: translateY(-8px); }
-        }
-
-        .brand-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.3rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.75rem;
-        }
-
-        .brand-subtitle {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.6;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        /* Right Side Login Panel */
-        .right-panel {
-            background-color: var(--beige-bg);
-            padding: 3rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 3rem 1.5rem;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(224, 229, 213, 0.8);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
+            background: #ffffff;
+            border: 1px solid #e2dacf;
+            border-radius: 28px;
+            padding: 3.5rem 3rem;
             width: 100%;
             max-width: 480px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 16px 45px rgba(12,59,46,0.06);
             transition: all 0.3s ease;
         }
 
         .system-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--primary-green);
+            color: var(--forest);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 10px;
         }
 
-        .form-floating > .form-control {
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ── FORM ELEMENTS ─────────────────────────────────── */
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group-custom input {
+            width: 100%;
+            height: 52px;
             border-radius: 12px;
             border: 1.5px solid #dce4dc;
-            padding-left: 2.8rem;
+            padding: 0 45px 0 18px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: #fff;
+            transition: all 0.25s ease;
+            outline: none;
         }
 
-        .form-floating > label {
-            padding-left: 2.8rem;
-        }
-
-        .form-floating > .form-control:focus {
-            border-color: var(--secondary-green);
-            box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.12);
-        }
-
-        .input-icon {
+        .input-group-custom label {
             position: absolute;
-            left: 1rem;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            z-index: 5;
-            color: var(--secondary-green);
-            font-size: 1.1rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: #fff;
+            padding: 0 4px;
         }
 
-        .password-toggle-btn {
+        .input-group-custom input:focus ~ label,
+        .input-group-custom input:valid ~ label {
+            top: 0;
+            font-size: 0.75rem;
+            color: var(--sage);
+            font-weight: 600;
+        }
+
+        .input-group-custom input:focus {
+            border-color: var(--sage);
+            box-shadow: 0 0 0 4px rgba(29, 92, 66, 0.08);
+        }
+
+        .input-icon-right {
             position: absolute;
-            right: 0.75rem;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            z-index: 5;
+            color: #94a3b8;
             background: none;
             border: none;
-            color: #6c757d;
             cursor: pointer;
-            padding: 8px;
+            padding: 0;
+            font-size: 1rem;
         }
 
-        .btn-login {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+        /* ── BUTTONS ───────────────────────────────────────── */
+        .btn-submit {
+            background: linear-gradient(135deg, var(--forest) 0%, var(--sage) 100%);
             color: #ffffff;
             border: none;
             border-radius: 12px;
-            padding: 0.9rem;
-            font-weight: 600;
+            height: 52px;
+            font-weight: 700;
             font-size: 1rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 18px rgba(26, 77, 46, 0.25);
-        }
-
-        .btn-login:hover {
-            background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(26, 77, 46, 0.35);
-        }
-
-        /* Divider */
-        .divider-wrap {
+            transition: all 0.25s ease;
+            width: 100%;
             display: flex;
             align-items: center;
-            text-align: center;
-            margin: 1.8rem 0;
-            color: #8fa396;
-            font-size: 0.85rem;
-            font-weight: 600;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(12, 59, 46, 0.16);
         }
 
-        .divider-wrap::before, .divider-wrap::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #dce4dc;
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(12, 59, 46, 0.25);
+            color: #fff;
         }
 
-        .divider-wrap span {
-            padding: 0 1rem;
-            letter-spacing: 2px;
-        }
-
-        /* Register as Patient Button */
-        .btn-register-patient {
-            border: 2px solid var(--secondary-green);
-            color: var(--secondary-green);
+        .btn-register-link {
+            border: 2px solid var(--forest);
+            color: var(--forest);
             border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            font-weight: 700;
+            font-size: 0.9rem;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            width: 100%;
         }
 
-        .btn-register-patient:hover {
-            background-color: var(--secondary-green);
+        .btn-register-link:hover {
+            background-color: var(--forest);
             color: #ffffff;
-            transform: translateY(-1px);
         }
 
-        /* Partner Registration Section */
-        .partner-cards-grid {
+        /* ── PARTNER PILLS ─────────────────────────────────── */
+        .partner-row {
             display: flex;
             gap: 12px;
             margin-top: 1rem;
         }
 
-        .partner-btn {
+        .partner-pill {
             flex: 1;
-            background: #f4f8f4;
-            border: 1px solid #d4e2d6;
+            background: #fff;
+            border: 1px solid #e2dacf;
             border-radius: 12px;
-            padding: 0.85rem 0.6rem;
-            text-align: center;
-            color: var(--primary-green);
-            font-size: 0.82rem;
+            padding: 10px;
+            font-size: 0.8rem;
             font-weight: 600;
+            color: var(--forest);
             text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            transition: all 0.2s;
         }
 
-        .partner-btn i {
-            font-size: 1.1rem;
-            color: var(--secondary-green);
+        .partner-pill:hover {
+            background: var(--parchment);
+            border-color: var(--forest);
+            transform: translateY(-1px);
         }
 
-        .partner-btn:hover {
-            background: #e1efe3;
-            border-color: var(--secondary-green);
-            color: var(--primary-green);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 77, 46, 0.1);
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.8rem 0;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
-        .admin-verify-notice {
-            background: #fff8e6;
-            border: 1px solid #ffe8b3;
-            color: #8a6d3b;
-            font-size: 0.76rem;
-            padding: 0.65rem 0.85rem;
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2dacf;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .notice-info {
+            background: rgba(197, 160, 89, 0.08);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: #7c5e28;
+            font-size: 0.73rem;
+            padding: 10px 14px;
             border-radius: 8px;
             margin-top: 1.2rem;
             line-height: 1.45;
             text-align: center;
-        }
-
-        .footer-text {
-            font-size: 0.78rem;
-            color: #8fa396;
-            text-align: center;
-            margin-top: 1.8rem;
         }
     </style>
 </head>
@@ -356,246 +241,107 @@
 
 @include('partials.nav-public')
 
-<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 80px);">
+<section class="login-section">
     <div class="login-card">
-                <div class="text-center mb-4">
-                    <a href="{{ url('/') }}" class="system-logo mb-2">
-                        <i class="fas fa-leaf text-success me-1"></i> Ayurveda
-                    </a>
-                    <h3 class="fw-bold text-dark mt-2 mb-1">Welcome Back</h3>
-                    <p class="text-muted small">Sign in to continue.</p>
-                </div>
+        <div class="text-center mb-4">
+            <a href="{{ url('/') }}" class="system-logo">
+                <i class="fas fa-leaf text-success me-1"></i> Ayurveda
+            </a>
+            <div class="subtitle">Sign in to access your consultations &amp; store</div>
+        </div>
 
-                <!-- Display Validation Errors -->
-                @if ($errors->any())
-                    <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="font-size: 0.88rem;">
-                        <ul class="mb-0 ps-3">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                @if (session('success'))
-                    <div class="alert alert-success border-0 shadow-sm rounded-3 py-2 px-3 mb-4 small">
-                        <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
-                    </div>
-                @endif
-
-                <!-- Universal Authentication Form -->
-                <form action="{{ route('login') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="redirect" value="{{ request()->query('redirect') }}">
-
-                    <!-- Email Input -->
-                    <div class="form-floating mb-3 position-relative">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" value="{{ old('email') }}" required autofocus>
-                        <label for="floatingEmail">Email Address</label>
-                    </div>
-
-                    <!-- Password Input -->
-                    <div class="form-floating mb-3 position-relative">
-                        <i class="fas fa-lock input-icon"></i>
-                        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
-                        <label for="floatingPassword">Password</label>
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('floatingPassword', this)">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-
-                    <!-- Remember Me & Forgot Password -->
-                    <div class="d-flex justify-content-between align-items-center mb-4 small">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label class="form-check-label text-secondary" for="remember">Remember me</label>
-                        </div>
-                        <a href="#" onclick="alert('Please contact System Administrator or use OTP login to reset password.')" class="text-success text-decoration-none fw-semibold">Forgot Password?</a>
-                    </div>
-
-                    <!-- Submit Login Button -->
-                    <button type="submit" class="btn btn-login w-100 mb-3">
-                        Login <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
-                </form>
-
-                <!-- Divider -->
-                <div class="divider-wrap">
-                    <span>OR</span>
-                </div>
-
-                <!-- Registration Actions -->
-                <div class="text-center">
-                    <p class="small text-muted mb-2 font-weight-500">New to our platform?</p>
-                    <a href="{{ route('register') }}{{ request()->has('redirect') ? '?redirect=' . urlencode(request()->query('redirect')) : '' }}" class="btn btn-register-patient w-100 py-2.5 mb-4">
-                        <i class="fas fa-user-plus me-2"></i> Register as Patient
-                    </a>
-
-                    <p class="small fw-bold text-dark mb-2">Join as a Partner</p>
-                    <div class="partner-cards-grid">
-                        <a href="{{ route('doctor.register') }}" class="partner-btn">
-                            <i class="fas fa-user-md"></i>
-                            <span>Apply as Doctor</span>
-                        </a>
-                        {{-- Hospital registration disabled temporarily --}}
-                        {{-- 
-                        <a href="{{ route('hospital.register') }}" class="partner-btn">
-                            <i class="fas fa-hospital"></i>
-                            <span>Register Hospital</span>
-                        </a>
-                        --}}
-                        <a href="{{ route('pharma.register') }}" class="partner-btn">
-                            <i class="fas fa-capsules"></i>
-                            <span>Register Pharma</span>
-                        </a>
-                    </div>
-
-                    <div class="admin-verify-notice">
-                        <i class="fas fa-info-circle me-1 text-warning"></i> Applications for Doctors, Hospitals, and Pharma Companies require admin verification before account activation.
-                    </div>
-
-                    <div class="footer-text">
-                        © 2026 Ayurveda Management System. All rights reserved.
-                    </div>
-                </div>
+        <!-- Display Validation Errors -->
+        @if ($errors->any())
+            <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="font-size: 0.85rem;">
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-</div>
+        @endif
 
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<div class="modal fade" id="partnerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 bg-light rounded-top-4">
-                <h5 class="modal-title fw-bold text-success" id="partnerModalTitle">Partner Application</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        @if (session('success'))
+            <div class="alert alert-success border-0 shadow-sm rounded-3 py-2 px-3 mb-4 small">
+                <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
             </div>
-            <div class="modal-body p-4 text-center">
-                <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex p-3 mb-3" style="font-size: 2rem;">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <h5 class="fw-bold mb-2 text-dark" id="partnerRoleText">Doctor Partner Registration</h5>
-                <p class="text-muted small mb-3">
-                    To maintain strict medical quality and regulatory compliance, partner accounts (Doctors, Hospitals, and Pharma Companies) are registered and verified by **System Administrator**.
-                </p>
-                <div class="p-3 bg-light rounded-3 text-start small border border-light">
-                    <i class="fas fa-check-circle text-success me-2"></i> Submit credentials & license verification to Admin.<br>
-                    <i class="fas fa-check-circle text-success me-2"></i> Account credential generation takes less than 24 hours.<br>
-                    <i class="fas fa-phone-alt text-success me-2"></i> Admin Support Desk: <strong>admin@ayurveda.com</strong>
-                </div>
+        @endif
+
+        <!-- Universal Authentication Form -->
+        <form action="{{ route('login') }}" method="POST">
+            @csrf
+            <input type="hidden" name="redirect" value="{{ request()->query('redirect') }}">
+
+            <!-- Email or Username Input -->
+            <div class="input-group-custom">
+                <input type="text" name="email" id="email" value="{{ old('email') }}" required autocomplete="off">
+                <label for="email">Email Address or Name (Username)</label>
             </div>
-            <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-success px-4 rounded-pill" data-bs-dismiss="modal">Understand & Close</button>
+
+            <!-- Password Input -->
+            <div class="input-group-custom">
+                <input type="password" name="password" id="password" required autocomplete="off">
+                <label for="password">Password</label>
+                <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('password', this)" title="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-4" style="font-size:0.83rem;">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                    <label class="form-check-label text-secondary" for="remember">Remember me</label>
+                </div>
+                <a href="#" onclick="alert('Please contact your System Administrator to reset your password.')" class="text-success text-decoration-none fw-bold">Forgot Password?</a>
+            </div>
+
+            <!-- Submit Login Button -->
+            <button type="submit" class="btn-submit">
+                Login <i class="fas fa-arrow-right ms-1"></i>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ route('register') }}{{ request()->has('redirect') ? '?redirect=' . urlencode(request()->query('redirect')) : '' }}" class="btn-register-link mb-3">
+                <i class="fas fa-user-plus me-2"></i> Register as Patient
+            </a>
+
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--forest); margin-top: 1.2rem;">Join as Partner</div>
+            <div class="partner-row">
+                <a href="{{ route('doctor.register') }}" class="partner-pill">
+                    <i class="fas fa-user-md"></i> Doctor
+                </a>
+                <a href="{{ route('pharma.register') }}" class="partner-pill">
+                    <i class="fas fa-capsules"></i> Pharmacy
+                </a>
+            </div>
+
+            <div class="notice-info">
+                <i class="fas fa-info-circle me-1"></i> Applications for Doctors &amp; Pharmacy Companies require admin verification. Chief Astrologer login is supported through the main form above.
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function togglePasswordVisibility(inputId, button) {
     const input = document.getElementById(inputId);
     const icon = button.querySelector('i');
-    
     if (input.type === 'password') {
         input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
+        icon.className = 'fas fa-eye-slash';
     } else {
         input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+        icon.className = 'fas fa-eye';
     }
 }
-
-function showPartnerNotice(roleName) {
-    document.getElementById('partnerModalTitle').innerText = roleName + ' Partner Registration';
-    document.getElementById('partnerRoleText').innerText = roleName + ' Account Request';
-    const partnerModal = new bootstrap.Modal(document.getElementById('partnerModal'));
-    partnerModal.show();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form');
-
-    forms.forEach(form => {
-        const emailInputs = form.querySelectorAll('input[type="email"], input[name="email"]');
-
-        function createOrGetFeedback(input) {
-            let container = input.closest('.form-floating') || input.parentNode;
-            let feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
-            if (!feedback) {
-                feedback = document.createElement('div');
-                feedback.className = 'live-feedback text-danger small mt-1 fw-semibold ps-1';
-                container.parentNode.appendChild(feedback);
-            }
-            return feedback;
-        }
-
-        function clearFeedback(input) {
-            input.classList.remove('is-invalid');
-            let container = input.closest('.form-floating') || input.parentNode;
-            const feedback = container.parentNode.querySelector('.live-feedback') || container.querySelector('.live-feedback');
-            if (feedback) feedback.textContent = '';
-        }
-
-        function setError(input, msg) {
-            input.classList.remove('is-valid');
-            input.classList.add('is-invalid');
-            const feedback = createOrGetFeedback(input);
-            feedback.textContent = msg;
-        }
-
-        // --- EMAIL VALIDATION ---
-        emailInputs.forEach(input => {
-            function validateEmail() {
-                const val = input.value.trim();
-                if (!val) {
-                    clearFeedback(input);
-                    return true;
-                }
-                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (!emailRegex.test(val)) {
-                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
-                    return false;
-                }
-                clearFeedback(input);
-                return true;
-            }
-
-            input.addEventListener('input', function() {
-                const val = input.value.trim();
-                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (!val || emailRegex.test(val)) clearFeedback(input);
-            });
-            input.addEventListener('blur', validateEmail);
-        });
-
-        // --- FORM SUBMIT GUARD ---
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            emailInputs.forEach(input => {
-                const val = input.value.trim();
-                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                if (!val && input.hasAttribute('required')) {
-                    setError(input, 'Email address is required.');
-                    isValid = false;
-                } else if (val && !emailRegex.test(val)) {
-                    setError(input, 'Please enter a valid email address (e.g. name@domain.com)');
-                    isValid = false;
-                }
-            });
-            if (!isValid) {
-                e.preventDefault();
-                const firstInvalid = form.querySelector('.is-invalid');
-                if (firstInvalid) firstInvalid.focus();
-            }
-        });
-    });
-});
 </script>
 </body>
 </html>
-

@@ -1,3 +1,4 @@
+@php $fullWidth = true; @endphp
 @extends('layouts.app')
 
 @section('navbar')
@@ -247,25 +248,6 @@
     </div>
 </div>
 
-{{-- ═══ PRODUCT BOTTLE SPLIT STRIP ════════════════ --}}
-<div class="feat-strip d-none d-md-flex">
-    <div class="feat-strip-img"></div>
-    <div class="feat-strip-content">
-        <div class="feat-strip-badge"><i class="fas fa-seedling"></i> From Nature's Lab</div>
-        <h2 class="feat-strip-title">Pure. Potent.<br><span>Proven by Tradition.</span></h2>
-        <p class="feat-strip-desc">
-            Every product is sourced from GMP-licensed pharmacies and formulated by BAMS &amp; MD 
-            Ayurvedic practitioners. Ancient healing science — delivered directly to you.
-        </p>
-        <div class="feat-pill-row">
-            <span class="feat-pill"><i class="fas fa-leaf me-1"></i>100% Natural</span>
-            <span class="feat-pill"><i class="fas fa-certificate me-1"></i>GMP Certified</span>
-            <span class="feat-pill"><i class="fas fa-flask me-1"></i>Lab Tested</span>
-            <span class="feat-pill"><i class="fas fa-user-md me-1"></i>Doctor Formulated</span>
-        </div>
-    </div>
-</div>
-
 {{-- ═══ CATALOG TOOLBAR ════════════════════════════ --}}
 <div class="catalog-bar">
     <div class="container">
@@ -350,9 +332,18 @@
                         @endif
 
                         <div class="prod-stars">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                            <span style="color:#9ca3af;margin-left:4px;">(4.8)</span>
+                            <span class="text-warning">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($product->average_rating))
+                                        <i class="fas fa-star"></i>
+                                    @elseif($i - $product->average_rating < 1)
+                                        <i class="fas fa-star-half-alt"></i>
+                                    @else
+                                        <i class="far fa-star"></i>
+                                    @endif
+                                @endfor
+                            </span>
+                            <span style="color:#9ca3af;margin-left:4px;font-size:0.75rem;">({{ $product->average_rating }})</span>
                         </div>
 
                         <div class="prod-footer">
@@ -360,7 +351,7 @@
                                 <div>
                                     <div class="prod-price">₹{{ number_format($product->price, 2) }}</div>
                                     @if($product->stock > 0)
-                                        <div class="prod-stock"><i class="fas fa-check-circle me-1"></i>In Stock</div>
+                                        <div class="prod-stock"><i class="fas fa-check-circle me-1"></i>In Stock ({{ $product->stock }} left)</div>
                                     @endif
                                 </div>
                             </div>
@@ -370,8 +361,8 @@
                                 @csrf
                                 <div class="qty-grp mb-2">
                                     <button type="button" class="qty-btn" onclick="const i=this.parentNode.querySelector('input');if(i.value>1)i.stepDown()">−</button>
-                                    <input type="number" name="quantity" class="qty-input" value="1" min="1" max="10">
-                                    <button type="button" class="qty-btn" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                                    <input type="number" name="quantity" class="qty-input" value="1" min="1" max="{{ $product->stock }}">
+                                    <button type="button" class="qty-btn" onclick="const i=this.parentNode.querySelector('input');if(parseInt(i.value)<{{ $product->stock }})i.stepUp()">+</button>
                                 </div>
                                 <button type="submit" class="btn-addcart">
                                     <i class="fas fa-shopping-cart me-1"></i>Add to Cart

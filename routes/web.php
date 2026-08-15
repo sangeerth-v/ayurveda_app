@@ -56,11 +56,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [UserController::class, 'storeOrder'])->name('orders.store');
     Route::get('/orders', [UserController::class, 'ordersIndex'])->name('orders.index');
     Route::get('/orders/{id}', [UserController::class, 'showOrder'])->name('orders.show');
+    Route::post('/products/{id}/reviews', [UserController::class, 'storeProductReview'])->name('products.reviews.store');
 
     // Doctor Bookings
     Route::get('/doctors/{id}/book', [UserController::class, 'createBooking'])->name('bookings.create');
     Route::post('/bookings', [UserController::class, 'storeBooking'])->name('bookings.store');
     Route::get('/my-appointments', [UserController::class, 'myBookings'])->name('bookings.my');
+    Route::post('/bookings/{id}/cancel', [UserController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::get('/bookings/{id}/reschedule', [UserController::class, 'showRescheduleForm'])->name('bookings.reschedule');
+    Route::post('/bookings/{id}/reschedule', [UserController::class, 'rescheduleBooking'])->name('bookings.reschedule.update');
+    Route::get('/doctors/{id}/booking-details', [UserController::class, 'getDoctorBookingDetails'])->name('doctors.booking_details');
 
     // Profile
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
@@ -83,7 +88,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth:admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
+
+        // Medical Astrology Settings
+        Route::get('/astrology', [AdminController::class, 'editAstrology'])->name('astrology.edit');
+        Route::post('/astrology', [AdminController::class, 'updateAstrology'])->name('astrology.update');
+
+        // Appointments Oversight by Admin
+        Route::get('/bookings', [AdminController::class, 'bookingsIndex'])->name('bookings.index');
+        Route::put('/bookings/{id}/status', [AdminController::class, 'updateBookingStatus'])->name('bookings.update_status');
+        Route::post('/bookings/{id}/emergency-approve', [AdminController::class, 'emergencyApproveBooking'])->name('bookings.emergency_approve');
+        Route::delete('/bookings/{id}', [AdminController::class, 'destroyBooking'])->name('bookings.destroy');
+
+        // Orders Oversight by Admin
+        Route::get('/orders', [AdminController::class, 'ordersIndex'])->name('orders.index');
         Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
+        Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.update_status');
+
+        // Products Oversight by Admin
+        Route::get('/products', [AdminController::class, 'productsIndex'])->name('products.index');
+        Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('products.edit');
+        Route::put('/products/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
+        Route::delete('/products/{id}', [AdminController::class, 'destroyProduct'])->name('products.destroy');
         
         // Doctor Management by Admin
         Route::resource('doctors', DoctorController::class);
@@ -148,6 +173,11 @@ Route::prefix('doctor')->name('doctor.')->middleware('auth:doctor')->group(funct
     Route::get('/products/{id}/edit', [DoctorController::class, 'editProduct'])->name('products.edit');
     Route::put('/products/{id}', [DoctorController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/{id}', [DoctorController::class, 'destroyProduct'])->name('products.destroy');
+
+    // Doctor Product Orders Management
+    Route::get('/orders', [DoctorController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{id}', [DoctorController::class, 'showOrder'])->name('orders.show');
+    Route::post('/orders/{id}/status', [DoctorController::class, 'updateOrderStatus'])->name('orders.update_status');
 });
 
 // --- Pharma Role Routes (PharmaController) ---

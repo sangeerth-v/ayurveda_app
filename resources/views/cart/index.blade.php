@@ -66,7 +66,7 @@
     }
 </style>
 
-<div class="container mb-5">
+<div class="container mb-5 page-shell">
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="d-flex justify-content-between align-items-end mb-4">

@@ -12,6 +12,7 @@ class DoctorToken extends Model
     protected $fillable = [
         'user_id',
         'doctor_id',
+        'token_number',
         'booking_date',
         'booking_time',
         'status',

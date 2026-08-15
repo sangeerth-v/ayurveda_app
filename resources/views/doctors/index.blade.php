@@ -1,3 +1,4 @@
+@php $fullWidth = true; @endphp
 @extends('layouts.app')
 
 @section('navbar')
@@ -59,32 +60,34 @@
 .step-num { width:56px; height:56px; border-radius:50%; background:var(--amber); color:var(--forest); font-weight:900; font-size:1.2rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.2rem; box-shadow:0 8px 20px rgba(255,186,8,0.35); }
 
 /* ─ DOCTOR CARDS ─ */
-.doctors-section { background:var(--parchment); padding:5rem 0; }
-.doc-card { background:#fff; border-radius:20px; border:1px solid #e5ede6; overflow:hidden; height:100%; transition:all 0.3s cubic-bezier(0.165,0.84,0.44,1); box-shadow:0 4px 16px rgba(12,59,46,0.06); }
-.doc-card:hover { transform:translateY(-8px); border-color:var(--gold); box-shadow:0 20px 45px rgba(12,59,46,0.14); }
-.doc-card-header { background:linear-gradient(160deg,#0c3b2e 0%,#1d5c42 100%); padding:2rem 1.5rem 1.5rem; text-align:center; position:relative; }
-.doc-avatar { width:82px; height:82px; border-radius:50%; border:3px solid rgba(255,255,255,0.35); background:rgba(255,255,255,0.12); overflow:hidden; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; }
-.doc-avatar img { width:100%; height:100%; object-fit:cover; }
-.doc-name { color:#fff; font-weight:800; font-size:1.05rem; margin-bottom:2px; }
-.doc-spec { color:rgba(255,255,255,0.65); font-size:0.82rem; }
-.doc-card-body { padding:1.5rem; display:flex; flex-direction:column; flex-grow:1; }
-.doc-info-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.doc-info-icon { width:28px; height:28px; border-radius:8px; background:#e8f5e9; color:var(--sage); display:flex; align-items:center; justify-content:center; font-size:0.78rem; flex-shrink:0; }
-.doc-info-text { font-size:0.84rem; color:#5a6a5c; }
-.doc-fee { font-size:1.25rem; font-weight:800; color:var(--forest); }
-.doc-fee-label { font-size:0.75rem; color:#8a9a8b; }
-.btn-book { background:linear-gradient(135deg,var(--forest) 0%,var(--sage) 100%); color:#fff; border:none; width:100%; padding:12px; border-radius:12px; font-weight:700; font-size:0.92rem; transition:all 0.25s; cursor:pointer; text-decoration:none; display:block; text-align:center; }
-.btn-book:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(12,59,46,0.25); color:#fff; }
-.btn-book-outline { background:transparent; color:var(--forest); border:2px solid var(--forest); width:100%; padding:11px; border-radius:12px; font-weight:700; font-size:0.92rem; transition:all 0.25s; cursor:pointer; text-decoration:none; display:block; text-align:center; }
+.doctors-section { background:var(--parchment); padding:3rem 0 5rem; }
+.doc-card { background:#fff; border-radius:16px; border:1px solid #e5ede6; overflow:hidden; height:100%; transition:all 0.3s cubic-bezier(0.165,0.84,0.44,1); box-shadow:0 3px 12px rgba(12,59,46,0.05); }
+.doc-card:hover { transform:translateY(-5px); border-color:var(--gold); box-shadow:0 14px 30px rgba(12,59,46,0.12); }
+.doc-card-photo-wrap { height:175px; position:relative; overflow:hidden; background:#eef3ee; }
+.doc-cover-img { width:100%; height:100%; object-fit:cover; object-position:top center; transition:transform 0.4s ease; filter:none !important; }
+.doc-card:hover .doc-cover-img { transform:scale(1.04); }
+.doc-cover-placeholder { height:100%; display:flex; align-items:center; justify-content:center; color:var(--sage); background:linear-gradient(135deg,#e8f0e8 0%,#d8e6d8 100%); }
+.doc-name { color:var(--forest); font-weight:800; font-size:1.05rem; margin-bottom:2px; font-family:'Playfair Display',serif; }
+.doc-spec { color:var(--herb); font-weight:700; font-size:0.82rem; }
+.doc-subspec { color:#6a7b6c; font-size:0.75rem; margin-top:1px; }
+.doc-card-body { padding:1rem; display:flex; flex-direction:column; flex-grow:1; }
+.doc-info-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.doc-info-icon { width:24px; height:24px; border-radius:6px; background:#e8f5e9; color:var(--sage); display:flex; align-items:center; justify-content:center; font-size:0.72rem; flex-shrink:0; }
+.doc-info-text { font-size:0.78rem; color:#5a6a5c; }
+.doc-fee { font-size:1.1rem; font-weight:800; color:var(--forest); }
+.doc-fee-label { font-size:0.7rem; color:#8a9a8b; }
+.btn-book { background:linear-gradient(135deg,var(--forest) 0%,var(--sage) 100%); color:#fff; border:none; width:100%; padding:9px; border-radius:10px; font-weight:700; font-size:0.85rem; transition:all 0.25s; cursor:pointer; text-decoration:none; display:block; text-align:center; }
+.btn-book:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(12,59,46,0.22); color:#fff; }
+.btn-book-outline { background:transparent; color:var(--forest); border:1.5px solid var(--forest); width:100%; padding:8px; border-radius:10px; font-weight:700; font-size:0.85rem; transition:all 0.25s; cursor:pointer; text-decoration:none; display:block; text-align:center; }
 .btn-book-outline:hover { background:var(--forest); color:#fff; }
-.type-badge { position:absolute; top:12px; right:12px; font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:50px; }
+.type-badge { position:absolute; top:8px; right:8px; font-size:0.64rem; font-weight:700; padding:3px 9px; border-radius:50px; z-index:2; box-shadow:0 3px 8px rgba(0,0,0,0.15); }
 .badge-online { background:#0d6efd; color:#fff; }
-.badge-offline { background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.35); }
+.badge-offline { background:rgba(255,255,255,0.88); color:var(--forest); border:1px solid rgba(12,59,46,0.2); }
 .badge-both { background:#6f42c1; color:#fff; }
-.location-badge { position:absolute; top:12px; left:12px; font-size:0.65rem; font-weight:700; background:var(--amber); color:var(--forest); padding:3px 10px; border-radius:50px; }
-.cat-pill-btn { background:#fff; border:1px solid #dce8dc; color:var(--forest); padding:7px 18px; border-radius:50px; font-size:0.83rem; font-weight:600; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.location-badge { position:absolute; top:8px; left:8px; font-size:0.64rem; font-weight:700; background:var(--amber); color:var(--forest); padding:3px 9px; border-radius:50px; z-index:2; box-shadow:0 3px 8px rgba(0,0,0,0.15); }
+.cat-pill-btn { background:#fff; border:1px solid #dce8dc; color:var(--forest); padding:6px 16px; border-radius:50px; font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
 .cat-pill-btn:hover,.cat-pill-btn.active { background:var(--sage); color:#fff; border-color:var(--sage); }
-.section-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; padding:5px 14px; border-radius:50px; margin-bottom:1rem; }
+.section-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; padding:4px 14px; border-radius:50px; margin-bottom:1rem; }
 .reveal { opacity:0; transform:translateY(28px); transition:all 0.65s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
 @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-8px);} }
@@ -130,7 +133,7 @@
                         </div>
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:1.2rem;">
                             <div style="width:42px;height:42px;border-radius:12px;background:rgba(197,160,89,0.15);color:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(197,160,89,0.3);"><i class="fas fa-leaf"></i></div>
-                            <div><div style="color:#fff;font-weight:700;font-size:0.92rem;">Ancient Siddha Frameworks</div><div style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:2px;">5000+ years of healing science</div></div>
+                            <div><div style="color:#fff;font-weight:700;font-size:0.92rem;">Ancient Ayurveda Frameworks</div><div style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:2px;">5000+ years of healing science</div></div>
                         </div>
                         <div style="display:flex;align-items:flex-start;gap:14px;">
                             <div style="width:42px;height:42px;border-radius:12px;background:rgba(197,160,89,0.15);color:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(197,160,89,0.3);"><i class="fas fa-file-medical"></i></div>
@@ -179,7 +182,7 @@
                 <div class="feat-card">
                     <div class="feat-icon"><i class="fas fa-heart"></i></div>
                     <h5 class="feat-title">Holistic Wellness</h5>
-                    <p class="feat-desc">Addressing root causes through ancient Siddha and Ayurvedic frameworks.</p>
+                    <p class="feat-desc">Addressing root causes through ancient Ayurvedic frameworks.</p>
                 </div>
             </div>
         </div>
@@ -188,7 +191,7 @@
 
 {{-- FILTER BAR --}}
 <section class="filters-bar" id="doctor-grid">
-    <div class="container">
+    <div class="container-fluid px-4 px-xl-5" style="max-width: 1850px;">
         <div class="text-center mb-4 reveal">
             <div class="section-eyebrow" style="background:rgba(79,119,45,0.1);color:var(--herb);margin:0 auto 0.8rem;"><i class="fas fa-search"></i> Find Your Vaidya</div>
             <h2 style="font-family:'Playfair Display',serif;color:var(--forest);font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:800;margin:0;">Our Expert Practitioners</h2>
@@ -233,9 +236,9 @@
 
 {{-- DOCTOR CARDS --}}
 <section class="doctors-section">
-    <div class="container">
+    <div class="container-fluid px-4 px-xl-5" style="max-width: 1850px;">
         @if(isset($doctors) && $doctors->count() > 0)
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="doctorGrid">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-3" id="doctorGrid">
             @foreach($doctors as $doctor)
             <div class="col doctor-card-wrap"
                  data-name="{{ strtolower($doctor->name) }}"
@@ -245,7 +248,15 @@
                  data-haslocation="{{ !empty($doctor->current_location) ? 'yes' : 'no' }}"
                  data-location="{{ strtolower($doctor->current_location ?? '') }}">
                 <div class="doc-card">
-                    <div class="doc-card-header">
+                    <div class="doc-card-photo-wrap">
+                        @if($doctor->photo)
+                            <img src="{{ asset('storage/' . $doctor->photo) }}" alt="Dr. {{ $doctor->name }}" class="doc-cover-img">
+                        @else
+                            <div class="doc-cover-placeholder">
+                                <i class="fas fa-user-md fa-5x"></i>
+                            </div>
+                        @endif
+
                         @if($doctor->consultation_type === 'Online')
                             <span class="type-badge badge-online">🎥 Online</span>
                         @elseif($doctor->consultation_type === 'Both')
@@ -256,20 +267,15 @@
                         @if($doctor->current_location)
                             <span class="location-badge"><i class="fas fa-globe-asia me-1"></i>{{ $doctor->current_location }}</span>
                         @endif
-                        <div class="doc-avatar">
-                            @if($doctor->photo)
-                                <img src="{{ asset('storage/' . $doctor->photo) }}" alt="Dr. {{ $doctor->name }}">
-                            @else
-                                <i class="fas fa-user-md fa-2x" style="color:rgba(255,255,255,0.7);"></i>
-                            @endif
-                        </div>
-                        <div class="doc-name">Dr. {{ $doctor->name }}</div>
-                        <div class="doc-spec">{{ $doctor->specialization_category ?? 'Ayurvedic Practitioner' }}</div>
-                        @if($doctor->specialization_subcategory)
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.72rem;margin-top:3px;">{{ $doctor->specialization_subcategory }}</div>
-                        @endif
                     </div>
                     <div class="doc-card-body">
+                        <div class="mb-3 pb-2 border-bottom" style="border-color:#f0f4f0 !important;">
+                            <div class="doc-name">Dr. {{ $doctor->name }}</div>
+                            <div class="doc-spec">{{ $doctor->specialization_category ?? 'Ayurvedic Practitioner' }}</div>
+                            @if($doctor->specialization_subcategory)
+                                <div class="doc-subspec">{{ $doctor->specialization_subcategory }}</div>
+                            @endif
+                        </div>
                         @if($doctor->qualification)
                         <div class="doc-info-row">
                             <div class="doc-info-icon"><i class="fas fa-graduation-cap"></i></div>

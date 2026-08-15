@@ -1,3 +1,4 @@
+@php $fullWidth = true; @endphp
 @extends('layouts.app')
 
 @section('navbar')
@@ -586,7 +587,159 @@
             </div>
         </div>
     </div>
+<!-- ═══ DOWNSIDE FULL-SCREEN HORIZONTAL MOVABLE ADVERTISEMENT BANNER ═══════════════════════════ -->
+@if(isset($advertisements) && $advertisements->count() > 0)
+<section class="py-4 bg-white overflow-hidden position-relative w-100">
+    <div class="container-fluid px-0">
+        <!-- Minimal Header Container -->
+        <div class="px-4 px-md-5 mb-3 d-flex align-items-center justify-content-between">
+            <h4 class="fw-bold text-dark mb-0" style="font-family:'Playfair Display',serif;">Promotional Announcements</h4>
+            <!-- Manual Move Controls -->
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-dark rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" 
+                        style="width:36px;height:36px;" onclick="scrollAdMarquee(-360)" title="Move Left">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button type="button" class="btn btn-outline-dark rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" 
+                        style="width:36px;height:36px;" onclick="scrollAdMarquee(360)" title="Move Right">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Full-Screen Edge-to-Edge Horizontal Movable Container -->
+        <div class="horizontal-ad-marquee-wrapper py-2 w-100" id="adMarqueeWrapper" onmouseenter="pauseAdMarquee()" onmouseleave="resumeAdMarquee()">
+            <div class="horizontal-ad-marquee-track" id="adMarqueeTrack">
+                @foreach($advertisements as $ad)
+                    <div class="horizontal-ad-card-item">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 position-relative ad-card-hover bg-white">
+                            <div class="position-relative overflow-hidden" style="height: 210px;">
+                                @if($ad->image_path)
+                                    @if($ad->link)
+                                        <a href="{{ $ad->link }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $ad->image_path) }}" class="w-100 h-100 object-fit-cover" alt="{{ $ad->title ?? 'Advertisement' }}">
+                                        </a>
+                                    @else
+                                        <img src="{{ asset('storage/' . $ad->image_path) }}" class="w-100 h-100 object-fit-cover" alt="{{ $ad->title ?? 'Advertisement' }}">
+                                    @endif
+                                @else
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success">
+                                        <i class="fas fa-bullhorn fa-3x opacity-50"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            @if($ad->title)
+                                <div class="card-body p-3 text-center">
+                                    <h6 class="fw-bold text-dark mb-2 text-truncate" title="{{ $ad->title }}">
+                                        {{ $ad->title }}
+                                    </h6>
+                                    @if($ad->link)
+                                        <a href="{{ $ad->link }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm">
+                                            View Offer <i class="fas fa-external-link-alt ms-1"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+
+                {{-- Duplicate slides for continuous infinite horizontal scroll effect if count > 1 --}}
+                @if($advertisements->count() > 1)
+                    @foreach($advertisements as $ad)
+                        <div class="horizontal-ad-card-item">
+                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 position-relative ad-card-hover bg-white">
+                                <div class="position-relative overflow-hidden" style="height: 210px;">
+                                    @if($ad->image_path)
+                                        @if($ad->link)
+                                            <a href="{{ $ad->link }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $ad->image_path) }}" class="w-100 h-100 object-fit-cover" alt="{{ $ad->title ?? 'Advertisement' }}">
+                                            </a>
+                                        @else
+                                            <img src="{{ asset('storage/' . $ad->image_path) }}" class="w-100 h-100 object-fit-cover" alt="{{ $ad->title ?? 'Advertisement' }}">
+                                        @endif
+                                    @else
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success">
+                                            <i class="fas fa-bullhorn fa-3x opacity-50"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                @if($ad->title)
+                                    <div class="card-body p-3 text-center">
+                                        <h6 class="fw-bold text-dark mb-2 text-truncate" title="{{ $ad->title }}">
+                                            {{ $ad->title }}
+                                        </h6>
+                                        @if($ad->link)
+                                            <a href="{{ $ad->link }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm">
+                                                View Offer <i class="fas fa-external-link-alt ms-1"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+    </div>
 </section>
+
+<style>
+.horizontal-ad-marquee-wrapper {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+}
+.horizontal-ad-marquee-wrapper::-webkit-scrollbar {
+    display: none;
+}
+.horizontal-ad-marquee-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    animation: ad-marquee-move 30s linear infinite;
+}
+.horizontal-ad-marquee-wrapper:hover .horizontal-ad-marquee-track {
+    animation-play-state: paused;
+}
+.horizontal-ad-card-item {
+    width: 380px;
+    flex-shrink: 0;
+}
+.ad-card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.ad-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1) !important;
+}
+@keyframes ad-marquee-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+</style>
+
+<script>
+function scrollAdMarquee(amount) {
+    const wrapper = document.getElementById('adMarqueeWrapper');
+    if (wrapper) {
+        wrapper.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+}
+function pauseAdMarquee() {
+    const track = document.getElementById('adMarqueeTrack');
+    if (track) track.style.animationPlayState = 'paused';
+}
+function resumeAdMarquee() {
+    const track = document.getElementById('adMarqueeTrack');
+    if (track) track.style.animationPlayState = 'running';
+}
+</script>
+@endif
 
 <!-- ═══ CTA FOOTER BANNER ════════════════════════════════ -->
 <section style="background:linear-gradient(135deg,#0c3b2e 0%,#1d5c42 100%);padding:5rem 0;">

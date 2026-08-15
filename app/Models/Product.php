@@ -22,6 +22,11 @@ class Product extends Model
         'expiry_date',
     ];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+        'stock' => 'integer',
+    ];
+
     public function pharmaCompany()
     {
         return $this->belongsTo(PharmaCompany::class);
@@ -30,5 +35,21 @@ class Product extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class)->latest();
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        $avg = $this->reviews()->avg('rating');
+        return $avg ? round($avg, 1) : 4.8;
+    }
+
+    public function getReviewsCountAttribute()
+    {
+        return $this->reviews()->count();
     }
 }

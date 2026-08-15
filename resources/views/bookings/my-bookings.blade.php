@@ -7,14 +7,34 @@
 @section('title', 'My Appointments | Ayurveda')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-10">
+<div class="container page-shell py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold" style="color:#1a4d2e;"><i class="fas fa-calendar-check me-2"></i>My Appointments</h3>
             <a href="{{ route('home') }}" class="btn btn-outline-success btn-sm">
                 <i class="fas fa-arrow-left me-1"></i> Back to Home
             </a>
         </div>
+
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-check-circle fs-5"></i>
+                    <div>{{ session('success') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-exclamation-circle fs-5"></i>
+                    <div>{{ session('error') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         @if($bookings->isEmpty())
             <div class="text-center py-5">
@@ -88,6 +108,20 @@
                                     @else
                                         <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i>Cancelled</span>
                                     @endif
+
+                                    @if(in_array($booking->status, ['Pending', 'Booked']))
+                                        <div class="mt-3 d-flex justify-content-end gap-2">
+                                            <a href="{{ route('bookings.reschedule', $booking->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
+                                                <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                                            </a>
+                                            <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm">
+                                                    <i class="fas fa-times me-1"></i> Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -96,5 +130,6 @@
             </div>
         @endif
     </div>
+</div>
 </div>
 @endsection

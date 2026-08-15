@@ -14,7 +14,7 @@ class DoctorController extends Controller
 {
     public function index()
     {
-        $doctors = Doctor::with(['district', 'hospital'])->paginate(10);
+        $doctors = Doctor::where('is_admin_astrologer', false)->with(['district', 'hospital'])->paginate(10);
         return view('admin.doctors.index', compact('doctors'));
     }
 
@@ -596,5 +596,80 @@ class DoctorController extends Controller
         $product->delete();
 
         return redirect()->route('doctor.products.index')->with('success', 'Product deleted successfully!');
+    }
+
+    // --- Doctor Product Orders Management ---
+    public function orders()
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+
+        $orders = \App\Models\Order::whereHas('items.product', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->with(['user', 'items' => function ($query) use ($doctorId) {
+            $query->whereHas('product', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            })->with('product');
+        }])->latest()->paginate(10);
+
+        return view('doctor.orders.index', compact('orders'));
+    }
+
+    public function showOrder($id)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+
+        $order = \App\Models\Order::with(['user', 'items' => function ($query) use ($doctorId) {
+            $query->whereHas('product', function ($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            })->with('product');
+        }])->findOrFail($id);
+
+        if (!$order->items->isNotEmpty()) {
+            abort(403, 'Unauthorized access to this order.');
+        }
+
+        return view('doctor.orders.show', compact('order'));
+    }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $doctorId = \Illuminate\Support\Facades\Auth::guard('doctor')->id();
+
+        $order = \App\Models\Order::whereHas('items.product', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->findOrFail($id);
+
+        $request->validate([
+            'order_status'   => 'nullable|in:Placed,Shipped,Delivered,Cancelled',
+            'payment_status' => 'nullable|in:Pending,Received,Completed,Paid',
+        ]);
+
+        $updateData = [];
+
+        if ($request->has('order_status') && $request->filled('order_status')) {
+            $updateData['order_status'] = $request->order_status;
+        }
+
+        if ($request->has('payment_status') && $request->filled('payment_status')) {
+            $statusVal = $request->payment_status;
+            if ($statusVal === 'Received' || $statusVal === 'Paid') {
+                $statusVal = 'Completed';
+            }
+            $updateData['payment_status'] = $statusVal;
+        }
+
+        if (!empty($updateData)) {
+            $order->update($updateData);
+
+            if (isset($updateData['order_status']) && $order->user && $order->user->email) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderStatusUpdatedMail($order));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to send order status mail to {$order->user->email}: " . $e->getMessage());
+                }
+            }
+        }
+
+        return back()->with('success', 'Order status updated successfully!');
     }
 }

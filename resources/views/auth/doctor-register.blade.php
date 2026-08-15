@@ -362,64 +362,87 @@
                             @error('specialization_subcategory') <div class="invalid-feedback d-block small">{{ $message }}</div> @enderror
                         </div>
 
-                        <!-- State & District -->
-                        <div class="col-md-6">
-                            <label class="form-label" for="state_name">State <span class="text-danger">*</span></label>
-                            <select name="state_name" id="state_name" class="form-select @error('state_name') is-invalid @enderror" required>
-                                <option value="">— Select State —</option>
-                                <option value="Andhra Pradesh" {{ old('state_name') == 'Andhra Pradesh' ? 'selected' : '' }}>Andhra Pradesh</option>
-                                <option value="Arunachal Pradesh" {{ old('state_name') == 'Arunachal Pradesh' ? 'selected' : '' }}>Arunachal Pradesh</option>
-                                <option value="Assam" {{ old('state_name') == 'Assam' ? 'selected' : '' }}>Assam</option>
-                                <option value="Bihar" {{ old('state_name') == 'Bihar' ? 'selected' : '' }}>Bihar</option>
-                                <option value="Chhattisgarh" {{ old('state_name') == 'Chhattisgarh' ? 'selected' : '' }}>Chhattisgarh</option>
-                                <option value="Goa" {{ old('state_name') == 'Goa' ? 'selected' : '' }}>Goa</option>
-                                <option value="Gujarat" {{ old('state_name') == 'Gujarat' ? 'selected' : '' }}>Gujarat</option>
-                                <option value="Haryana" {{ old('state_name') == 'Haryana' ? 'selected' : '' }}>Haryana</option>
-                                <option value="Himachal Pradesh" {{ old('state_name') == 'Himachal Pradesh' ? 'selected' : '' }}>Himachal Pradesh</option>
-                                <option value="Jharkhand" {{ old('state_name') == 'Jharkhand' ? 'selected' : '' }}>Jharkhand</option>
-                                <option value="Karnataka" {{ old('state_name') == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
-                                <option value="Kerala" {{ old('state_name') == 'Kerala' ? 'selected' : '' }}>Kerala</option>
-                                <option value="Madhya Pradesh" {{ old('state_name') == 'Madhya Pradesh' ? 'selected' : '' }}>Madhya Pradesh</option>
-                                <option value="Maharashtra" {{ old('state_name') == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
-                                <option value="Manipur" {{ old('state_name') == 'Manipur' ? 'selected' : '' }}>Manipur</option>
-                                <option value="Meghalaya" {{ old('state_name') == 'Meghalaya' ? 'selected' : '' }}>Meghalaya</option>
-                                <option value="Mizoram" {{ old('state_name') == 'Mizoram' ? 'selected' : '' }}>Mizoram</option>
-                                <option value="Nagaland" {{ old('state_name') == 'Nagaland' ? 'selected' : '' }}>Nagaland</option>
-                                <option value="Odisha" {{ old('state_name') == 'Odisha' ? 'selected' : '' }}>Odisha</option>
-                                <option value="Punjab" {{ old('state_name') == 'Punjab' ? 'selected' : '' }}>Punjab</option>
-                                <option value="Rajasthan" {{ old('state_name') == 'Rajasthan' ? 'selected' : '' }}>Rajasthan</option>
-                                <option value="Sikkim" {{ old('state_name') == 'Sikkim' ? 'selected' : '' }}>Sikkim</option>
-                                <option value="Tamil Nadu" {{ old('state_name') == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
-                                <option value="Telangana" {{ old('state_name') == 'Telangana' ? 'selected' : '' }}>Telangana</option>
-                                <option value="Tripura" {{ old('state_name') == 'Tripura' ? 'selected' : '' }}>Tripura</option>
-                                <option value="Uttar Pradesh" {{ old('state_name') == 'Uttar Pradesh' ? 'selected' : '' }}>Uttar Pradesh</option>
-                                <option value="Uttarakhand" {{ old('state_name') == 'Uttarakhand' ? 'selected' : '' }}>Uttarakhand</option>
-                                <option value="West Bengal" {{ old('state_name') == 'West Bengal' ? 'selected' : '' }}>West Bengal</option>
-                                <option value="Andaman and Nicobar Islands" {{ old('state_name') == 'Andaman and Nicobar Islands' ? 'selected' : '' }}>Andaman and Nicobar Islands</option>
-                                <option value="Chandigarh" {{ old('state_name') == 'Chandigarh' ? 'selected' : '' }}>Chandigarh</option>
-                                <option value="Dadra and Nagar Haveli and Daman and Diu" {{ old('state_name') == 'Dadra and Nagar Haveli and Daman and Diu' ? 'selected' : '' }}>Dadra & Nagar Haveli and Daman & Diu</option>
-                                <option value="Delhi" {{ old('state_name') == 'Delhi' ? 'selected' : '' }}>Delhi (NCT)</option>
-                                <option value="Jammu and Kashmir" {{ old('state_name') == 'Jammu and Kashmir' ? 'selected' : '' }}>Jammu & Kashmir</option>
-                                <option value="Ladakh" {{ old('state_name') == 'Ladakh' ? 'selected' : '' }}>Ladakh</option>
-                                <option value="Lakshadweep" {{ old('state_name') == 'Lakshadweep' ? 'selected' : '' }}>Lakshadweep</option>
-                                <option value="Puducherry" {{ old('state_name') == 'Puducherry' ? 'selected' : '' }}>Puducherry</option>
-                            </select>
-                            @error('state_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label" for="district_name">Working District <span class="text-danger">*</span></label>
-                            <select name="district_name" id="district_name" class="form-select @error('district_name') is-invalid @enderror" required disabled>
-                                <option value="">— Select State First —</option>
-                            </select>
-                            @error('district_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
-                        </div>
-
-                        <!-- Current Location (If Abroad / Other Place) -->
+                        <!-- Practice Location Type Selection (India vs Outside India) -->
                         <div class="col-12">
-                            <label class="form-label" for="current_location"><i class="fas fa-globe-asia text-success me-1"></i> Current Location (Optional / If Abroad or Outside Native Place)</label>
-                            <input type="text" name="current_location" id="current_location" class="form-control @error('current_location') is-invalid @enderror" placeholder="e.g. Dubai, UAE / Riyadh, Saudi Arabia / Bengaluru" value="{{ old('current_location') }}">
-                            <div class="form-text small text-muted"><i class="fas fa-info-circle me-1"></i>If you currently reside or practice abroad or outside your home state/district, please mention your present city & country.</div>
+                            <label class="form-label mb-2">Practice Location <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-3">
+                                <div class="flex-fill">
+                                    <input type="radio" class="btn-check" name="practice_location_type" id="location_india" value="india" {{ old('practice_location_type', 'india') == 'india' ? 'checked' : '' }} onchange="togglePracticeLocationType()">
+                                    <label class="btn btn-outline-success w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" for="location_india">
+                                        <i class="fas fa-flag-checkered"></i> India
+                                    </label>
+                                </div>
+                                <div class="flex-fill">
+                                    <input type="radio" class="btn-check" name="practice_location_type" id="location_outside_india" value="outside_india" {{ old('practice_location_type') == 'outside_india' ? 'checked' : '' }} onchange="togglePracticeLocationType()">
+                                    <label class="btn btn-outline-success w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" for="location_outside_india">
+                                        <i class="fas fa-globe-americas"></i> Outside India
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- India Fields: State & District -->
+                        <div id="india_location_wrapper" class="col-12 p-0 m-0">
+                            <div class="row g-3 m-0 p-0">
+                                <div class="col-md-6 ps-0 pe-md-2">
+                                    <label class="form-label" for="state_name">State <span class="text-danger">*</span></label>
+                                    <select name="state_name" id="state_name" class="form-select @error('state_name') is-invalid @enderror">
+                                        <option value="">— Select State —</option>
+                                        <option value="Andhra Pradesh" {{ old('state_name') == 'Andhra Pradesh' ? 'selected' : '' }}>Andhra Pradesh</option>
+                                        <option value="Arunachal Pradesh" {{ old('state_name') == 'Arunachal Pradesh' ? 'selected' : '' }}>Arunachal Pradesh</option>
+                                        <option value="Assam" {{ old('state_name') == 'Assam' ? 'selected' : '' }}>Assam</option>
+                                        <option value="Bihar" {{ old('state_name') == 'Bihar' ? 'selected' : '' }}>Bihar</option>
+                                        <option value="Chhattisgarh" {{ old('state_name') == 'Chhattisgarh' ? 'selected' : '' }}>Chhattisgarh</option>
+                                        <option value="Goa" {{ old('state_name') == 'Goa' ? 'selected' : '' }}>Goa</option>
+                                        <option value="Gujarat" {{ old('state_name') == 'Gujarat' ? 'selected' : '' }}>Gujarat</option>
+                                        <option value="Haryana" {{ old('state_name') == 'Haryana' ? 'selected' : '' }}>Haryana</option>
+                                        <option value="Himachal Pradesh" {{ old('state_name') == 'Himachal Pradesh' ? 'selected' : '' }}>Himachal Pradesh</option>
+                                        <option value="Jharkhand" {{ old('state_name') == 'Jharkhand' ? 'selected' : '' }}>Jharkhand</option>
+                                        <option value="Karnataka" {{ old('state_name') == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
+                                        <option value="Kerala" {{ old('state_name') == 'Kerala' ? 'selected' : '' }}>Kerala</option>
+                                        <option value="Madhya Pradesh" {{ old('state_name') == 'Madhya Pradesh' ? 'selected' : '' }}>Madhya Pradesh</option>
+                                        <option value="Maharashtra" {{ old('state_name') == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
+                                        <option value="Manipur" {{ old('state_name') == 'Manipur' ? 'selected' : '' }}>Manipur</option>
+                                        <option value="Meghalaya" {{ old('state_name') == 'Meghalaya' ? 'selected' : '' }}>Meghalaya</option>
+                                        <option value="Mizoram" {{ old('state_name') == 'Mizoram' ? 'selected' : '' }}>Mizoram</option>
+                                        <option value="Nagaland" {{ old('state_name') == 'Nagaland' ? 'selected' : '' }}>Nagaland</option>
+                                        <option value="Odisha" {{ old('state_name') == 'Odisha' ? 'selected' : '' }}>Odisha</option>
+                                        <option value="Punjab" {{ old('state_name') == 'Punjab' ? 'selected' : '' }}>Punjab</option>
+                                        <option value="Rajasthan" {{ old('state_name') == 'Rajasthan' ? 'selected' : '' }}>Rajasthan</option>
+                                        <option value="Sikkim" {{ old('state_name') == 'Sikkim' ? 'selected' : '' }}>Sikkim</option>
+                                        <option value="Tamil Nadu" {{ old('state_name') == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
+                                        <option value="Telangana" {{ old('state_name') == 'Telangana' ? 'selected' : '' }}>Telangana</option>
+                                        <option value="Tripura" {{ old('state_name') == 'Tripura' ? 'selected' : '' }}>Tripura</option>
+                                        <option value="Uttar Pradesh" {{ old('state_name') == 'Uttar Pradesh' ? 'selected' : '' }}>Uttar Pradesh</option>
+                                        <option value="Uttarakhand" {{ old('state_name') == 'Uttarakhand' ? 'selected' : '' }}>Uttarakhand</option>
+                                        <option value="West Bengal" {{ old('state_name') == 'West Bengal' ? 'selected' : '' }}>West Bengal</option>
+                                        <option value="Andaman and Nicobar Islands" {{ old('state_name') == 'Andaman and Nicobar Islands' ? 'selected' : '' }}>Andaman and Nicobar Islands</option>
+                                        <option value="Chandigarh" {{ old('state_name') == 'Chandigarh' ? 'selected' : '' }}>Chandigarh</option>
+                                        <option value="Dadra and Nagar Haveli and Daman and Diu" {{ old('state_name') == 'Dadra and Nagar Haveli and Daman and Diu' ? 'selected' : '' }}>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option>
+                                        <option value="Delhi" {{ old('state_name') == 'Delhi' ? 'selected' : '' }}>Delhi (NCT)</option>
+                                        <option value="Jammu and Kashmir" {{ old('state_name') == 'Jammu and Kashmir' ? 'selected' : '' }}>Jammu &amp; Kashmir</option>
+                                        <option value="Ladakh" {{ old('state_name') == 'Ladakh' ? 'selected' : '' }}>Ladakh</option>
+                                        <option value="Lakshadweep" {{ old('state_name') == 'Lakshadweep' ? 'selected' : '' }}>Lakshadweep</option>
+                                        <option value="Puducherry" {{ old('state_name') == 'Puducherry' ? 'selected' : '' }}>Puducherry</option>
+                                    </select>
+                                    @error('state_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="col-md-6 pe-0 ps-md-2">
+                                    <label class="form-label" for="district_name">Working District <span class="text-danger">*</span></label>
+                                    <select name="district_name" id="district_name" class="form-select @error('district_name') is-invalid @enderror" disabled>
+                                        <option value="">— Select State First —</option>
+                                    </select>
+                                    @error('district_name') <div class="invalid-feedback small">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outside India Field: Country & City / Current Location -->
+                        <div id="outside_india_wrapper" class="col-12" style="display: none;">
+                            <label class="form-label" for="current_location"><i class="fas fa-globe-asia text-success me-1"></i> Country &amp; City / Location Details <span class="text-danger">*</span></label>
+                            <input type="text" name="current_location" id="current_location" class="form-control @error('current_location') is-invalid @enderror" placeholder="e.g. Dubai, UAE / London, UK / New York, USA / Riyadh, Saudi Arabia" value="{{ old('current_location') }}">
+                            <div class="form-text small text-muted"><i class="fas fa-info-circle me-1"></i>Please specify the country, city, and present practice address outside India.</div>
                             @error('current_location') <div class="invalid-feedback small">{{ $message }}</div> @enderror
                         </div>
 
@@ -513,12 +536,49 @@
                             <input type="file" name="photo" class="form-control" accept="image/*">
                             <div class="form-text small text-muted">Professional headshot photo (JPEG/PNG, max 2MB).</div>
                         </div>
+
+                        <!-- Medical Astrology Toggle & Extension (As requested in sketch) -->
+                        <div class="col-12 mt-3">
+                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #f0f7f3 0%, #e8f3ec 100%); border: 1.5px solid #c8e0d0 !important;">
+                                <div class="card-body p-3 p-md-4">
+                                    <div class="form-check form-switch d-flex align-items-center justify-content-between ps-0 mb-0">
+                                        <label class="form-check-label fw-bold text-dark d-flex align-items-center gap-2 mb-0" style="cursor: pointer;" for="knows_medical_astrology">
+                                            <span class="d-inline-flex align-items-center justify-content-center bg-white text-success rounded-circle shadow-sm" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                                                <i class="fas fa-star-of-life"></i>
+                                            </span>
+                                            <div>
+                                                <div class="fs-6 fw-bold text-success mb-0">Know Medical Astrology</div>
+                                                <div class="text-muted small fw-normal">Are you qualified or experienced in Ayurvedic Medical Astrology (Jyotish)?</div>
+                                            </div>
+                                        </label>
+                                        <input class="form-check-input ms-3" type="checkbox" name="knows_medical_astrology" id="knows_medical_astrology" value="1" {{ old('knows_medical_astrology') ? 'checked' : '' }} onchange="toggleAstrologyExtension()" style="width: 2.8em; height: 1.5em; cursor: pointer;">
+                                    </div>
+
+                                    <!-- Expandable Extension Section (As drawn in sketch) -->
+                                    <div id="astrology_extension_wrapper" class="mt-3 pt-3 border-top" style="display: none; border-color: #d0e4d6 !important;">
+                                        <div class="row g-3">
+                                            <!-- What to know about it -->
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold text-dark" for="astrology_details"><i class="fas fa-book-open text-success me-1"></i> What to know about it</label>
+                                                <textarea name="astrology_details" id="astrology_details" class="form-control bg-white" rows="3" placeholder="Describe your experience or practice approach in Medical Astrology (e.g. Nadi pariksha, planetary influence analysis on doshas)...">{{ old('astrology_details') }}</textarea>
+                                            </div>
+
+                                            <!-- Any qualification -->
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold text-dark" for="astrology_qualification"><i class="fas fa-certificate text-success me-1"></i> Any qualification?</label>
+                                                <input type="text" name="astrology_qualification" id="astrology_qualification" class="form-control bg-white" placeholder="e.g. Jyotish Acharya, Certificate in Vedic Medical Astrology" value="{{ old('astrology_qualification') }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="mt-4">
                         <button type="submit" class="btn btn-submit-doctor w-100 py-3 fw-bold">
-                            <i class="fas fa-paper-plane me-2"></i> Submit Doctor Application
+                            <i class="fas fa-paper-plane me-2"></i> Register as a Doctor
                         </button>
                     </div>
                 </form>
@@ -548,6 +608,13 @@ function togglePassword(inputId, button) {
 
 
 
+function toggleAstrologyExtension() {
+    const checkbox = document.getElementById('knows_medical_astrology');
+    const wrapper = document.getElementById('astrology_extension_wrapper');
+    if (!checkbox || !wrapper) return;
+    wrapper.style.display = checkbox.checked ? 'block' : 'none';
+}
+
 function toggleConsultationTimes() {
     const typeSelect = document.getElementById('consultation_type');
     const offlineWrap = document.getElementById('offline_time_wrapper');
@@ -569,8 +636,46 @@ function toggleConsultationTimes() {
     }
 }
 
+function togglePracticeLocationType() {
+    const isIndia = document.getElementById('location_india') ? document.getElementById('location_india').checked : true;
+    const indiaWrap = document.getElementById('india_location_wrapper');
+    const outsideWrap = document.getElementById('outside_india_wrapper');
+    const stateSelect = document.getElementById('state_name');
+    const districtSelect = document.getElementById('district_name');
+    const locationInput = document.getElementById('current_location');
+
+    if (!indiaWrap || !outsideWrap) return;
+
+    if (isIndia) {
+        indiaWrap.style.display = 'block';
+        outsideWrap.style.display = 'none';
+
+        if (stateSelect) stateSelect.setAttribute('required', 'required');
+        if (locationInput) {
+            locationInput.removeAttribute('required');
+        }
+    } else {
+        indiaWrap.style.display = 'none';
+        outsideWrap.style.display = 'block';
+
+        if (stateSelect) {
+            stateSelect.removeAttribute('required');
+            stateSelect.value = '';
+        }
+        if (districtSelect) {
+            districtSelect.removeAttribute('required');
+            districtSelect.value = '';
+        }
+        if (locationInput) {
+            locationInput.setAttribute('required', 'required');
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     toggleConsultationTimes();
+    toggleAstrologyExtension();
+    togglePracticeLocationType();
     const forms = document.querySelectorAll('form');
 
     forms.forEach(form => {

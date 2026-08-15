@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div class="container">
+<div class="container page-shell">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <h2 class="mb-4 text-center" style="color: #2c5f2d;">My Orders</h2>

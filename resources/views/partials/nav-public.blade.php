@@ -44,9 +44,33 @@
                 <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="{{ route('products.index') }}" class="nav-link">Products</a></li>
                 <li class="nav-item"><a href="{{ route('doctors.index') }}" class="nav-link">Doctors</a></li>
-                <li class="nav-item"><a href="{{ route('medical_astrology') }}" class="nav-link"><i class="fas fa-magic me-1 text-warning"></i> Medical Astrology</a></li>
+                <li class="nav-item"><a href="{{ route('medical_astrology') }}" class="nav-link"> Medical Astrology</a></li>
                 
-                @if(Auth::guard('web')->check())
+                @if(Auth::guard('admin')->check())
+                    <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="fas fa-user-shield me-1"></i> Admin Dashboard</a></li>
+                    <li class="nav-item">
+                        <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
+                        </form>
+                    </li>
+                @elseif(Auth::guard('doctor')->check())
+                    <li class="nav-item"><a href="{{ route('doctor.dashboard') }}" class="nav-link"><i class="fas fa-user-md me-1"></i> Doctor Dashboard</a></li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
+                        </form>
+                    </li>
+                @elseif(Auth::guard('pharma')->check())
+                    <li class="nav-item"><a href="{{ route('pharma.dashboard') }}" class="nav-link"><i class="fas fa-clinic-medical me-1"></i> Pharmacy Dashboard</a></li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
+                        </form>
+                    </li>
+                @elseif(Auth::guard('web')->check())
                     <li class="nav-item"><a href="{{ route('cart.index') }}" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li class="nav-item"><a href="{{ route('orders.index') }}" class="nav-link">My Orders</a></li>
                     <li class="nav-item"><a href="{{ route('bookings.my') }}" class="nav-link"><i class="fas fa-calendar-check"></i> My Appointments</a></li>

@@ -36,12 +36,18 @@ class Doctor extends Authenticatable
         'council_certificate',
         'hospital_id',
         'is_active',
+        'knows_medical_astrology',
+        'astrology_details',
+        'astrology_qualification',
+        'is_admin_astrologer',
     ];
 
     protected $casts = [
         'consultation_fee' => 'integer',
         'experience' => 'integer',
         'is_active' => 'boolean',
+        'knows_medical_astrology' => 'boolean',
+        'is_admin_astrologer' => 'boolean',
     ];
 
 

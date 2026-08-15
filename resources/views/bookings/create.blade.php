@@ -7,8 +7,9 @@
 @section('title', 'Book Doctor | Ayurveda')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
+<div class="container page-shell py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="card-header py-4" style="background: linear-gradient(135deg, #1a4d2e, #4f772d);">
                 <h4 class="mb-0 text-white fw-bold">
@@ -278,5 +279,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

@@ -30,11 +30,7 @@ class PharmaCompany extends Authenticatable
 
     public function setPasswordAttribute($value)
     {
-        if (!empty($value) && (str_starts_with((string)$value, '$2y$') || str_starts_with((string)$value, '$2a$'))) {
-            $this->attributes['password'] = $value;
-        } else {
-            $this->attributes['password'] = Hash::make($value);
-        }
+        $this->attributes['password'] = Hash::make($value);
     }
 
     public function district()

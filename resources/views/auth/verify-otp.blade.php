@@ -32,7 +32,7 @@
                     <form action="{{ route('register.verify_otp') }}" method="POST" class="mb-3">
                         @csrf
                         <div class="mb-4">
-                            <input type="text" name="otp" class="form-control form-control-lg text-center fs-4 fw-bold" maxlength="6" pattern="[0-9]{6}" placeholder="------" required autofocus autocomplete="off" style="letter-spacing: 0.75rem;">
+                            <input type="text" name="otp" value="{{ old('otp') }}" class="form-control form-control-lg text-center fs-4 fw-bold" maxlength="6" pattern="[0-9]{6}" placeholder="------" required autofocus autocomplete="off" style="letter-spacing: 0.75rem;">
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg w-100">Verify & Register</button>
                     </form>

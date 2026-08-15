@@ -38,13 +38,6 @@ class AppServiceProvider extends ServiceProvider
                                 ->orderBy('order_index', 'asc')
                                 ->get();
 
-                // If no ad is explicitly marked as is_popup, fallback to active advertisements
-                if ($popupAds->isEmpty()) {
-                    $popupAds = Advertisement::where('is_active', true)
-                                    ->orderBy('order_index', 'asc')
-                                    ->get();
-                }
-
                 $view->with('popupAds', $popupAds);
                 $view->with('popupAd', $popupAds->first());
             }

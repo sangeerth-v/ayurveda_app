@@ -24,31 +24,49 @@ use App\Mail\OrderPlacedPharmaMail;
 class UserController extends Controller
 {
     // --- Auth Section ---
+    // --- Auth Section ---
     public function showLogin()
     {
+        if (Auth::guard('web')->check()) return redirect()->route('home');
+        if (Auth::guard('admin')->check()) return redirect()->route('admin.dashboard');
+        if (Auth::guard('doctor')->check()) return redirect()->route('doctor.dashboard');
+        if (Auth::guard('pharma')->check()) return redirect()->route('pharma.dashboard');
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $loginInput = $request->email;
+        $password = $request->password;
+        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
+
         $guards = ['web', 'admin', 'doctor', 'pharma', 'hospital'];
 
-        \Log::info("USER_LOGIN: Attempt for email: " . $request->email);
+        \Log::info("USER_LOGIN: Attempt for input: " . $loginInput);
 
         foreach ($guards as $guard) {
             if ($guard === 'admin') {
-                $admin = \App\Models\Admin::where('email', $request->email)->first();
-                if ($admin && ($admin->password === $request->password || Hash::check($request->password, $admin->password))) {
+                if ($isEmail) {
+                    $admin = \App\Models\Admin::where('email', $loginInput)->first();
+                } else {
+                    $admin = \App\Models\Admin::where('name', $loginInput)->first();
+                }
+                
+                if ($admin && ($admin->password === $password || Hash::check($password, $admin->password))) {
                     Auth::guard('admin')->login($admin);
                     
                     $request->session()->regenerate();
                     
+                    $intended = session('url.intended');
+                    if ($intended && (str_contains($intended, '/login') || str_contains($intended, '/register') || str_contains($intended, '/notifications/'))) {
+                        session()->forget('url.intended');
+                    }
+
                     if ($request->filled('redirect')) {
                         return redirect($request->redirect);
                     }
@@ -63,27 +81,40 @@ class UserController extends Controller
                     'hospital' => \App\Models\Hospital::class,
                 };
                 
-                $user = $userModel::where('email', $request->email)->first();
-                if ($user && ($user->password === $request->password || Auth::guard($guard)->attempt($credentials))) {
-                    if (in_array($guard, ['hospital', 'doctor', 'pharma']) && isset($user->is_active) && !$user->is_active) {
-                        return back()->withErrors(['email' => 'Your account is pending admin approval. Please wait for administrator verification.']);
-                    }
+                if ($isEmail) {
+                    $user = $userModel::where('email', $loginInput)->first();
+                } else {
+                    $user = $userModel::where('name', $loginInput)->first();
+                }
+                
+                if ($user) {
+                    $passwordMatches = ($user->password === $password) || Hash::check($password, $user->password);
+                    if ($passwordMatches) {
+                        if (in_array($guard, ['hospital', 'doctor', 'pharma']) && isset($user->is_active) && !$user->is_active) {
+                            return back()->withInput($request->only('email'))->withErrors(['email' => 'Your account is pending admin approval. Please wait for administrator verification.']);
+                        }
 
-                    Auth::guard($guard)->login($user);
-                    \Log::info("USER_LOGIN: Success for $guard.");
-                    
-                    $request->session()->regenerate();
+                        Auth::guard($guard)->login($user);
+                        \Log::info("USER_LOGIN: Success for $guard.");
+                        
+                        $request->session()->regenerate();
 
-                    if ($request->filled('redirect')) {
-                        return redirect($request->redirect);
+                        $intended = session('url.intended');
+                        if ($intended && (str_contains($intended, '/login') || str_contains($intended, '/register') || str_contains($intended, '/notifications/'))) {
+                            session()->forget('url.intended');
+                        }
+
+                        if ($request->filled('redirect')) {
+                            return redirect($request->redirect);
+                        }
+                        
+                        return redirect()->intended($this->redirectPath($guard));
                     }
-                    
-                    return redirect()->intended($this->redirectPath($guard));
                 }
             }
         }
 
-        return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+        return back()->withInput($request->only('email'))->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
 
     public function logout(Request $request)
@@ -102,6 +133,10 @@ class UserController extends Controller
 
     public function showRegister()
     {
+        if (Auth::guard('web')->check()) return redirect()->route('home');
+        if (Auth::guard('admin')->check()) return redirect()->route('admin.dashboard');
+        if (Auth::guard('doctor')->check()) return redirect()->route('doctor.dashboard');
+        if (Auth::guard('pharma')->check()) return redirect()->route('pharma.dashboard');
         return view('auth.register');
     }
 
@@ -124,9 +159,10 @@ class UserController extends Controller
             'qualification' => 'required|string|min:2|max:255',
             'specialization_category' => 'required|exists:doctor_categories,id',
             'specialization_subcategory' => 'nullable|string|max:255',
-            'state_name' => 'required|string|min:2|max:100',
-            'district_name' => 'required|string|min:2|max:100',
-            'current_location' => 'nullable|string|max:255',
+            'practice_location_type' => 'nullable|in:india,outside_india',
+            'state_name' => 'nullable|required_if:practice_location_type,india|string|min:2|max:100',
+            'district_name' => 'nullable|required_if:practice_location_type,india|string|min:2|max:100',
+            'current_location' => 'nullable|required_if:practice_location_type,outside_india|string|max:255',
             'experience' => 'required|integer|min:0|max:70',
             'consultation_fee' => 'required|numeric|min:0|max:100000',
             'consultation_type' => 'required|in:Both,Offline,Online',
@@ -144,16 +180,23 @@ class UserController extends Controller
             'email.email' => 'Please enter a valid email address.',
             'password.min' => 'Password must be at least 8 characters long.',
             'address.min' => 'Please enter a complete clinic address (at least 10 characters).',
-            'state_name.required' => 'Please select your state.',
-            'district_name.required' => 'Please select your district.',
-            'specialization_subcategory.required' => 'Please enter your specialization subcategory.',
+            'state_name.required_if' => 'Please select your state if practicing in India.',
+            'district_name.required_if' => 'Please select your working district if practicing in India.',
+            'current_location.required_if' => 'Please enter your country & city if practicing outside India.',
         ]);
 
-        // Find or create the district by name (case-insensitive)
-        $districtName = trim($request->district_name);
-        $district = \App\Models\District::whereRaw('LOWER(name) = ?', [strtolower($districtName)])->first();
-        if (!$district) {
-            $district = \App\Models\District::create(['name' => ucwords(strtolower($districtName))]);
+        // Find or create district if district_name is provided
+        $districtId = null;
+        if ($request->filled('district_name')) {
+            $districtName = trim($request->district_name);
+            $district = \App\Models\District::whereRaw('LOWER(name) = ?', [strtolower($districtName)])->first();
+            if (!$district) {
+                $district = \App\Models\District::create(['name' => ucwords(strtolower($districtName))]);
+            }
+            $districtId = $district->id;
+        } else {
+            $district = \App\Models\District::firstOrCreate(['name' => 'Abroad / Other']);
+            $districtId = $district->id;
         }
 
         $photoPath = null;
@@ -187,13 +230,13 @@ class UserController extends Controller
         \App\Models\Doctor::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => Hash::make($request->password),
             'password_plain' => $request->password,
             'phone' => $request->phone,
             'medical_registration_no' => strtoupper($request->medical_registration_no),
             'specialization_category' => $category ? $category->name : $request->specialization_category,
             'specialization_subcategory' => $request->specialization_subcategory,
-            'district_id' => $district->id,
+            'district_id' => $districtId,
             'current_location' => $request->current_location,
             'address' => $request->address,
             'qualification' => $request->qualification,
@@ -207,6 +250,9 @@ class UserController extends Controller
             'council_certificate' => $councilCertPath,
             'hospital_id' => $request->hospital_id,
             'is_active' => false,
+            'knows_medical_astrology' => $request->has('knows_medical_astrology') || $request->input('knows_medical_astrology') == '1',
+            'astrology_details' => $request->astrology_details,
+            'astrology_qualification' => $request->astrology_qualification,
         ]);
 
         return redirect()->route('login')->with('success', 'Doctor application submitted successfully! Your account credentials will be active after admin verification.');
@@ -262,7 +308,7 @@ class UserController extends Controller
             'contact_person' => $request->contact_person,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => $request->password,
+            'password' => Hash::make($request->password),
             'password_plain' => $request->password,
             'district_id' => $district->id,
             'license_document' => $licenseDocPath,
@@ -406,7 +452,7 @@ class UserController extends Controller
             'name' => $pending['name'],
             'email' => $pending['email'],
             'phone' => $pending['phone'],
-            'password' => $pending['password'],
+            'password' => Hash::make($pending['password']),
         ]);
 
         try {
@@ -469,7 +515,7 @@ class UserController extends Controller
         $advertisements = \App\Models\Advertisement::where('is_active', true)
                             ->orderBy('order_index')
                             ->get();
-        $popupAd = \App\Models\Advertisement::where('is_popup', true)->first();
+        $popupAd = \App\Models\Advertisement::where('is_active', true)->where('is_popup', true)->first();
         return view('home', compact('advertisements', 'popupAd'));
     }
 
@@ -517,7 +563,7 @@ class UserController extends Controller
 
     public function doctors(Request $request)
     {
-        $query = Doctor::with(['district']);
+        $query = Doctor::where('is_admin_astrologer', false)->with(['district']);
 
         // Filter by consultation type or location if requested
         if ($request->filled('type')) {
@@ -548,13 +594,40 @@ class UserController extends Controller
 
     public function medicalAstrology()
     {
-        $doctors = Doctor::with(['district', 'hospital'])->get();
-        return view('medical-astrology', compact('doctors'));
+        $astrologer = Doctor::where('is_admin_astrologer', true)->first();
+        if (!$astrologer) {
+            $district = \App\Models\District::first();
+            if (!$district) {
+                $district = \App\Models\District::create(['name' => 'Thiruvananthapuram']);
+            }
+
+            $astrologer = Doctor::create([
+                'name' => 'Chief Medical Astrologer',
+                'email' => 'admin.astrology@example.com',
+                'password' => \Hash::make('password123'),
+                'is_admin_astrologer' => true,
+                'knows_medical_astrology' => true,
+                'is_active' => true,
+                'specialization_category' => 'Medical Astrology',
+                'qualification' => 'Vedic Astrologer & Ayurveda Expert',
+                'experience' => 15,
+                'consultation_fee' => 500,
+                'consultation_type' => 'Both',
+                'available_time' => '09:00 AM to 01:00 PM',
+                'online_available_time' => '04:00 PM to 08:00 PM',
+                'astrology_qualification' => 'Jyotish Acharya',
+                'astrology_details' => 'Chief Medical Astrologer analyzing planetary influences on health and Tridosha imbalances.',
+                'district_id' => $district->id,
+                'address' => 'Ayurveda Astrology Head Office',
+            ]);
+        }
+
+        return view('medical-astrology', compact('astrologer'));
     }
 
     public function showProduct($id)
     {
-        $product = Product::with(['pharmaCompany', 'doctor'])->findOrFail($id);
+        $product = Product::with(['pharmaCompany', 'doctor', 'reviews.user'])->findOrFail($id);
         return view('products.show', compact('product'));
     }
 
@@ -569,10 +642,19 @@ class UserController extends Controller
     public function addToCart(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+        $qtyToAdd = max(1, (int) $request->input('quantity', 1));
+
+        if ($product->stock <= 0) {
+            return redirect()->back()->with('error', 'Sorry, ' . $product->name . ' is currently out of stock!');
+        }
+
         $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
         $cartItem = CartItem::where('cart_id', $cart->id)->where('product_id', $product->id)->first();
 
-        $qtyToAdd = $request->input('quantity', 1);
+        $existingQty = $cartItem ? $cartItem->quantity : 0;
+        if ($product->stock < ($existingQty + $qtyToAdd)) {
+            return redirect()->back()->with('error', 'Sorry, only ' . $product->stock . ' units available for ' . $product->name . '!');
+        }
 
         if ($cartItem) {
             $cartItem->increment('quantity', $qtyToAdd);
@@ -590,8 +672,13 @@ class UserController extends Controller
     public function updateCart(Request $request, $id)
     {
         $request->validate(['quantity' => 'required|integer|min:1']);
-        $cartItem = CartItem::findOrFail($id);
+        $cartItem = CartItem::with('product')->findOrFail($id);
         if($cartItem->cart->user_id != Auth::id()) abort(403);
+
+        if ($cartItem->product && $cartItem->product->stock < $request->quantity) {
+            return redirect()->route('cart.index')->with('error', 'Sorry, only ' . $cartItem->product->stock . ' units available for ' . $cartItem->product->name . '!');
+        }
+
         $cartItem->update(['quantity' => $request->quantity]);
         return redirect()->route('cart.index')->with('success', 'Cart updated!');
     }
@@ -615,7 +702,38 @@ class UserController extends Controller
     {
         $order = Order::with('items.product')->findOrFail($id);
         if ($order->user_id != Auth::id()) abort(403);
-        return view('orders.show', compact('order'));
+
+        $userReviews = \App\Models\ProductReview::where('user_id', Auth::id())
+            ->where('order_id', $order->id)
+            ->get()
+            ->keyBy('product_id');
+
+        return view('orders.show', compact('order', 'userReviews'));
+    }
+
+    public function storeProductReview(Request $request, $id)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string|max:1000',
+            'order_id' => 'nullable|exists:orders,id',
+        ]);
+
+        $product = Product::findOrFail($id);
+
+        \App\Models\ProductReview::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'product_id' => $product->id,
+                'order_id' => $request->order_id,
+            ],
+            [
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]
+        );
+
+        return back()->with('success', 'Thank you! Your product rating & review has been saved.');
     }
 
     public function storeOrder(Request $request)
@@ -631,6 +749,17 @@ class UserController extends Controller
 
         $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
         if (!$cart || $cart->items->isEmpty()) return redirect()->route('cart.index')->with('error', 'Cart is empty!');
+
+        foreach ($cart->items as $item) {
+            $product = $item->product;
+            if (!$product) {
+                return redirect()->route('cart.index')->with('error', 'One of the selected products is no longer available.');
+            }
+
+            if ($product->stock < $item->quantity) {
+                return redirect()->route('cart.index')->with('error', 'Not enough stock available for ' . $product->name . '.');
+            }
+        }
 
         $totalPrice = 0;
         foreach ($cart->items as $item) $totalPrice += $item->price * $item->quantity;
@@ -649,6 +778,11 @@ class UserController extends Controller
         ]);
 
         foreach ($cart->items as $item) {
+            $product = $item->product;
+            if ($product) {
+                $product->decrement('stock', $item->quantity);
+            }
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item->product_id,
@@ -815,11 +949,19 @@ class UserController extends Controller
             }
         }
 
+        // Calculate daily token number per doctor for the selected date (resets every day!)
+        $lastToken = DoctorToken::where('doctor_id', $request->doctor_id)
+            ->whereDate('booking_date', $request->booking_date)
+            ->max('token_number');
+
+        $nextTokenNumber = ($lastToken ?? 0) + 1;
+
         $booking = DoctorToken::create([
             'user_id'           => Auth::id(),
             'doctor_id'         => $request->doctor_id,
             'booking_date'      => $request->booking_date,
             'booking_time'      => $request->booking_time,
+            'token_number'      => $nextTokenNumber,
             'status'            => 'Pending',
             'consultation_type' => $request->consultation_type,
         ]);
@@ -912,5 +1054,209 @@ class UserController extends Controller
         }
 
         return response()->json(['has_notification' => false]);
+    }
+
+    public function cancelBooking($id)
+    {
+        $booking = DoctorToken::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if (!in_array($booking->status, ['Pending', 'Booked'])) {
+            return back()->with('error', 'This appointment cannot be cancelled because it is already ' . strtolower($booking->status) . '.');
+        }
+
+        $booking->status = 'Cancelled';
+        $booking->save();
+
+        // Send email to the doctor
+        if ($booking->doctor && $booking->doctor->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->doctor->email)->send(new \App\Mail\AppointmentCancelledByPatientMail($booking));
+            } catch (\Exception $e) {
+                \Log::error("Failed to send appointment cancellation email to doctor: " . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', 'Appointment has been cancelled successfully.');
+    }
+
+    public function getDoctorBookingDetails($id)
+    {
+        $doctor = Doctor::with(['district'])->find($id);
+        if (!$doctor) {
+            return response()->json(['error' => 'Doctor not found'], 404);
+        }
+
+        $bookedSlots = DoctorToken::where('doctor_id', $id)
+            ->whereIn('status', ['Booked', 'Pending'])
+            ->where('booking_date', '>=', now()->toDateString())
+            ->get(['booking_date', 'booking_time']);
+
+        $unavailabilities = \App\Models\DoctorUnavailability::where('doctor_id', $id)
+            ->where('unavailable_date', '>=', now()->toDateString())
+            ->pluck('unavailable_date')
+            ->toArray();
+
+        $offlineSlots = $this->parseTimeSlots($doctor->available_time);
+        $onlineSlots = $this->parseTimeSlots($doctor->online_available_time);
+
+        $defaultOffline = ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00', '16:15', '16:30', '16:45', '17:00'];
+        $defaultOnline  = ['16:00', '16:15', '16:30', '16:45', '17:00', '17:15', '17:30', '17:45', '18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30', '19:45', '20:00'];
+
+        if (empty($offlineSlots)) {
+            $offlineSlots = $defaultOffline;
+        }
+
+        if (empty($onlineSlots)) {
+            $onlineSlots = $defaultOnline;
+        }
+
+        return response()->json([
+            'doctor' => [
+                'id' => $doctor->id,
+                'name' => $doctor->name,
+                'photo' => $doctor->photo ? asset('storage/' . $doctor->photo) : null,
+                'specialization_category' => $doctor->specialization_category ?? 'General',
+                'district_name' => $doctor->district->name ?? '',
+                'consultation_fee' => $doctor->consultation_fee,
+                'consultation_type' => $doctor->consultation_type,
+                'available_time' => $doctor->available_time,
+                'online_available_time' => $doctor->online_available_time,
+            ],
+            'bookedSlots' => $bookedSlots,
+            'unavailabilities' => $unavailabilities,
+            'offlineSlots' => $offlineSlots,
+            'onlineSlots' => $onlineSlots,
+        ]);
+    }
+
+    public function showRescheduleForm($id)
+    {
+        $booking = DoctorToken::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if (!in_array($booking->status, ['Pending', 'Booked'])) {
+            return redirect()->route('bookings.my')->with('error', 'This appointment cannot be rescheduled.');
+        }
+
+        $doctors = Doctor::where('is_active', true)->where('is_admin_astrologer', false)->with(['district'])->get();
+
+        return view('bookings.reschedule', compact('booking', 'doctors'));
+    }
+
+    public function rescheduleBooking(Request $request, $id)
+    {
+        $booking = DoctorToken::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if (!in_array($booking->status, ['Pending', 'Booked'])) {
+            return redirect()->route('bookings.my')->with('error', 'This appointment cannot be rescheduled.');
+        }
+
+        $request->validate([
+            'doctor_id'         => 'required|exists:doctors,id',
+            'booking_date'      => 'required|date|after_or_equal:today',
+            'booking_time'      => 'required',
+            'consultation_type' => 'required|in:Online,Offline',
+        ]);
+
+        $doctor = Doctor::where('is_active', true)->findOrFail($request->doctor_id);
+
+        // Validate consultation type
+        if ($doctor->consultation_type !== 'Both' && $doctor->consultation_type !== $request->consultation_type) {
+            return back()->withErrors(['consultation_type' => 'This doctor does not offer ' . $request->consultation_type . ' consultations.'])->withInput();
+        }
+
+        // Validate time slot is not already booked/pending for this doctor (excluding this specific booking itself if keeping same slot!)
+        $exists = DoctorToken::where('doctor_id', $request->doctor_id)
+            ->where('booking_date', $request->booking_date)
+            ->where('booking_time', $request->booking_time)
+            ->where('id', '!=', $id)
+            ->whereIn('status', ['Booked', 'Pending'])
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['booking_time' => 'This time slot is already booked or pending approval.'])->withInput();
+        }
+
+        // Validate doctor is available on selected date
+        $isUnavailable = \App\Models\DoctorUnavailability::where('doctor_id', $request->doctor_id)
+            ->where('unavailable_date', $request->booking_date)
+            ->exists();
+
+        if ($isUnavailable) {
+            return back()->withErrors(['booking_date' => 'The doctor is unavailable on this date.'])->withInput();
+        }
+
+        // Prevent booking past times for today
+        if ($request->booking_date == now()->toDateString()) {
+            if ($request->booking_time < now()->format('H:i')) {
+                return back()->withErrors(['booking_time' => 'You cannot book a past time slot for today.'])->withInput();
+            }
+        }
+
+        // Save original details to notify
+        $originalDoctorName = $booking->doctor->name ?? 'N/A';
+        $originalDoctorEmail = $booking->doctor->email ?? null;
+        $originalDate = $booking->booking_date;
+        $originalTime = $booking->booking_time;
+
+        // Recalculate daily token number if doctor or date has changed
+        if ($booking->doctor_id != $request->doctor_id || $booking->booking_date != $request->booking_date) {
+            $lastToken = DoctorToken::where('doctor_id', $request->doctor_id)
+                ->whereDate('booking_date', $request->booking_date)
+                ->max('token_number');
+            $nextTokenNumber = ($lastToken ?? 0) + 1;
+            $booking->token_number = $nextTokenNumber;
+        }
+
+        // Update the booking details
+        $booking->doctor_id = $request->doctor_id;
+        $booking->booking_date = $request->booking_date;
+        $booking->booking_time = $request->booking_time;
+        $booking->consultation_type = $request->consultation_type;
+        $booking->status = 'Pending'; // Needs doctor approval again
+        $booking->google_meet_link = null; // Clear old link since details changed
+        $booking->save();
+
+        // Format dates/times for messages
+        $formattedDate = \Carbon\Carbon::parse($request->booking_date)->format('d M Y');
+        $formattedTime = \Carbon\Carbon::parse($request->booking_time)->format('h:i A');
+
+        // Notification for Patient
+        \App\Models\UserNotification::create([
+            'user_id' => Auth::id(),
+            'title'   => 'Appointment Rescheduled 📅',
+            'message' => "Your appointment was rescheduled to {$formattedDate} at {$formattedTime} ({$request->consultation_type}) with Dr. {$doctor->name}.",
+            'type'    => 'appointment_pending',
+            'link'    => route('bookings.my'),
+            'is_read' => false,
+        ]);
+
+        // Send cancel/update mail to old doctor if doctor changed
+        if ($originalDoctorEmail && $booking->doctor_id != $request->doctor_id) {
+            try {
+                // Send cancellation email to old doctor
+                \Illuminate\Support\Facades\Mail::to($originalDoctorEmail)->send(new \App\Mail\AppointmentCancelledByPatientMail($booking));
+            } catch (\Exception $e) {
+                \Log::error("Failed to notify old doctor on reschedule: " . $e->getMessage());
+            }
+        }
+
+        // Send request email to new/current doctor
+        if ($booking->doctor->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->doctor->email)->send(
+                    new \App\Mail\AppointmentRescheduledMail($booking, $originalDoctorName, $originalDate, $originalTime)
+                );
+            } catch (\Exception $e) {
+                \Log::error("Failed to send appointment rescheduled email to doctor: " . $e->getMessage());
+            }
+        }
+
+        return redirect()->route('bookings.my')->with('success', 'Appointment rescheduled successfully! Awaiting doctor approval.');
     }
 }

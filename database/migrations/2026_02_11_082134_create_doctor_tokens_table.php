@@ -17,6 +17,7 @@ return new class extends Migration
     $table->id();
     $table->foreignId('user_id')->constrained()->onDelete('cascade');
     $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
+    $table->integer('token_number')->nullable();
 
     $table->date('booking_date');
     $table->time('booking_time');

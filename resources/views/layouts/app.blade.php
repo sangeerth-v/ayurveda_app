@@ -42,11 +42,54 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--light-bg);
+            background:
+                radial-gradient(circle at top left, rgba(109, 151, 115, 0.16), transparent 34%),
+                radial-gradient(circle at bottom right, rgba(255, 186, 8, 0.10), transparent 28%),
+                linear-gradient(180deg, #f3f7f2 0%, #edf3ee 100%);
             color: var(--text-dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        .page-shell {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(109, 151, 115, 0.18);
+            background: rgba(255, 255, 255, 0.38);
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+        }
+
+        .page-shell::before,
+        .page-shell::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(10px);
+        }
+
+        .page-shell::before {
+            width: 190px;
+            height: 190px;
+            background: rgba(109, 151, 115, 0.12);
+            top: -40px;
+            right: -20px;
+        }
+
+        .page-shell::after {
+            width: 220px;
+            height: 220px;
+            background: rgba(255, 186, 8, 0.08);
+            bottom: -55px;
+            left: -30px;
+        }
+
+        .page-shell > * {
+            position: relative;
+            z-index: 1;
         }
 
         /* Typography */
@@ -180,24 +223,42 @@
     @yield('navbar')
 
 
-    <div class="main-content">
-        <div class="container">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="main-content" style="{{ isset($fullWidth) && $fullWidth ? 'padding: 0;' : 'padding: 3rem 0;' }}">
+        @if(isset($fullWidth) && $fullWidth)
+            @if(session('success') || session('error'))
+                <div class="container mt-3">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                 </div>
             @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             @yield('content')
-        </div>
+        @else
+            <div class="container">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @yield('content')
+            </div>
+        @endif
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -233,7 +294,12 @@
         }
 
         function checkNativeNotifications() {
-            fetch("{{ route('notifications.unread_latest') }}")
+            fetch("{{ route('notifications.unread_latest') }}", {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.has_notification) {
@@ -284,8 +350,8 @@
 
     @yield('scripts')
 
-    @unless(request()->is('admin*') || request()->is('doctor*') || request()->is('hospital*') || request()->is('pharma*'))
+    @if(request()->is('/') || request()->routeIs('home'))
         @include('partials.popup-ad')
-    @endunless
+    @endif
 </body>
 </html>
